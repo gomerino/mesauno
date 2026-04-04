@@ -14,14 +14,34 @@ const NAVY = "#001d66";
 /** Ancho típico de boarding pass térmico / móvil (~82 mm a escala UI). */
 const BP_WIDTH = "min(100vw - 1.5rem, 20rem)";
 
-function formatFechaDMY(iso: string | null, fallback: string) {
+const MESES_CORTO = [
+  "ENE",
+  "FEB",
+  "MAR",
+  "ABR",
+  "MAY",
+  "JUN",
+  "JUL",
+  "AGO",
+  "SEP",
+  "OCT",
+  "NOV",
+  "DIC",
+] as const;
+
+/** Formato invitación: 04 ABR 27 */
+function formatFechaDDMMMYY(iso: string | null, fallback: string) {
   if (!iso) return fallback;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return fallback;
   const day = String(d.getUTCDate()).padStart(2, "0");
-  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const year = d.getUTCFullYear();
-  return `${day}.${month}.${year}`;
+  const mon = MESES_CORTO[d.getUTCMonth()] ?? "---";
+  const yy = String(d.getUTCFullYear()).slice(-2);
+  return `${day} ${mon} ${yy}`;
+}
+
+function isHttpUrl(s: string): boolean {
+  return s.startsWith("https://") || s.startsWith("http://");
 }
 
 function airportCodeFromLine(line: string, fallback: string): string {
@@ -45,19 +65,24 @@ function DashCell({
   value,
   mono,
   children,
+  nowrap,
 }: {
   label: string;
   value?: string;
   mono?: boolean;
   children?: ReactNode;
+  /** Una sola línea (asiento, fecha, vuelo). */
+  nowrap?: boolean;
 }) {
   const v = value && value.length > 0 ? value : "—";
   return (
-    <div className="flex min-w-0 flex-col border-r border-dotted border-gray-300 px-0.5 py-1.5 text-center last:border-r-0 sm:px-1">
-      <p className="text-[7px] font-semibold uppercase leading-tight tracking-wide text-gray-500">{label}</p>
+    <div className="flex min-w-0 flex-col items-center gap-0.5 border-r border-dotted border-gray-300 px-0.5 py-1.5 text-center last:border-r-0 sm:px-1">
+      <p className="w-full shrink-0 text-[7px] font-semibold uppercase leading-none tracking-wide text-gray-500">
+        {label}
+      </p>
       {children ?? (
         <p
-          className={`mt-0.5 break-words text-[10px] font-bold leading-snug text-gray-900 sm:text-[11px] ${mono ? "font-mono tracking-tight" : ""}`}
+          className={`w-full text-[10px] font-bold leading-none text-gray-900 sm:text-[11px] ${mono ? "font-mono tracking-tight" : ""} ${nowrap ? "whitespace-nowrap" : "break-words"}`}
         >
           {v}
         </p>
@@ -70,7 +95,7 @@ export function BoardingPassCard({ invitado, pareja, qrValue, playlists = null }
   const ev = mergeEventoParaPase(invitado, pareja);
   const vuelo = ev.codigo_vuelo.trim() || "DM7726";
   const embarque = ev.hora_embarque.trim() || "17:30";
-  const fecha = formatFechaDMY(ev.fecha_evento, "20.02.2027");
+  const fecha = formatFechaDDMMMYY(ev.fecha_evento, "20 FEB 27");
   const destinoLinea = resolveDestinoParaMapa(ev.destino);
   const destCode = airportCodeFromLine(destinoLinea, "LOV");
   const originCode = process.env.NEXT_PUBLIC_BOARDING_ORIGIN_CODE?.trim() || "SCL";
@@ -111,37 +136,51 @@ export function BoardingPassCard({ invitado, pareja, qrValue, playlists = null }
           <p className="mt-1 text-[9px] text-gray-600">Clase: Primera · Dress code elegante</p>
         </div>
 
-        {/* Vuelo · Embarque · Fecha (más ancha) · Asiento */}
+        {/* Vuelo · Embarque · Fecha · Asiento — columnas repartidas, valores en una línea */}
         <div className="mt-3 border-t border-gray-200 pt-2" aria-label="Detalles de vuelo">
-          <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,2.75fr)_minmax(0,1fr)] border-t border-gray-200">
-            <DashCell label="Vuelo" value={vuelo} mono />
-            <DashCell label="Embarque" mono>
+          <div className="grid w-full border-t border-gray-200 [grid-template-columns:minmax(0,0.95fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,0.95fr)]">
+            <DashCell label="Vuelo" value={vuelo} mono nowrap />
+            <DashCell label="Embarque" mono nowrap>
               <div
-                className="mx-auto mt-1 inline-block min-w-[2.75rem] px-1.5 py-0.5 text-center font-mono text-[10px] font-bold text-white sm:text-[11px]"
+                className="w-full whitespace-nowrap px-1 py-0.5 text-center font-mono text-[10px] font-bold leading-none text-white sm:text-[11px]"
                 style={{ backgroundColor: NAVY }}
               >
                 {embarque}
               </div>
             </DashCell>
-            <div className="flex min-w-0 flex-col border-r border-dotted border-gray-300 px-1 py-1.5 text-center sm:px-1.5">
-              <p className="text-[7px] font-semibold uppercase leading-tight tracking-wide text-gray-500">
-                Fecha
-              </p>
-              <p className="mt-1 break-words font-mono text-[11px] font-bold leading-snug tracking-tight text-gray-900 sm:text-xs">
-                {fecha}
-              </p>
-            </div>
-            <DashCell label="Asiento" value={asiento} mono />
+            <DashCell label="Fecha" value={fecha} mono nowrap />
+            <DashCell label="Asiento" value={asiento} mono nowrap />
           </div>
         </div>
 
-        {/* QR — tamaño reducido para caber en vista */}
+        {/* QR — clicable si el valor es una URL (mismo destino que al escanear) */}
         <div className="mt-3 flex justify-center border-t border-dashed border-gray-200 pt-3">
           <div className="text-center">
-            <BoardingPassQR value={qrValue} size={72} />
-            <p className="mt-1 font-mono text-[8px] uppercase tracking-wider text-gray-500">
-              {isMapsQrPayload(qrValue) ? "Escanear · Cómo llegar" : "Scan / Embarque digital"}
-            </p>
+            {isHttpUrl(qrValue) ? (
+              <a
+                href={qrValue}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-block cursor-pointer rounded-xl outline-none ring-offset-2 transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[#001d66]"
+                aria-label={
+                  isMapsQrPayload(qrValue)
+                    ? "Abrir cómo llegar en el mapa"
+                    : "Abrir enlace del código QR"
+                }
+              >
+                <BoardingPassQR value={qrValue} size={72} />
+                <p className="mt-1 font-mono text-[8px] uppercase tracking-wider text-[#001d66] underline decoration-[#001d66]/40 underline-offset-2 group-hover:text-[#002a8c]">
+                  {isMapsQrPayload(qrValue) ? "Tocar · Cómo llegar" : "Tocar para abrir"}
+                </p>
+              </a>
+            ) : (
+              <>
+                <BoardingPassQR value={qrValue} size={72} />
+                <p className="mt-1 font-mono text-[8px] uppercase tracking-wider text-gray-500">
+                  {isMapsQrPayload(qrValue) ? "Escanear · Cómo llegar" : "Scan / Embarque digital"}
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>

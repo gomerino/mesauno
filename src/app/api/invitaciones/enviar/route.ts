@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
   const { data: invitado, error: invErr } = await supabase
     .from("invitados")
-    .select("id, nombre_pasajero, nombre_acompanante, email, pareja_id, owner_user_id, invitado_acompanantes(*)")
+    .select("id, nombre_pasajero, email, pareja_id, owner_user_id, invitado_acompanantes(*)")
     .eq("id", invitadoId)
     .maybeSingle();
 

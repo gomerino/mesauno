@@ -14,6 +14,19 @@ function pick(
   return fallback;
 }
 
+/** Invitado primero (p. ej. asiento propio en el pase), luego pareja, luego fallback. */
+function pickInvitadoPrimero(
+  invVal: string | null | undefined,
+  parejaVal: string | null | undefined,
+  fallback: string
+): string {
+  const i = invVal?.trim();
+  if (i) return i;
+  const p = parejaVal?.trim();
+  if (p) return p;
+  return fallback;
+}
+
 /** Valores efectivos para boarding pass / Wallet (pareja manda; invitado es respaldo legacy). */
 export function mergeEventoParaPase(invitado: Invitado, pareja: Pareja | null) {
   const fecha =
@@ -39,7 +52,7 @@ export function mergeEventoParaPase(invitado: Invitado, pareja: Pareja | null) {
     codigo_vuelo: pick(pareja?.codigo_vuelo, invitado.codigo_vuelo, "DM7726"),
     hora_embarque: pick(pareja?.hora_embarque, invitado.hora_embarque, "17:30"),
     puerta: pick(pareja?.puerta, invitado.puerta, "B"),
-    asiento: pick(pareja?.asiento_default, invitado.asiento, "12A"),
+    asiento: pickInvitadoPrimero(invitado.asiento, pareja?.asiento_default, "12A"),
     destino: pick(pareja?.destino, invitado.destino, "Forever Island"),
     nombre_evento: pick(pareja?.nombre_evento, invitado.nombre_evento, "Boda Dreams"),
     fecha_evento: fecha,

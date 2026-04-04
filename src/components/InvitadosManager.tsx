@@ -11,6 +11,8 @@ type FormState = {
   acompanantes: string[];
   email: string;
   telefono: string;
+  /** Asiento en el boarding pass; si está vacío se usa el de Pareja y evento. */
+  asiento: string;
   restricciones_alimenticias: string;
 };
 
@@ -20,6 +22,7 @@ function emptyForm(): FormState {
     acompanantes: [],
     email: "",
     telefono: "",
+    asiento: "",
     restricciones_alimenticias: "",
   };
 }
@@ -38,6 +41,7 @@ function rowToForm(row: Invitado): FormState {
     acompanantes: fromRows.length ? fromRows : legacy,
     email: row.email ?? "",
     telefono: row.telefono ?? "",
+    asiento: row.asiento ?? "",
     restricciones_alimenticias: restriccionesFromDb(row.restricciones_alimenticias),
   };
 }
@@ -50,9 +54,9 @@ function payloadFromForm(
 ) {
   const base = {
     nombre_pasajero: form.nombre.trim(),
-    nombre_acompanante: null as string | null,
     email: form.email.trim() || null,
     telefono: form.telefono.trim() || null,
+    asiento: form.asiento.trim() || null,
     restricciones_alimenticias: restriccionesToDb(form.restricciones_alimenticias),
   };
   if (!editingId) {
@@ -249,12 +253,13 @@ export function InvitadosManager({ parejaId, ownerUserId, initialInvitados }: Pr
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/5">
-        <table className="w-full min-w-[720px] text-left text-sm text-slate-200">
+        <table className="w-full min-w-[800px] text-left text-sm text-slate-200">
           <thead>
             <tr className="border-b border-white/10 text-xs uppercase tracking-wide text-slate-500">
               <th className="px-4 py-3">Nombre</th>
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Teléfono</th>
+              <th className="px-4 py-3">Asiento</th>
               <th className="px-4 py-3">RSVP</th>
               <th className="px-4 py-3 text-right">Acciones</th>
             </tr>
@@ -262,7 +267,7 @@ export function InvitadosManager({ parejaId, ownerUserId, initialInvitados }: Pr
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-10 text-center text-slate-500">
+                <td colSpan={6} className="px-4 py-10 text-center text-slate-500">
                   No hay invitados. Crea el primero.
                 </td>
               </tr>
@@ -279,6 +284,9 @@ export function InvitadosManager({ parejaId, ownerUserId, initialInvitados }: Pr
                   </td>
                   <td className="px-4 py-3">{row.email ?? "—"}</td>
                   <td className="px-4 py-3">{row.telefono ?? "—"}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-slate-300">
+                    {row.asiento?.trim() ? row.asiento.trim() : "—"}
+                  </td>
                   <td className="px-4 py-3">{rsvpLabel[row.rsvp_estado ?? "pendiente"] ?? "—"}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap items-center justify-end gap-2">
@@ -406,6 +414,19 @@ export function InvitadosManager({ parejaId, ownerUserId, initialInvitados }: Pr
                     onChange={(e) => setForm({ ...form, telefono: e.target.value })}
                   />
                 </div>
+              </div>
+              <div>
+                <label className={label}>Asiento en el pase</label>
+                <input
+                  className={input}
+                  value={form.asiento}
+                  onChange={(e) => setForm({ ...form, asiento: e.target.value })}
+                  placeholder="Ej: 12A (opcional)"
+                  autoComplete="off"
+                />
+                <p className="mt-1 text-xs text-slate-500">
+                  Si lo dejas vacío, se usa el asiento por defecto de «Pareja y evento».
+                </p>
               </div>
               <div>
                 <label className={label}>Restricciones alimenticias</label>

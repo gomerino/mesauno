@@ -29,7 +29,7 @@ export default async function PanelInvitadosPage() {
     <>
       <h1 className="font-display text-3xl font-bold text-white">Crear invitados</h1>
       <p className="mt-2 text-slate-400">
-        Aquí solo entra cada invitado: nombre, contacto, acompañantes y alimentación. Fecha del evento,
+        Aquí solo entra cada invitado: nombre, contacto, asiento en el pase, acompañantes y alimentación. Fecha del evento,
         vuelo, lugar y mensaje del viaje están en{" "}
         <Link href="/panel/pareja-evento" className="text-teal-300 underline hover:text-teal-200">
           Pareja y evento

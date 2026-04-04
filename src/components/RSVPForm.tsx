@@ -113,28 +113,44 @@ export function RSVPForm({ invitadoId, initialRestricciones, initialEstado, comp
           />
         </div>
 
-        <div className={card}>
+        <div className={`${card} min-w-0`}>
           <p className={labelSm}>3 · Fondo de Millas</p>
-          <p className="mt-0.5 text-[11px] leading-snug text-gray-600">
+          <p className="mt-0.5 text-xs leading-relaxed text-gray-600 sm:text-[11px] sm:leading-snug">
             Si quieres hacernos un regalo, puedes realizar una transferencia a nuestro fondo de millas.
           </p>
-          <div className="mt-2 rounded-lg border border-[#001d66]/20 bg-[#001d66]/[0.06] p-2.5">
-            <dl className="space-y-1.5 font-mono text-[10px] leading-snug text-gray-800 sm:text-[11px]">
-              <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-2">
-                <dt className="shrink-0 text-gray-500">Cuenta corriente</dt>
-                <dd className="font-semibold text-gray-900">53-17217-05</dd>
+          <div className="mt-2.5 min-w-0 overflow-hidden rounded-lg border border-[#001d66]/20 bg-[#001d66]/[0.06] px-3 py-2 sm:px-3 sm:py-2.5">
+            <dl className="divide-y divide-[#001d66]/15">
+              <div className="flex flex-col gap-1 py-2.5 first:pt-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:py-2">
+                <dt className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                  Cuenta corriente
+                </dt>
+                <dd className="min-w-0 font-mono text-sm font-semibold tabular-nums tracking-wide text-gray-900 sm:max-w-[58%] sm:text-right sm:text-[13px]">
+                  53-17217-05
+                </dd>
               </div>
-              <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-2">
-                <dt className="shrink-0 text-gray-500">Banco</dt>
-                <dd className="text-right font-medium text-gray-900 sm:text-right">Banco de Chile</dd>
+              <div className="flex flex-col gap-1 py-2.5 first:pt-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:py-2">
+                <dt className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                  Banco
+                </dt>
+                <dd className="min-w-0 text-sm font-medium leading-snug text-gray-900 sm:max-w-[58%] sm:text-right sm:text-[13px]">
+                  Banco de Chile
+                </dd>
               </div>
-              <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-2">
-                <dt className="shrink-0 text-gray-500">RUT</dt>
-                <dd className="font-semibold text-gray-900">13.468.424-0</dd>
+              <div className="flex flex-col gap-1 py-2.5 first:pt-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:py-2">
+                <dt className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                  RUT
+                </dt>
+                <dd className="min-w-0 font-mono text-sm font-semibold tabular-nums text-gray-900 sm:max-w-[58%] sm:text-right sm:text-[13px]">
+                  13.468.424-0
+                </dd>
               </div>
-              <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-2">
-                <dt className="shrink-0 text-gray-500">Nombre</dt>
-                <dd className="text-right text-gray-900 sm:text-right">Claudia Ibáñez Salas</dd>
+              <div className="flex flex-col gap-1 py-2.5 first:pt-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:py-2">
+                <dt className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                  Nombre
+                </dt>
+                <dd className="min-w-0 break-words text-sm font-medium leading-snug text-gray-900 sm:max-w-[58%] sm:text-right sm:text-[13px]">
+                  Claudia Ibáñez Salas
+                </dd>
               </div>
             </dl>
           </div>
