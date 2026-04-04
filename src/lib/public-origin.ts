@@ -1,25 +1,67 @@
 import { headers } from "next/headers";
 
+function trimTrailingSlash(url: string): string {
+  return url.replace(/\/$/, "");
+}
+
+/** URL canónica pública (dominio real). Prioridad: env → Vercel → cabeceras proxy. */
+function originFromVercel(): string | null {
+  const v = process.env.VERCEL_URL?.trim();
+  if (!v || v.includes("localhost")) return null;
+  const host = v.replace(/^https?:\/\//, "");
+  return `https://${host}`;
+}
+
+/**
+ * Origen público para enlaces en correos y APIs (evita localhost si hay otra señal).
+ * En producción define NEXT_PUBLIC_SITE_URL=https://tu-dominio.com
+ */
+export function getPublicOriginFromRequest(request: Request): string {
+  const env = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (env) {
+    return trimTrailingSlash(env);
+  }
+
+  const fromVercel = originFromVercel();
+  if (fromVercel) {
+    return fromVercel;
+  }
+
+  const forwardedHost =
+    request.headers.get("x-forwarded-host")?.split(",")[0]?.trim() ??
+    request.headers.get("host") ??
+    "";
+  if (forwardedHost && !forwardedHost.includes("localhost")) {
+    const proto =
+      request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() ??
+      (forwardedHost.includes("127.0.0.1") ? "http" : "https");
+    return `${proto}://${forwardedHost}`;
+  }
+
+  return new URL(request.url).origin;
+}
+
 /** URL pública del sitio (Server Components, QR, enlaces). */
 export async function getSiteOrigin(): Promise<string> {
   const env = process.env.NEXT_PUBLIC_SITE_URL?.trim();
   if (env) {
-    return env.replace(/\/$/, "");
+    return trimTrailingSlash(env);
   }
+
+  const fromVercel = originFromVercel();
+  if (fromVercel) {
+    return fromVercel;
+  }
+
   const h = await headers();
-  const host = h.get("host");
+  const host = h.get("x-forwarded-host")?.split(",")[0]?.trim() ?? h.get("host");
   if (!host) {
     return "http://localhost:3000";
   }
-  const proto = h.get("x-forwarded-proto") ?? (host.includes("localhost") ? "http" : "https");
-  return `${proto}://${host}`;
-}
-
-/** URL pública desde un Request (API routes). */
-export function getPublicOriginFromRequest(request: Request): string {
-  const env = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (env) {
-    return env.replace(/\/$/, "");
+  if (!host.includes("localhost")) {
+    const proto = h.get("x-forwarded-proto") ?? "https";
+    return `${proto}://${host}`;
   }
-  return new URL(request.url).origin;
+  const proto = h.get("x-forwarded-proto") ?? "http";
+  return `${proto}://${host}`;
 }
