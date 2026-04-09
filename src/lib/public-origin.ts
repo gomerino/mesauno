@@ -4,6 +4,15 @@ function trimTrailingSlash(url: string): string {
   return url.replace(/\/$/, "");
 }
 
+/**
+ * Dominio público fijado por entorno (recomendado para enlaces de Auth/correos).
+ * `SITE_URL` solo servidor; `NEXT_PUBLIC_SITE_URL` cliente + servidor.
+ */
+export function getCanonicalSiteOriginFromEnv(): string | null {
+  const raw = process.env.SITE_URL?.trim() || process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  return raw ? trimTrailingSlash(raw) : null;
+}
+
 /** URL canónica pública (dominio real). Prioridad: env → Vercel → cabeceras proxy. */
 function originFromVercel(): string | null {
   const v = process.env.VERCEL_URL?.trim();
@@ -17,9 +26,9 @@ function originFromVercel(): string | null {
  * En producción define NEXT_PUBLIC_SITE_URL=https://tu-dominio.com
  */
 export function getPublicOriginFromRequest(request: Request): string {
-  const env = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (env) {
-    return trimTrailingSlash(env);
+  const fromEnv = getCanonicalSiteOriginFromEnv();
+  if (fromEnv) {
+    return fromEnv;
   }
 
   const fromVercel = originFromVercel();
@@ -43,9 +52,9 @@ export function getPublicOriginFromRequest(request: Request): string {
 
 /** URL pública del sitio (Server Components, QR, enlaces). */
 export async function getSiteOrigin(): Promise<string> {
-  const env = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (env) {
-    return trimTrailingSlash(env);
+  const fromEnv = getCanonicalSiteOriginFromEnv();
+  if (fromEnv) {
+    return fromEnv;
   }
 
   const fromVercel = originFromVercel();

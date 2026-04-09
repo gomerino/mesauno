@@ -3,15 +3,17 @@
 import type { Invitado } from "@/types/database";
 import { nombresAcompanantes, sortInvitadoAcompanantes } from "@/lib/invitado-acompanantes";
 import { restriccionesFromDb, restriccionesToDb } from "@/lib/restricciones-alimenticias";
+import { supabaseErrorMessage } from "@/lib/supabase-error";
 import { createClient } from "@/lib/supabase/client";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 type FormState = {
   nombre: string;
   acompanantes: string[];
   email: string;
   telefono: string;
-  /** Asiento en el boarding pass; si está vacío se usa el de Pareja y evento. */
+  /** Asiento en el boarding pass; si está vacío se usa el del evento. */
   asiento: string;
   restricciones_alimenticias: string;
 };
@@ -48,7 +50,7 @@ function rowToForm(row: Invitado): FormState {
 
 function payloadFromForm(
   form: FormState,
-  parejaId: string | null,
+  eventoId: string | null,
   ownerUserId: string,
   editingId: string | null
 ) {
@@ -61,10 +63,10 @@ function payloadFromForm(
   };
   if (!editingId) {
     // Siempre fijar owner_user_id al usuario logueado (RLS lo exige; no enviar null).
-    if (parejaId) {
-      return { ...base, pareja_id: parejaId, owner_user_id: ownerUserId };
+    if (eventoId) {
+      return { ...base, evento_id: eventoId, owner_user_id: ownerUserId };
     }
-    return { ...base, pareja_id: null, owner_user_id: ownerUserId };
+    return { ...base, evento_id: null, owner_user_id: ownerUserId };
   }
   return base;
 }
@@ -74,16 +76,20 @@ const input =
   "mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-white outline-none ring-teal-500 focus:ring-2";
 
 type Props = {
-  parejaId: string | null;
-  /** auth.users.id del novio logueado (obligatorio si parejaId es null). */
-  ownerUserId: string;
+  eventoId: string | null;
   initialInvitados: Invitado[];
 };
 
-export function InvitadosManager({ parejaId, ownerUserId, initialInvitados }: Props) {
+export function InvitadosManager({ eventoId, initialInvitados }: Props) {
+  const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const [rows, setRows] = useState<Invitado[]>(initialInvitados);
   const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (modalOpen) return;
+    setRows(initialInvitados);
+  }, [initialInvitados, modalOpen]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
@@ -115,26 +121,36 @@ export function InvitadosManager({ parejaId, ownerUserId, initialInvitados }: Pr
 
   async function syncAcompanantes(invitadoId: string, lines: string[]) {
     const trimmed = lines.map((n) => n.trim()).filter(Boolean);
-    const { error: delErr } = await supabase
-      .from("invitado_acompanantes")
-      .delete()
-      .eq("invitado_id", invitadoId);
-    if (delErr) return delErr;
-    if (trimmed.length === 0) return null;
-    const { error: insErr } = await supabase.from("invitado_acompanantes").insert(
-      trimmed.map((nombre, orden) => ({ invitado_id: invitadoId, nombre, orden }))
-    );
-    return insErr;
+    const { error } = await supabase.rpc("sync_invitado_acompanantes_panel", {
+      p_invitado_id: invitadoId,
+      p_nombres: trimmed,
+    });
+    return error;
   }
 
   async function fetchInvitadoFull(id: string): Promise<Invitado | null> {
-    const { data, error } = await supabase
+    const nested = await supabase
       .from("invitados")
       .select("*, invitado_acompanantes(*)")
       .eq("id", id)
       .maybeSingle();
-    if (error || !data) return null;
-    return data as Invitado;
+    if (!nested.error && nested.data) {
+      const row = nested.data as Invitado;
+      if (Array.isArray(row.invitado_acompanantes)) {
+        return row;
+      }
+    }
+    const plain = await supabase.from("invitados").select("*").eq("id", id).maybeSingle();
+    if (plain.error || !plain.data) return null;
+    const { data: acRows, error: acErr } = await supabase
+      .from("invitado_acompanantes")
+      .select("*")
+      .eq("invitado_id", id)
+      .order("orden", { ascending: true });
+    if (acErr) {
+      return { ...plain.data, invitado_acompanantes: [] } as Invitado;
+    }
+    return { ...plain.data, invitado_acompanantes: acRows ?? [] } as Invitado;
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -145,19 +161,28 @@ export function InvitadosManager({ parejaId, ownerUserId, initialInvitados }: Pr
     }
     setSaving(true);
     setFormError(null);
-    const payload = payloadFromForm(form, parejaId, ownerUserId, editingId);
+    const {
+      data: { user },
+      error: authErr,
+    } = await supabase.auth.getUser();
+    if (authErr || !user) {
+      setSaving(false);
+      setFormError("Inicia sesión para guardar.");
+      return;
+    }
+    const payload = payloadFromForm(form, eventoId, user.id, editingId);
 
     if (editingId) {
       const { error } = await supabase.from("invitados").update(payload).eq("id", editingId);
       if (error) {
         setSaving(false);
-        setFormError(error.message);
+        setFormError(supabaseErrorMessage(error));
         return;
       }
       const syncErr = await syncAcompanantes(editingId, form.acompanantes);
       if (syncErr) {
         setSaving(false);
-        setFormError(syncErr.message);
+        setFormError(supabaseErrorMessage(syncErr));
         return;
       }
       const full = await fetchInvitadoFull(editingId);
@@ -166,35 +191,50 @@ export function InvitadosManager({ parejaId, ownerUserId, initialInvitados }: Pr
         setRows((r) => r.map((x) => (x.id === editingId ? full : x)));
       }
       closeModal();
+      router.refresh();
       return;
     }
 
-    const { data: created, error: insErr } = await supabase
-      .from("invitados")
-      .insert(payload)
-      .select("id")
-      .maybeSingle();
+    // RPC SECURITY DEFINER + row_security off: el INSERT no depende del WITH CHECK de RLS (evita 42501 en PostgREST).
+    const insPayload = payload as {
+      nombre_pasajero: string;
+      email: string | null;
+      telefono: string | null;
+      asiento: string | null;
+      restricciones_alimenticias: string[] | null;
+      evento_id: string | null;
+      owner_user_id: string;
+    };
+    const { data: newId, error: insErr } = await supabase.rpc("insert_invitado_panel", {
+      p_evento_id: insPayload.evento_id,
+      p_nombre_pasajero: insPayload.nombre_pasajero,
+      p_email: insPayload.email,
+      p_telefono: insPayload.telefono,
+      p_asiento: insPayload.asiento,
+      p_restricciones_alimenticias: insPayload.restricciones_alimenticias,
+    });
 
-    if (insErr || !created?.id) {
+    if (insErr || newId == null || typeof newId !== "string") {
       setSaving(false);
-      setFormError(insErr?.message ?? "No se pudo crear el invitado");
+      setFormError(insErr ? supabaseErrorMessage(insErr) : "No se pudo crear el invitado");
       return;
     }
 
-    const syncErr = await syncAcompanantes(created.id, form.acompanantes);
+    const syncErr = await syncAcompanantes(newId, form.acompanantes);
     if (syncErr) {
-      await supabase.from("invitados").delete().eq("id", created.id);
+      await supabase.from("invitados").delete().eq("id", newId);
       setSaving(false);
-      setFormError(syncErr.message);
+      setFormError(supabaseErrorMessage(syncErr));
       return;
     }
 
-    const full = await fetchInvitadoFull(created.id);
+    const full = await fetchInvitadoFull(newId);
     setSaving(false);
     if (full) {
       setRows((r) => [full, ...r]);
     }
     closeModal();
+    router.refresh();
   }
 
   async function handleDelete(id: string) {
@@ -425,7 +465,7 @@ export function InvitadosManager({ parejaId, ownerUserId, initialInvitados }: Pr
                   autoComplete="off"
                 />
                 <p className="mt-1 text-xs text-slate-500">
-                  Si lo dejas vacío, se usa el asiento por defecto de «Pareja y evento».
+                  Si lo dejas vacío, se usa el asiento por defecto del evento.
                 </p>
               </div>
               <div>

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { invitadosDelPanel } from "@/lib/panel-invitados";
+import { selectEventoForMember } from "@/lib/evento-membership";
+import { fetchInvitadosPanelRows } from "@/lib/panel-invitados";
 import { restriccionesFromDb } from "@/lib/restricciones-alimenticias";
 import type { Invitado } from "@/types/database";
 
@@ -52,15 +53,12 @@ export default async function AsistentesPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: pareja } = await supabase
-    .from("parejas")
-    .select("id")
-    .eq("user_id", user!.id)
-    .maybeSingle();
+  const { data: evento } = await selectEventoForMember(supabase, user!.id, "id");
 
-  const { data: rows } = await invitadosDelPanel(supabase, user!.id, pareja?.id ?? null).order(
-    "nombre_pasajero"
-  );
+  const { data: rows } = await fetchInvitadosPanelRows(supabase, user!.id, evento?.id ?? null, "*", {
+    orderBy: "nombre_pasajero",
+    ascending: true,
+  });
 
   const list = (rows ?? []) as unknown as Invitado[];
   const confirmados = list.filter((i) => i.rsvp_estado === "confirmado");

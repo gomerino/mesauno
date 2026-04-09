@@ -116,7 +116,7 @@ export function RSVPForm({ invitadoId, initialRestricciones, initialEstado, comp
         <div className={`${card} min-w-0`}>
           <p className={labelSm}>3 · Fondo de Millas</p>
           <p className="mt-0.5 text-xs leading-relaxed text-gray-600 sm:text-[11px] sm:leading-snug">
-            Si quieres hacernos un regalo, puedes realizar una transferencia a nuestro fondo de millas.
+            Ya tenemos el hogar de nuestros sueños, ¡pero si quieres hacernos un regalo, puedes realizar una transferencia para nuestra próxima aventura!
           </p>
           <div className="mt-2.5 min-w-0 overflow-hidden rounded-lg border border-[#001d66]/20 bg-[#001d66]/[0.06] px-3 py-2 sm:px-3 sm:py-2.5">
             <dl className="divide-y divide-[#001d66]/15">

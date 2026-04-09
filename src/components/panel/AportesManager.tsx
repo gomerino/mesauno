@@ -7,14 +7,14 @@ import { useMemo, useState } from "react";
 type InvOpt = { id: string; nombre_pasajero: string };
 
 type Props = {
-  parejaId: string;
+  eventoId: string;
   invitados: InvOpt[];
   initialAportes: AporteRegalo[];
   tableMissing: boolean;
 };
 
 export function AportesManager({
-  parejaId,
+  eventoId,
   invitados,
   initialAportes,
   tableMissing,
@@ -42,7 +42,7 @@ export function AportesManager({
     const { data, error: err } = await supabase
       .from("aportes_regalo")
       .insert({
-        pareja_id: parejaId,
+        evento_id: eventoId,
         monto: n,
         concepto: concepto.trim() || null,
         invitado_id: invitadoId || null,

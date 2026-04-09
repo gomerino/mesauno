@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import type { Invitado, Pareja } from "@/types/database";
-import { mergeEventoParaPase, resolveDestinoParaMapa } from "@/lib/pareja-evento";
+import type { Invitado, Evento } from "@/types/database";
+import { mergeEventoParaPase, resolveDestinoParaMapa } from "@/lib/evento-boarding";
 import { BoardingPassHeader } from "@/components/BoardingPassHeader";
 import { BoardingPassQR } from "@/components/BoardingPassQR";
 import { EventPlaylistSection } from "@/components/EventPlaylistSection";
@@ -53,8 +53,8 @@ function airportCodeFromLine(line: string, fallback: string): string {
 
 type Props = {
   invitado: Invitado;
-  /** Configuración global (novios + evento); null usa solo datos legacy del invitado. */
-  pareja: Pareja | null;
+  /** Configuración global del evento; null usa solo datos legacy del invitado. */
+  evento: Evento | null;
   qrValue: string;
   /** Spotify, Apple Music u otro enlace (ver `resolveEventPlaylistEnv`). */
   playlists?: EventPlaylistUrls | null;
@@ -91,8 +91,8 @@ function DashCell({
   );
 }
 
-export function BoardingPassCard({ invitado, pareja, qrValue, playlists = null }: Props) {
-  const ev = mergeEventoParaPase(invitado, pareja);
+export function BoardingPassCard({ invitado, evento, qrValue, playlists = null }: Props) {
+  const ev = mergeEventoParaPase(invitado, evento);
   const vuelo = ev.codigo_vuelo.trim() || "DM7726";
   const embarque = ev.hora_embarque.trim() || "17:30";
   const fecha = formatFechaDDMMMYY(ev.fecha_evento, "20 FEB 27");

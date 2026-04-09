@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
+import { selectEventoForMember } from "@/lib/evento-membership";
 import { AportesManager } from "@/components/panel/AportesManager";
-import { invitadosDelPanel } from "@/lib/panel-invitados";
+import { fetchInvitadosPanelRows } from "@/lib/panel-invitados";
 import type { AporteRegalo, Invitado } from "@/types/database";
 
 export default async function RegalosPage() {
@@ -9,29 +10,26 @@ export default async function RegalosPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: pareja } = await supabase
-    .from("parejas")
-    .select("id")
-    .eq("user_id", user!.id)
-    .maybeSingle();
+  const { data: evento } = await selectEventoForMember(supabase, user!.id, "id");
 
-  const { data: invRows } = await invitadosDelPanel(
+  const { data: invRows } = await fetchInvitadosPanelRows(
     supabase,
     user!.id,
-    pareja?.id ?? null,
-    "id, nombre_pasajero"
-  ).order("nombre_pasajero");
+    evento?.id ?? null,
+    "id, nombre_pasajero",
+    { orderBy: "nombre_pasajero", ascending: true }
+  );
 
   const invitados = (invRows ?? []) as unknown as Pick<Invitado, "id" | "nombre_pasajero">[];
 
   let initialAportes: AporteRegalo[] = [];
   let tableMissing = false;
 
-  if (pareja) {
+  if (evento) {
     const { data: apData, error: apError } = await supabase
       .from("aportes_regalo")
       .select("*")
-      .eq("pareja_id", pareja.id)
+      .eq("evento_id", evento.id)
       .order("created_at", { ascending: false });
 
     if (apError) {
@@ -80,9 +78,9 @@ export default async function RegalosPage() {
           </p>
         </div>
 
-        {pareja ? (
+        {evento ? (
           <AportesManager
-            parejaId={pareja.id}
+            eventoId={evento.id}
             invitados={invitados}
             initialAportes={initialAportes}
             tableMissing={tableMissing}
@@ -91,8 +89,9 @@ export default async function RegalosPage() {
           <div className="rounded-xl border border-white/10 bg-white/5 p-6 text-sm text-slate-400">
             <p>
               Para usar la tabla de <strong className="text-slate-200">aportes</strong> y totales,
-              añade tu fila en <code className="text-teal-400">parejas</code> en Supabase. Los datos
-              bancarios de arriba los puedes compartir igualmente.
+              crea el evento y tu usuario en <code className="text-teal-400">evento_miembros</code> (panel{" "}
+              <code className="text-teal-400">/panel/evento</code> o migración). Los datos bancarios de arriba los
+              puedes compartir igualmente.
             </p>
           </div>
         )}

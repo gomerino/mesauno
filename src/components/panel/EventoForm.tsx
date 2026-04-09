@@ -1,6 +1,6 @@
 "use client";
 
-import type { Pareja } from "@/types/database";
+import type { Evento } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -10,8 +10,7 @@ const input =
   "mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-white outline-none ring-teal-500 focus:ring-2";
 
 type Props = {
-  initial: Pareja | null;
-  userId: string;
+  initial: Evento | null;
 };
 
 function fechaInput(v: string | null | undefined): string {
@@ -20,7 +19,7 @@ function fechaInput(v: string | null | undefined): string {
   return s.length === 10 ? s : "";
 }
 
-export function ParejaEventoForm({ initial, userId }: Props) {
+export function EventoForm({ initial }: Props) {
   const supabase = useMemo(() => createClient(), []);
   const router = useRouter();
   const [saving, setSaving] = useState(false);
@@ -46,7 +45,6 @@ export function ParejaEventoForm({ initial, userId }: Props) {
     setSaving(true);
     setErr(null);
     const row = {
-      user_id: userId,
       nombre_novio_1: nombre_novio_1.trim() || null,
       nombre_novio_2: nombre_novio_2.trim() || null,
       fecha_boda: fecha_boda.trim() || null,
@@ -60,7 +58,21 @@ export function ParejaEventoForm({ initial, userId }: Props) {
       asiento_default: asiento_default.trim() || null,
       motivo_viaje: motivo_viaje.trim() || null,
     };
-    const { error } = await supabase.from("parejas").upsert(row, { onConflict: "user_id" });
+
+    if (initial?.id) {
+      const { error } = await supabase.from("eventos").update(row).eq("id", initial.id);
+      setSaving(false);
+      if (error) {
+        setErr(error.message);
+        return;
+      }
+      router.refresh();
+      return;
+    }
+
+    // No usar .select() aquí: en PG el RETURNING corre antes que los triggers AFTER INSERT,
+    // así que aún no existe la fila en evento_miembros y la política SELECT de eventos falla (RLS).
+    const { error } = await supabase.from("eventos").insert(row);
     setSaving(false);
     if (error) {
       setErr(error.message);
@@ -72,9 +84,9 @@ export function ParejaEventoForm({ initial, userId }: Props) {
   return (
     <form onSubmit={onSubmit} className="mx-auto max-w-2xl space-y-10">
       <section className="space-y-4">
-        <h2 className="font-display text-lg font-semibold text-white">Pareja</h2>
+        <h2 className="font-display text-lg font-semibold text-white">Novios / organizadores</h2>
         <p className="text-sm text-slate-400">
-          Estos datos son los de los novios y se usan en el pie del boarding pass y en el sitio.
+          Datos que salen en el pie del boarding pass. Otros gestores del mismo evento se añaden desde administración.
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -176,7 +188,7 @@ export function ParejaEventoForm({ initial, userId }: Props) {
         disabled={saving}
         className="rounded-full bg-teal-500 px-8 py-3 text-sm font-semibold text-white hover:bg-teal-400 disabled:opacity-50"
       >
-        {saving ? "Guardando…" : "Guardar pareja y evento"}
+        {saving ? "Guardando…" : "Guardar evento"}
       </button>
     </form>
   );

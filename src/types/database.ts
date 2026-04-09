@@ -1,7 +1,6 @@
-/** Novios + configuración global del evento (un registro por usuario). */
-export type Pareja = {
+/** Configuración global del evento (novios, fecha, boarding pass). Varios usuarios vía `evento_miembros`. */
+export type Evento = {
   id: string;
-  user_id: string;
   nombre_novio_1: string | null;
   nombre_novio_2: string | null;
   fecha_boda: string | null;
@@ -16,6 +15,18 @@ export type Pareja = {
   motivo_viaje: string | null;
   /** Línea corta bajo el encabezado del boarding pass (lugar). */
   lugar_evento_linea: string | null;
+  /** Membresía Mesa Uno (Mercado Pago). */
+  plan_status?: "trial" | "paid" | "expired" | null;
+  payment_id?: string | null;
+  monto_pagado?: number | null;
+  created_at?: string | null;
+};
+
+export type EventoMiembro = {
+  id: string;
+  evento_id: string;
+  user_id: string;
+  rol: "admin" | "editor" | "staff_centro";
   created_at?: string | null;
 };
 
@@ -32,7 +43,6 @@ export type Invitado = {
   nombre_pasajero: string;
   /** @deprecated Preferir `invitado_acompanantes` (varios). Migración SQL copia a la tabla. */
   nombre_acompanante?: string | null;
-  /** Acompañantes en el mismo pase (tabla hija; no es la tabla `parejas` de los novios). */
   invitado_acompanantes?: InvitadoAcompanante[] | null;
   email: string | null;
   telefono: string | null;
@@ -46,17 +56,25 @@ export type Invitado = {
   destino: string | null;
   nombre_evento: string | null;
   fecha_evento: string | null;
-  /** Texto del panel (motivo del viaje), mismo valor en todos los invitados de la pareja. */
   motivo_viaje: string | null;
-  pareja_id: string | null;
-  /** Usuario que creó el invitado cuando aún no hay pareja (RLS). */
+  evento_id: string | null;
+  /** Usuario que creó el invitado cuando aún no hay evento vinculado (RLS). */
   owner_user_id?: string | null;
+  email_enviado?: boolean | null;
+  fecha_envio?: string | null;
+  invitacion_vista?: boolean | null;
+  fecha_ultima_vista?: string | null;
+  /** URL pública `/invitacion/[token_acceso]` sin exponer `id`. */
+  token_acceso?: string | null;
+  /** Hash único para check-in presencial. */
+  qr_code_token?: string | null;
+  asistencia_confirmada?: boolean | null;
   created_at?: string | null;
 };
 
 export type AporteRegalo = {
   id: string;
-  pareja_id: string;
+  evento_id: string;
   invitado_id: string | null;
   monto: number;
   concepto: string | null;

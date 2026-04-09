@@ -6,8 +6,8 @@ import path from "path";
 import os from "os";
 import AdmZip from "adm-zip";
 import { nombresAcompanantes } from "@/lib/invitado-acompanantes";
-import { mergeEventoParaPase } from "@/lib/pareja-evento";
-import type { Invitado, Pareja } from "@/types/database";
+import { mergeEventoParaPase } from "@/lib/evento-boarding";
+import type { Evento, Invitado } from "@/types/database";
 
 const execFileAsync = promisify(execFile);
 
@@ -21,8 +21,8 @@ function sha1(buf: Buffer): string {
   return crypto.createHash("sha1").update(buf).digest("hex");
 }
 
-function buildPassJson(invitado: Invitado, pareja: Pareja | null): Record<string, unknown> {
-  const ev = mergeEventoParaPase(invitado, pareja);
+function buildPassJson(invitado: Invitado, evento: Evento | null): Record<string, unknown> {
+  const ev = mergeEventoParaPase(invitado, evento);
   const passTypeId =
     process.env.WALLET_PASS_TYPE_IDENTIFIER ?? "pass.com.dreamswedding.invite";
   const teamId = process.env.WALLET_TEAM_IDENTIFIER ?? "TEAMPLACEHLDR";
@@ -123,9 +123,9 @@ export type BuildResult = {
 
 export async function buildPkpassForInvitado(
   invitado: Invitado,
-  pareja: Pareja | null
+  evento: Evento | null
 ): Promise<BuildResult> {
-  const passJson = Buffer.from(JSON.stringify(buildPassJson(invitado, pareja)), "utf8");
+  const passJson = Buffer.from(JSON.stringify(buildPassJson(invitado, evento)), "utf8");
   const icon = MINI_PNG;
   const icon2x = MINI_PNG;
   const logo = MINI_PNG;

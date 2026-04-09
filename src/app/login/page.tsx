@@ -5,9 +5,15 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
 
+function safeNextPath(raw: string | null): string {
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/panel";
+  return raw;
+}
+
 function LoginForm() {
   const searchParams = useSearchParams();
   const err = searchParams.get("error");
+  const nextPath = safeNextPath(searchParams.get("next"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,7 +30,7 @@ function LoginForm() {
       setMessage(error.message);
       return;
     }
-    window.location.href = "/panel";
+    window.location.href = nextPath;
   }
 
   async function handleMagicLink(e: React.FormEvent) {
@@ -43,10 +49,14 @@ function LoginForm() {
 
   return (
     <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur">
-      <h1 className="font-display text-2xl font-bold text-white">Panel de novios</h1>
+      <h1 className="font-display text-2xl font-bold text-white">Acceso</h1>
       <p className="mt-2 text-sm text-slate-400">
-        Inicia sesión con email y contraseña (configura usuarios en Supabase Auth) o solicita un
-        enlace mágico.
+        Novios y equipo del evento: entran al panel de gestión. Cuentas de administración de la
+        plataforma (email en <code className="text-teal-400">ADMIN_EMAILS</code>) van al área de
+        administración tras iniciar sesión.
+      </p>
+      <p className="mt-2 text-sm text-slate-500">
+        Usuarios y contraseñas se gestionan en Supabase Auth; también puedes usar enlace mágico.
       </p>
       {(err || message) && (
         <p className="mt-4 rounded-lg bg-orange-500/20 px-3 py-2 text-sm text-orange-200">

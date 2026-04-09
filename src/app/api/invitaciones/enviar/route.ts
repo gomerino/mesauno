@@ -1,5 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
+import { selectEventoForMember } from "@/lib/evento-membership";
+import { fetchInvitadoWithAcompanantes } from "@/lib/invitado-fetch";
 import { nombresAcompanantes } from "@/lib/invitado-acompanantes";
+import { buildInvitacionEmailHtml } from "@/lib/invitacion-email";
 import { getPublicOriginFromRequest } from "@/lib/public-origin";
 import type { Invitado } from "@/types/database";
 import { NextResponse } from "next/server";
@@ -38,26 +41,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  const { data: pareja } = await supabase
-    .from("parejas")
-    .select("id, nombre_novio_1, nombre_novio_2")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const { data: evento } = await selectEventoForMember(
+    supabase,
+    user.id,
+    "id, nombre_novio_1, nombre_novio_2"
+  );
 
-  const { data: invitado, error: invErr } = await supabase
-    .from("invitados")
-    .select("id, nombre_pasajero, email, pareja_id, owner_user_id, invitado_acompanantes(*)")
-    .eq("id", invitadoId)
-    .maybeSingle();
+  const { data: invitado, error: invErr } = await fetchInvitadoWithAcompanantes(
+    supabase,
+    invitadoId
+  );
 
   if (invErr || !invitado) {
     return NextResponse.json({ error: "Invitado no encontrado" }, { status: 404 });
   }
 
-  const esDePareja = pareja && invitado.pareja_id === pareja.id;
-  const esPropioSinPareja =
-    invitado.pareja_id == null && invitado.owner_user_id === user.id;
-  if (!esDePareja && !esPropioSinPareja) {
+  const esDelEvento = evento && invitado.evento_id === evento.id;
+  const esPropioSinEvento =
+    invitado.evento_id == null && invitado.owner_user_id === user.id;
+  if (!esDelEvento && !esPropioSinEvento) {
     return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   }
 
@@ -67,42 +69,20 @@ export async function POST(request: Request) {
   }
 
   const origin = getPublicOriginFromRequest(request);
-  const link = `${origin}/invitacion/${invitado.id}`;
-  const n1 = pareja?.nombre_novio_1 ?? "";
-  const n2 = pareja?.nombre_novio_2 ?? "";
+  const inv = invitado as Invitado & { token_acceso?: string | null };
+  const access = inv.token_acceso ?? invitado.id;
+  const link = `${origin}/invitacion/${access}`;
+  const n1 = evento?.nombre_novio_1 ?? "";
+  const n2 = evento?.nombre_novio_2 ?? "";
   const firmantes =
     [n1, n2].filter(Boolean).join(" y ") || user.email?.split("@")[0] || "Los novios";
 
-  const inv = invitado as Invitado;
-  const saludoNombres = [inv.nombre_pasajero?.trim(), ...nombresAcompanantes(inv)]
+  const invRow = invitado as Invitado;
+  const saludoNombres = [invRow.nombre_pasajero?.trim(), ...nombresAcompanantes(invRow)]
     .filter(Boolean)
     .join(", ");
 
-  const html = `
-<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8" /></head>
-<body style="font-family: system-ui, sans-serif; background: #f0f0f0; margin: 0; padding: 24px;">
-  <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
-    <table width="560" cellpadding="0" cellspacing="0" style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
-      <tr><td style="background: #001d66; padding: 20px 24px;">
-        <p style="margin: 0; color: #fff; font-size: 14px; letter-spacing: 0.12em; font-weight: 700;">DREAMS AIRLINES</p>
-        <p style="margin: 8px 0 0; color: #c7d4ff; font-size: 13px;">Invitación digital</p>
-      </td></tr>
-      <tr><td style="padding: 28px 24px;">
-        <p style="margin: 0 0 12px; font-size: 18px; color: #111;">Hola${saludoNombres ? `, ${saludoNombres}` : ""}</p>
-        <p style="margin: 0 0 20px; color: #444; line-height: 1.5;">
-          ${firmantes} te envían tu pase de embarque para el gran día. Abre el enlace para ver tu invitación y confirmar asistencia.
-        </p>
-        <p style="margin: 0 0 24px;">
-          <a href="${link}" style="display: inline-block; background: #001d66; color: #fff; text-decoration: none; padding: 14px 28px; border-radius: 999px; font-weight: 600;">Ver mi invitación</a>
-        </p>
-        <p style="margin: 0; font-size: 12px; color: #888; word-break: break-all;">Si el botón no funciona, copia este enlace: ${link}</p>
-      </td></tr>
-    </table>
-  </td></tr></table>
-</body>
-</html>`;
+  const html = buildInvitacionEmailHtml({ link, firmantes, saludoNombres });
 
   const resend = new Resend(apiKey);
   const { error: sendErr } = await resend.emails.send({
@@ -115,6 +95,12 @@ export async function POST(request: Request) {
   if (sendErr) {
     return NextResponse.json({ error: sendErr.message ?? "Error al enviar correo" }, { status: 502 });
   }
+
+  const now = new Date().toISOString();
+  await supabase
+    .from("invitados")
+    .update({ email_enviado: true, fecha_envio: now })
+    .eq("id", invitado.id);
 
   return NextResponse.json({ ok: true });
 }

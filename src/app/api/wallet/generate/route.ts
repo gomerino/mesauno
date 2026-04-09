@@ -1,4 +1,4 @@
-import { fetchParejaForInvitado } from "@/lib/pareja-evento";
+import { fetchEventoForInvitado } from "@/lib/evento-boarding";
 import { createServiceClient } from "@/lib/supabase/server";
 import { buildPkpassForInvitado } from "@/lib/wallet/buildPkpass";
 import type { Invitado } from "@/types/database";
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   const { data, error } = await supabase
     .from("invitados")
     .select("*, invitado_acompanantes(*)")
-    .eq("id", id)
+    .or(`id.eq.${id},token_acceso.eq.${id}`)
     .maybeSingle();
 
   if (error) {
@@ -26,8 +26,8 @@ export async function GET(request: Request) {
   }
 
   const invitado = data as Invitado;
-  const pareja = await fetchParejaForInvitado(supabase, invitado);
-  const result = await buildPkpassForInvitado(invitado, pareja);
+  const evento = await fetchEventoForInvitado(supabase, invitado);
+  const result = await buildPkpassForInvitado(invitado, evento);
 
   const headers = new Headers();
   headers.set("Content-Type", "application/vnd.apple.pkpass");

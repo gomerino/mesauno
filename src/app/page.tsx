@@ -31,8 +31,8 @@ export default function HomePage() {
           </Link>
         </div>
         <p className="mt-12 text-sm text-slate-500">
-          Demo: usa una URL de invitación <code className="text-teal-400">/invitacion/[id]</code> con un UUID
-          de invitado en Supabase.
+          Demo: usa <code className="text-teal-400">/invitacion/[token]</code> con el UUID del invitado o el
+          token de acceso (<code className="text-teal-400">token_acceso</code> en Supabase).
         </p>
       </main>
     </div>
