@@ -1,3 +1,4 @@
+import { InvitacionAlbumSection } from "@/components/invitacion/InvitacionAlbumSection";
 import { InvitacionCronograma } from "@/components/invitacion/InvitacionCronograma";
 import { InvitacionMusicaColaborativa } from "@/components/invitacion/InvitacionMusicaColaborativa";
 import { createClient, createStrictServiceClient } from "@/lib/supabase/server";
@@ -17,7 +18,7 @@ import { restriccionesFromDb } from "@/lib/restricciones-alimenticias";
 import { resolveEventPlaylistEnv } from "@/lib/event-playlist-env";
 import { fetchInvitadoWithAcompanantes } from "@/lib/invitado-fetch";
 import { playlistListRecentPublic, spotifyGetCredentials } from "@/lib/spotify-credentials";
-import type { EventoProgramaHito, Invitado } from "@/types/database";
+import type { EventoFoto, EventoProgramaHito, Invitado } from "@/types/database";
 
 type Props = { params: Promise<{ token: string }> };
 
@@ -45,6 +46,17 @@ export default async function InvitacionPage({ params }: Props) {
   if (!programaErr && Array.isArray(programaRaw)) {
     programaHitos = programaRaw as EventoProgramaHito[];
   }
+
+  let albumFotos: EventoFoto[] = [];
+  if (invitado.evento_id) {
+    const { data: fotosRaw, error: fotosErr } = await supabase.rpc("fotos_evento_lista_publica", {
+      p_token: token,
+    });
+    if (!fotosErr && Array.isArray(fotosRaw)) {
+      albumFotos = fotosRaw as EventoFoto[];
+    }
+  }
+
   const trackingToken = invitado.token_acceso ?? invitado.id;
 
   let musicColabEnabled = false;
@@ -79,9 +91,23 @@ export default async function InvitacionPage({ params }: Props) {
           </a>
         </div>
 
-        <div className="min-w-0 lg:max-h-[calc(100dvh-5.5rem)] lg:overflow-y-auto lg:pr-1">
+        <div
+          className={
+            "min-w-0 lg:max-h-[calc(100dvh-5.5rem)] lg:overflow-y-auto lg:pr-1 " +
+            (invitado.evento_id ? "pb-24 lg:pb-6" : "")
+          }
+        >
           <MotivoViajeInvitacion texto={motivoViaje} />
           <InvitacionCronograma hitos={programaHitos} fechaEvento={fechaEventoPrograma} />
+          {invitado.evento_id ? (
+            <div className="mt-3">
+              <InvitacionAlbumSection
+                eventoId={invitado.evento_id}
+                invitacionToken={token}
+                initialFotos={albumFotos}
+              />
+            </div>
+          ) : null}
           <InvitacionAcciones
             invitadoId={invitado.id}
             initialRestricciones={restriccionesFromDb(invitado.restricciones_alimenticias)}

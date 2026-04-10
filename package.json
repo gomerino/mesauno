@@ -12,6 +12,7 @@
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.49.1",
     "adm-zip": "^0.5.16",
+    "browser-image-compression": "^2.0.2",
     "html5-qrcode": "^2.3.8",
     "lucide-react": "^0.468.0",
     "mercadopago": "^2.12.0",

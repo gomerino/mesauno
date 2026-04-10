@@ -27,11 +27,13 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   }
 
   const { data: evento } = await selectEventoForMember(supabase, user.id, "id");
-  const equipoHref = evento?.id ? `/dashboard/${evento.id as string}/equipo` : null;
+  const eventoId = evento?.id as string | undefined;
+  const equipoHref = eventoId ? `/dashboard/${eventoId}/equipo` : null;
+  const programaHref = eventoId ? `/dashboard/${eventoId}/programa` : null;
 
   return (
     <>
-      <PanelShell userEmail={user.email ?? ""} equipoHref={equipoHref}>
+      <PanelShell userEmail={user.email ?? ""} equipoHref={equipoHref} programaHref={programaHref}>
         {children}
       </PanelShell>
       <DashboardToaster />

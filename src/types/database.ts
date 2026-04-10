@@ -104,6 +104,15 @@ export type EventoProgramaHito = {
   created_at?: string | null;
 };
 
+/** Fila en `evento_fotos`; `storage_path` relativo al bucket `fotos_eventos`. */
+export type EventoFoto = {
+  id: string;
+  evento_id: string;
+  invitado_id: string | null;
+  storage_path: string;
+  created_at: string;
+};
+
 export type MarketplaceServicio = {
   id: string;
   nombre: string;

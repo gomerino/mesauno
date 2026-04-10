@@ -3,23 +3,22 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-function buildNav(equipoHref: string | null) {
-  const base = [
+function buildNav(equipoHref: string | null, programaHref: string | null) {
+  const head = [
     { href: "/panel", label: "Inicio", end: true },
     { href: "/panel/evento", label: "Evento" },
+  ] as const;
+  const mid: { href: string; label: string }[] = [];
+  if (programaHref) mid.push({ href: programaHref, label: "Programa" });
+  if (equipoHref) mid.push({ href: equipoHref, label: "Equipo" });
+  const tail = [
     { href: "/panel/invitados", label: "Crear invitados" },
     { href: "/panel/vista-invitacion", label: "Ver invitación" },
     { href: "/marketplace", label: "Marketplace" },
     { href: "/panel/asistentes", label: "Asistentes (RSVP)" },
     { href: "/panel/regalos", label: "Regalos y dinero" },
   ] as const;
-  if (!equipoHref) return [...base];
-  return [
-    base[0],
-    base[1],
-    { href: equipoHref, label: "Equipo" },
-    ...base.slice(2),
-  ] as const;
+  return [...head, ...mid, ...tail] as const;
 }
 
 function navActive(pathname: string, href: string, end?: boolean) {
@@ -33,12 +32,14 @@ type Props = {
   userEmail: string;
   /** Enlace a gestión de equipo del evento (solo admin/editor). */
   equipoHref?: string | null;
+  /** Cronograma que ven los invitados (Mesa Uno /dashboard). */
+  programaHref?: string | null;
   children: React.ReactNode;
 };
 
-export function PanelShell({ userEmail, equipoHref = null, children }: Props) {
+export function PanelShell({ userEmail, equipoHref = null, programaHref = null, children }: Props) {
   const pathname = usePathname();
-  const NAV = buildNav(equipoHref);
+  const NAV = buildNav(equipoHref, programaHref);
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
