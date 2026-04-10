@@ -1,3 +1,4 @@
+import { RecordatoriosEventoSection } from "@/components/panel/RecordatoriosEventoSection";
 import { SpotifyPlaylistConnect } from "@/components/panel/SpotifyPlaylistConnect";
 import { EventoForm } from "@/components/panel/EventoForm";
 import { selectEventoForMember } from "@/lib/evento-membership";
@@ -42,6 +43,20 @@ export default async function PanelEventoPage() {
       <div className="mt-10">
         <EventoForm initial={(evento ?? null) as Evento | null} />
       </div>
+
+      {eventoId && (
+        <div className="mt-10">
+          <RecordatoriosEventoSection
+            eventoId={eventoId}
+            initial={{
+              recordatorios_activos: Boolean((evento as Evento | null)?.recordatorios_activos),
+              max_recordatorios: (evento as Evento | null)?.max_recordatorios ?? 2,
+              frecuencia_recordatorios: (evento as Evento | null)?.frecuencia_recordatorios ?? 3,
+              fecha_inicio_recordatorios: (evento as Evento | null)?.fecha_inicio_recordatorios ?? null,
+            }}
+          />
+        </div>
+      )}
 
       <div className="mt-12">
         {eventoId ? (

@@ -54,6 +54,10 @@ export default async function EquipoPage({ params }: { params: Promise<{ evento_
         <Link href="/panel/evento" className="text-teal-400 hover:text-teal-300">
           ← Configuración
         </Link>
+        {" · "}
+        <Link href={`/dashboard/${evento_id}/programa`} className="text-teal-400 hover:text-teal-300">
+          Programa del evento
+        </Link>
       </p>
       <h1 className="font-display mt-2 text-3xl font-bold text-white">Gestión de equipo</h1>
       <p className="mt-2 text-slate-400">

@@ -1,3 +1,4 @@
+import { InvitacionCronograma } from "@/components/invitacion/InvitacionCronograma";
 import { InvitacionMusicaColaborativa } from "@/components/invitacion/InvitacionMusicaColaborativa";
 import { createClient, createStrictServiceClient } from "@/lib/supabase/server";
 import { BoardingPassCard } from "@/components/BoardingPassCard";
@@ -16,7 +17,7 @@ import { restriccionesFromDb } from "@/lib/restricciones-alimenticias";
 import { resolveEventPlaylistEnv } from "@/lib/event-playlist-env";
 import { fetchInvitadoWithAcompanantes } from "@/lib/invitado-fetch";
 import { playlistListRecentPublic, spotifyGetCredentials } from "@/lib/spotify-credentials";
-import type { Invitado } from "@/types/database";
+import type { EventoProgramaHito, Invitado } from "@/types/database";
 
 type Props = { params: Promise<{ token: string }> };
 
@@ -32,8 +33,18 @@ export default async function InvitacionPage({ params }: Props) {
   const invitado = data as Invitado;
   const evento = await fetchEventoForInvitado(supabase, invitado);
   const qrValue = boardingPassQrMapUrlMerged(invitado, evento);
-  const motivoViaje = mergeEventoParaPase(invitado, evento).motivo_viaje;
+  const merged = mergeEventoParaPase(invitado, evento);
+  const motivoViaje = merged.motivo_viaje;
+  const fechaEventoPrograma = merged.fecha_evento;
   const playlists = resolveEventPlaylistEnv();
+
+  let programaHitos: EventoProgramaHito[] = [];
+  const { data: programaRaw, error: programaErr } = await supabase.rpc("programa_evento_lista_publica", {
+    p_token: token,
+  });
+  if (!programaErr && Array.isArray(programaRaw)) {
+    programaHitos = programaRaw as EventoProgramaHito[];
+  }
   const trackingToken = invitado.token_acceso ?? invitado.id;
 
   let musicColabEnabled = false;
@@ -70,6 +81,7 @@ export default async function InvitacionPage({ params }: Props) {
 
         <div className="min-w-0 lg:max-h-[calc(100dvh-5.5rem)] lg:overflow-y-auto lg:pr-1">
           <MotivoViajeInvitacion texto={motivoViaje} />
+          <InvitacionCronograma hitos={programaHitos} fechaEvento={fechaEventoPrograma} />
           <InvitacionAcciones
             invitadoId={invitado.id}
             initialRestricciones={restriccionesFromDb(invitado.restricciones_alimenticias)}

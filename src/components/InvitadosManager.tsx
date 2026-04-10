@@ -1,5 +1,6 @@
 "use client";
 
+import { WhatsAppInviteButton } from "@/components/dashboard/WhatsAppInviteButton";
 import type { Invitado } from "@/types/database";
 import { nombresAcompanantes, sortInvitadoAcompanantes } from "@/lib/invitado-acompanantes";
 import { restriccionesFromDb, restriccionesToDb } from "@/lib/restricciones-alimenticias";
@@ -339,6 +340,11 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
                           {sendFlash.msg}
                         </span>
                       )}
+                      <WhatsAppInviteButton
+                        nombreInvitado={row.nombre_pasajero ?? ""}
+                        telefono={row.telefono ?? ""}
+                        tokenAcceso={String(row.token_acceso ?? row.id)}
+                      />
                       <button
                         type="button"
                         onClick={() => handleSendEmail(row.id)}

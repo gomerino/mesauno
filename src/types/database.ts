@@ -19,6 +19,13 @@ export type Evento = {
   plan_status?: "trial" | "paid" | "expired" | null;
   payment_id?: string | null;
   monto_pagado?: number | null;
+  /** Máximo de correos de insistencia (excluye el envío inicial). */
+  max_recordatorios?: number | null;
+  /** Días mínimos entre insistencias. */
+  frecuencia_recordatorios?: number | null;
+  recordatorios_activos?: boolean | null;
+  /** Primer día (inclusive) en que el cron puede enviar recordatorios. null = sin aplazamiento. */
+  fecha_inicio_recordatorios?: string | null;
   created_at?: string | null;
 };
 
@@ -62,6 +69,8 @@ export type Invitado = {
   owner_user_id?: string | null;
   email_enviado?: boolean | null;
   fecha_envio?: string | null;
+  conteo_recordatorios?: number | null;
+  ultimo_recordatorio_at?: string | null;
   invitacion_vista?: boolean | null;
   fecha_ultima_vista?: string | null;
   /** URL pública `/invitacion/[token_acceso]` sin exponer `id`. */
@@ -78,6 +87,20 @@ export type AporteRegalo = {
   invitado_id: string | null;
   monto: number;
   concepto: string | null;
+  created_at?: string | null;
+};
+
+export type EventoProgramaHito = {
+  id: string;
+  evento_id: string;
+  /** HH:MM:SS desde Postgres */
+  hora: string;
+  titulo: string;
+  descripcion_corta: string | null;
+  lugar_nombre: string | null;
+  ubicacion_url: string | null;
+  icono: "Church" | "Beer" | "Utensils" | "Music";
+  orden: number;
   created_at?: string | null;
 };
 

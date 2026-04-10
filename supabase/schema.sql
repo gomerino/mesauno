@@ -18,6 +18,10 @@ create table if not exists public.eventos (
   plan_status text not null default 'trial' check (plan_status in ('trial', 'paid', 'expired')),
   payment_id text,
   monto_pagado numeric,
+  max_recordatorios int not null default 2 check (max_recordatorios >= 1 and max_recordatorios <= 5),
+  frecuencia_recordatorios int not null default 3 check (frecuencia_recordatorios >= 2 and frecuencia_recordatorios <= 14),
+  recordatorios_activos boolean not null default false,
+  fecha_inicio_recordatorios date,
   created_at timestamptz default now()
 );
 
@@ -144,6 +148,8 @@ create table if not exists public.invitados (
   nombre_acompanante text,
   email_enviado boolean not null default false,
   fecha_envio timestamptz,
+  conteo_recordatorios int not null default 0 check (conteo_recordatorios >= 0),
+  ultimo_recordatorio_at timestamptz,
   invitacion_vista boolean not null default false,
   fecha_ultima_vista timestamptz,
   token_acceso uuid not null default gen_random_uuid(),
@@ -691,4 +697,8 @@ create policy "aportes_regalo_delete" on public.aportes_regalo
     and not public.user_is_evento_staff_centro(evento_id)
   );
 
+-- Programa del evento: tabla `evento_programa_hitos` + función `programa_evento_lista_publica` — migration_evento_programa.sql
+
 -- Spotify (música colaborativa): tablas `evento_spotify` y `playlist_aportes` — ejecutar también migration_spotify_music.sql
+-- Recordatorios: `log_recordatorios`, función `invitados_elegibles_recordatorio` — ejecutar migration_recordatorios.sql
+-- y si la BD ya existía antes: migration_recordatorios_fecha_inicio.sql (fecha_inicio_recordatorios + función).
