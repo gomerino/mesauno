@@ -24,6 +24,7 @@ export function getMembershipUnitPrice(): number {
   return 19_990;
 }
 
-export function useMercadoPagoSandboxPoints(): boolean {
+/** Preferir `sandbox_init_point` cuando MP_USE_SANDBOX está activo (credenciales de prueba). */
+export function isMercadoPagoSandboxMode(): boolean {
   return process.env.MP_USE_SANDBOX === "1" || process.env.MP_USE_SANDBOX === "true";
 }

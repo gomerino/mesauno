@@ -2,10 +2,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Primer evento donde el usuario es miembro (panel asume un evento por usuario; si hay varios, el más antiguo).
+ * `any` evita choques de tipos con `.select(columns)` dinámico y tablas sin tipar en el cliente generado.
  */
 export async function selectEventoForMember(supabase: SupabaseClient, userId: string, columns = "*") {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = supabase as any;
+  const db: any = supabase;
   const { data: memb, error: e1 } = await db
     .from("evento_miembros")
     .select("evento_id")

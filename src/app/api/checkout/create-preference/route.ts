@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   createMercadoPagoConfig,
   getMembershipUnitPrice,
-  useMercadoPagoSandboxPoints,
+  isMercadoPagoSandboxMode,
 } from "@/lib/mercadopago-server";
 import { getPublicOriginFromRequest } from "@/lib/public-origin";
 import { Preference } from "mercadopago";
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
       },
     });
 
-    const initPoint = useMercadoPagoSandboxPoints() ? pref.sandbox_init_point : pref.init_point;
+    const initPoint = isMercadoPagoSandboxMode() ? pref.sandbox_init_point : pref.init_point;
     if (!initPoint) {
       return NextResponse.json({ error: "No se obtuvo init_point de Mercado Pago." }, { status: 502 });
     }
