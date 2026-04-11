@@ -66,7 +66,15 @@ export async function addTrackToPlaylist(invitationAccessToken: string, track: T
 
   if (creds.spotify_user_id) {
     const playlistMeta = await spotifyFetchPlaylistOwner(refreshed.access_token, creds.playlist_id);
-    if (!playlistMeta || playlistMeta.ownerId !== creds.spotify_user_id) {
+    if (!playlistMeta.ok) {
+      return {
+        ok: false,
+        error:
+          "No pudimos validar la playlist del evento. Los novios deben revisar el enlace en el panel.",
+      };
+    }
+    const ownerMatches = playlistMeta.ownerId === creds.spotify_user_id;
+    if (!ownerMatches && !playlistMeta.collaborative) {
       return {
         ok: false,
         error:

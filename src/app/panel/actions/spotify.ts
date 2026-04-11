@@ -57,18 +57,34 @@ export async function saveSpotifyPlaylistIdAction(
   await spotifyUpdateRefreshTokenIfPresent(db, eventoId, refreshed.refresh_token);
 
   const playlistMeta = await spotifyFetchPlaylistOwner(refreshed.access_token, parsed);
-  if (!playlistMeta) {
+  if (!playlistMeta.ok) {
+    if (playlistMeta.status === 404) {
+      return {
+        ok: false,
+        error:
+          "No encontramos esa playlist. Copiá el enlace desde Spotify (Compartir → Copiar enlace al playlist) o revisá el ID.",
+      };
+    }
+    if (playlistMeta.status === 403) {
+      return {
+        ok: false,
+        error:
+          "Spotify no permitió leer la playlist con tu cuenta (403). Si es privada de otra persona, no podés usarla; si es tuya, probá volver a vincular Spotify.",
+      };
+    }
     return {
       ok: false,
       error:
-        "No pudimos leer esa playlist con tu cuenta de Spotify. Revisá el enlace o el ID; si la lista es de otra persona, no podremos añadir canciones.",
+        "No pudimos leer esa playlist. Revisá el enlace (también sirve con /intl-es/ en la URL); si la lista es muy antigua o borrada, creá una nueva.",
     };
   }
-  if (playlistMeta.ownerId !== creds.spotify_user_id) {
+
+  const ownerMatches = playlistMeta.ownerId === creds.spotify_user_id;
+  if (!ownerMatches && !playlistMeta.collaborative) {
     return {
       ok: false,
       error:
-        "La playlist tiene que ser de la misma cuenta de Spotify que vinculaste (Spotify devuelve 403 si intentás modificar una lista de otra persona).",
+        "Esta playlist es de otra cuenta. Usá una lista creada con la cuenta que vinculaste, o una lista colaborativa donde tu usuario sea colaborador.",
     };
   }
 

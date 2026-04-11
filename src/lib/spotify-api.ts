@@ -227,11 +227,15 @@ export async function spotifyResolveUserIdAfterAuthorization(
   return { spotifyUserId: null, refreshToken: refresh };
 }
 
-/** Metadatos mínimos para validar que la playlist la controla la cuenta del token. */
+export type SpotifyPlaylistMetaOk = { ok: true; ownerId: string; collaborative: boolean };
+export type SpotifyPlaylistMetaErr = { ok: false; status: number };
+export type SpotifyPlaylistMetaResult = SpotifyPlaylistMetaOk | SpotifyPlaylistMetaErr;
+
+/** Metadatos mínimos para validar la playlist (dueño y si es colaborativa). */
 export async function spotifyFetchPlaylistOwner(
   accessToken: string,
   playlistId: string
-): Promise<{ ownerId: string; collaborative: boolean } | null> {
+): Promise<SpotifyPlaylistMetaResult> {
   const res = await fetch(`https://api.spotify.com/v1/playlists/${encodeURIComponent(playlistId)}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
     cache: "no-store",
@@ -239,12 +243,18 @@ export async function spotifyFetchPlaylistOwner(
   const bodyText = await res.text();
   if (!res.ok) {
     logSpotifyApiError("api/playlists (GET)", res.status, bodyText);
-    return null;
+    return { ok: false, status: res.status };
   }
-  const j = JSON.parse(bodyText) as { owner?: { id?: string }; collaborative?: boolean };
+  let j: { owner?: { id?: string }; collaborative?: boolean };
+  try {
+    j = JSON.parse(bodyText) as { owner?: { id?: string }; collaborative?: boolean };
+  } catch (e) {
+    console.error("[spotify] playlist GET JSON inválido", e, bodyText.slice(0, 200));
+    return { ok: false, status: 500 };
+  }
   const ownerId = j.owner?.id?.trim();
-  if (!ownerId) return null;
-  return { ownerId, collaborative: Boolean(j.collaborative) };
+  if (!ownerId) return { ok: false, status: 500 };
+  return { ok: true, ownerId, collaborative: Boolean(j.collaborative) };
 }
 
 export async function spotifyCreatePlaylist(
