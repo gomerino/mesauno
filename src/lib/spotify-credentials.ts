@@ -26,12 +26,33 @@ export async function spotifyUpsertRefreshToken(
   refreshToken: string,
   spotifyUserId?: string | null
 ): Promise<boolean> {
-  const { data: existing } = await db.from("evento_spotify").select("playlist_id").eq("evento_id", eventoId).maybeSingle();
+  const { data: existing, error: selErr } = await db
+    .from("evento_spotify")
+    .select("playlist_id, spotify_user_id")
+    .eq("evento_id", eventoId)
+    .maybeSingle();
+
+  if (selErr) {
+    console.error("[spotify] select antes de upsert", selErr.message);
+    return false;
+  }
+
+  /** Id resuelto en esta ronda OAuth (GET /me). */
+  const resolved =
+    spotifyUserId != null && String(spotifyUserId).trim() !== "" ? String(spotifyUserId).trim() : null;
+
+  /**
+   * Si /me falló en un reintento, no pisar un `spotify_user_id` ya guardado con null.
+   * Si esta ronda devolvió id, usarlo.
+   */
+  const mergedUserId =
+    resolved ?? (existing as { spotify_user_id?: string | null } | null)?.spotify_user_id?.trim() ?? null;
+
   const { error } = await db.from("evento_spotify").upsert(
     {
       evento_id: eventoId,
       refresh_token: refreshToken,
-      spotify_user_id: spotifyUserId ?? null,
+      spotify_user_id: mergedUserId,
       playlist_id: (existing as { playlist_id?: string | null } | null)?.playlist_id ?? null,
       updated_at: new Date().toISOString(),
     },
@@ -41,6 +62,25 @@ export async function spotifyUpsertRefreshToken(
     console.error("[spotify] upsert token", error.message);
     return false;
   }
+
+  // Refuerzo: PostgREST a veces no persiste bien columnas opcionales en upsert; aseguramos el id si lo tenemos.
+  if (resolved) {
+    const { error: uErr, data: after } = await db
+      .from("evento_spotify")
+      .update({ spotify_user_id: resolved, updated_at: new Date().toISOString() })
+      .eq("evento_id", eventoId)
+      .select("spotify_user_id")
+      .maybeSingle();
+    if (uErr) {
+      console.error("[spotify] update spotify_user_id tras OAuth", uErr.message);
+      return false;
+    }
+    if (after?.spotify_user_id !== resolved) {
+      console.error("[spotify] spotify_user_id no coincide tras update", { expected: resolved, got: after?.spotify_user_id });
+      return false;
+    }
+  }
+
   return true;
 }
 

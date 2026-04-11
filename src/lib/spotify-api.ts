@@ -141,15 +141,30 @@ export async function spotifyFetchCurrentUserId(
     if (logFailure) logSpotifyApiError("api/me", res.status, bodyText);
     return null;
   }
-  let j: { id?: string };
+  const id = parseSpotifyMeUserId(bodyText);
+  if (!id) {
+    console.error("[spotify] api/me sin id/uri reconocible", bodyText.slice(0, 400));
+  }
+  return id;
+}
+
+/** Extrae el user id del JSON de GET /v1/me (`id` o `uri` spotify:user:…). */
+export function parseSpotifyMeUserId(bodyText: string): string | null {
+  let j: Record<string, unknown>;
   try {
-    j = JSON.parse(bodyText) as { id?: string };
+    j = JSON.parse(bodyText) as Record<string, unknown>;
   } catch (e) {
     console.error("[spotify] api/me JSON inválido", e, bodyText.slice(0, 300));
     return null;
   }
-  const id = j.id?.trim();
-  return id || null;
+  const rawId = j.id;
+  if (typeof rawId === "string" && rawId.trim()) return rawId.trim();
+  const uri = j.uri;
+  if (typeof uri === "string" && uri.startsWith("spotify:user:")) {
+    const segment = uri.slice("spotify:user:".length).split(":")[0]?.trim();
+    if (segment) return segment;
+  }
+  return null;
 }
 
 /** Si el access token es JWT, intenta leer `sub` (Spotify a veces emite JWT con el user id). */
