@@ -1,4 +1,5 @@
 import { getSpotifyClientId, getSpotifyClientSecret } from "@/lib/spotify-config";
+import { logSpotifyApiError } from "@/lib/spotify-api-error";
 
 export type SpotifySearchTrack = {
   uri: string;
@@ -23,7 +24,7 @@ async function postForm(url: string, body: string, headers: Record<string, strin
   });
   if (!res.ok) {
     const t = await res.text();
-    console.error("[spotify] token error", res.status, t.slice(0, 200));
+    logSpotifyApiError("accounts/token", res.status, t);
     return null;
   }
   return (await res.json()) as TokenResponse;
@@ -74,11 +75,12 @@ export async function spotifySearchTracks(accessToken: string, query: string, li
     headers: { Authorization: `Bearer ${accessToken}` },
     cache: "no-store",
   });
+  const bodyText = await res.text();
   if (!res.ok) {
-    console.error("[spotify] search", res.status);
+    logSpotifyApiError("api/search", res.status, bodyText);
     return [];
   }
-  const json = (await res.json()) as {
+  const json = JSON.parse(bodyText) as {
     tracks?: {
       items?: Array<{
         uri: string;
@@ -114,21 +116,120 @@ export async function spotifyAddTracksToPlaylist(
     },
     body: JSON.stringify({ uris: trackUris }),
   });
+  const bodyText = await res.text();
   if (!res.ok) {
-    const t = await res.text();
-    console.error("[spotify] add tracks", res.status, t.slice(0, 300));
+    logSpotifyApiError("api/playlists/tracks (POST)", res.status, bodyText);
     return false;
   }
   return true;
 }
 
-export async function spotifyFetchCurrentUserId(accessToken: string): Promise<string | null> {
+export async function spotifyFetchCurrentUserId(
+  accessToken: string,
+  options?: { logFailure?: boolean }
+): Promise<string | null> {
+  const logFailure = options?.logFailure !== false;
+  const token = accessToken?.trim();
+  if (!token) return null;
+
   const res = await fetch("https://api.spotify.com/v1/me", {
-    headers: { Authorization: `Bearer ${accessToken}` },
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
   });
-  if (!res.ok) return null;
-  const j = (await res.json()) as { id?: string };
-  return j.id ?? null;
+  const bodyText = await res.text();
+  if (!res.ok) {
+    if (logFailure) logSpotifyApiError("api/me", res.status, bodyText);
+    return null;
+  }
+  let j: { id?: string };
+  try {
+    j = JSON.parse(bodyText) as { id?: string };
+  } catch (e) {
+    console.error("[spotify] api/me JSON inválido", e, bodyText.slice(0, 300));
+    return null;
+  }
+  const id = j.id?.trim();
+  return id || null;
+}
+
+/** Si el access token es JWT, intenta leer `sub` (Spotify a veces emite JWT con el user id). */
+function tryDecodeSpotifyUserIdFromJwt(accessToken: string): string | null {
+  const parts = accessToken.trim().split(".");
+  if (parts.length !== 3) return null;
+  try {
+    const b64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const json = Buffer.from(b64, "base64").toString("utf8");
+    const payload = JSON.parse(json) as { sub?: string };
+    let sub = payload.sub?.trim();
+    if (!sub) return null;
+    if (sub.startsWith("spotify:user:")) sub = sub.slice("spotify:user:".length);
+    return sub || null;
+  } catch {
+    return null;
+  }
+}
+
+const ME_RETRY_MS = [0, 200, 500];
+
+/**
+ * Resuelve el Spotify user id tras el intercambio del código:
+ * reintentos en /me, segundo intento con token renovado (a veces el primer access falla en /me),
+ * y fallback JWT si el token lo permite.
+ */
+export async function spotifyResolveUserIdAfterAuthorization(
+  accessToken: string,
+  refreshToken: string
+): Promise<{ spotifyUserId: string | null; refreshToken: string }> {
+  let access = accessToken.trim();
+  let refresh = refreshToken.trim();
+
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  for (let attempt = 0; attempt < ME_RETRY_MS.length; attempt++) {
+    if (ME_RETRY_MS[attempt] > 0) await sleep(ME_RETRY_MS[attempt]);
+    const lastTry = attempt === ME_RETRY_MS.length - 1;
+    const id = await spotifyFetchCurrentUserId(access, { logFailure: lastTry });
+    if (id) return { spotifyUserId: id, refreshToken: refresh };
+  }
+
+  const refreshed = await spotifyRefreshAccessToken(refresh);
+  if (refreshed?.access_token) {
+    access = refreshed.access_token.trim();
+    if (refreshed.refresh_token) refresh = refreshed.refresh_token.trim();
+    const id = await spotifyFetchCurrentUserId(access);
+    if (id) return { spotifyUserId: id, refreshToken: refresh };
+  }
+
+  const fromJwt = tryDecodeSpotifyUserIdFromJwt(access);
+  if (fromJwt) {
+    console.warn("[spotify] spotify_user_id obtenido desde JWT (fallback); /me no devolvió id.");
+    return { spotifyUserId: fromJwt, refreshToken: refresh };
+  }
+
+  console.warn(
+    "[spotify] spotify_user_id sigue nulo: revisá /me en logs (403 = usuario no en dashboard de la app en modo development), credenciales y scopes."
+  );
+  return { spotifyUserId: null, refreshToken: refresh };
+}
+
+/** Metadatos mínimos para validar que la playlist la controla la cuenta del token. */
+export async function spotifyFetchPlaylistOwner(
+  accessToken: string,
+  playlistId: string
+): Promise<{ ownerId: string; collaborative: boolean } | null> {
+  const res = await fetch(`https://api.spotify.com/v1/playlists/${encodeURIComponent(playlistId)}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    cache: "no-store",
+  });
+  const bodyText = await res.text();
+  if (!res.ok) {
+    logSpotifyApiError("api/playlists (GET)", res.status, bodyText);
+    return null;
+  }
+  const j = JSON.parse(bodyText) as { owner?: { id?: string }; collaborative?: boolean };
+  const ownerId = j.owner?.id?.trim();
+  if (!ownerId) return null;
+  return { ownerId, collaborative: Boolean(j.collaborative) };
 }
 
 export async function spotifyCreatePlaylist(
@@ -152,11 +253,11 @@ export async function spotifyCreatePlaylist(
       }),
     }
   );
+  const bodyText = await res.text();
   if (!res.ok) {
-    const t = await res.text();
-    console.error("[spotify] create playlist", res.status, t.slice(0, 300));
+    logSpotifyApiError("api/users/playlists (POST)", res.status, bodyText);
     return null;
   }
-  const j = (await res.json()) as { id?: string };
+  const j = JSON.parse(bodyText) as { id?: string };
   return j.id ? { id: j.id } : null;
 }

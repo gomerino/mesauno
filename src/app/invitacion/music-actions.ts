@@ -7,7 +7,11 @@ import {
   spotifyGetCredentials,
   spotifyUpdateRefreshTokenIfPresent,
 } from "@/lib/spotify-credentials";
-import { spotifyAddTracksToPlaylist, spotifyRefreshAccessToken } from "@/lib/spotify-api";
+import {
+  spotifyAddTracksToPlaylist,
+  spotifyFetchPlaylistOwner,
+  spotifyRefreshAccessToken,
+} from "@/lib/spotify-api";
 import { rateLimitPlaylistAdd } from "@/lib/spotify-rate-limit";
 import { headers } from "next/headers";
 
@@ -59,6 +63,17 @@ export async function addTrackToPlaylist(invitationAccessToken: string, track: T
   }
 
   await spotifyUpdateRefreshTokenIfPresent(db, invitado.evento_id, refreshed.refresh_token);
+
+  if (creds.spotify_user_id) {
+    const playlistMeta = await spotifyFetchPlaylistOwner(refreshed.access_token, creds.playlist_id);
+    if (!playlistMeta || playlistMeta.ownerId !== creds.spotify_user_id) {
+      return {
+        ok: false,
+        error:
+          "La playlist del evento no coincide con la cuenta de Spotify vinculada. Los novios deben revisar la configuración en el panel.",
+      };
+    }
+  }
 
   const added = await spotifyAddTracksToPlaylist(refreshed.access_token, creds.playlist_id, [uri]);
   if (!added) {

@@ -1,10 +1,14 @@
 import { spotifyClientCredentialsAccessToken, spotifySearchTracks } from "@/lib/spotify-api";
-import { getSpotifyClientId } from "@/lib/spotify-config";
+import { getSpotifyClientId, getSpotifyClientSecret } from "@/lib/spotify-config";
 import { rateLimitSpotifySearch } from "@/lib/spotify-rate-limit";
 import { NextResponse } from "next/server";
 
+/**
+ * Búsqueda para invitados: solo Client Credentials (client_id + client_secret).
+ * No usa el token OAuth del novio, así que no depende de su sesión ni de sus scopes.
+ */
 export async function spotifySearchRouteGET(request: Request): Promise<Response> {
-  if (!getSpotifyClientId()) {
+  if (!getSpotifyClientId() || !getSpotifyClientSecret()) {
     return NextResponse.json({ error: "Búsqueda no disponible." }, { status: 503 });
   }
 

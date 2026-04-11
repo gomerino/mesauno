@@ -24,8 +24,10 @@ export function getSpotifyOAuthStateSecret(): string {
   );
 }
 
+/** Scopes del flujo OAuth (Authorization Code) para la cuenta de los novios. */
 export const SPOTIFY_MODIFY_SCOPES = [
   "playlist-modify-public",
   "playlist-modify-private",
   "user-read-playback-state",
+  "user-library-read",
 ] as const;

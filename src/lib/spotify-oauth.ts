@@ -1,5 +1,5 @@
 import { createClient, createStrictServiceClient } from "@/lib/supabase/server";
-import { spotifyExchangeCode, spotifyCreatePlaylist, spotifyFetchCurrentUserId } from "@/lib/spotify-api";
+import { spotifyExchangeCode, spotifyCreatePlaylist, spotifyResolveUserIdAfterAuthorization } from "@/lib/spotify-api";
 import { getSpotifyClientId, getSpotifyRedirectUri, SPOTIFY_MODIFY_SCOPES } from "@/lib/spotify-config";
 import { signSpotifyOAuthState, verifySpotifyOAuthState } from "@/lib/spotify-oauth-state";
 import { spotifyGetCredentials, spotifyUpdatePlaylistId, spotifyUpsertRefreshToken } from "@/lib/spotify-credentials";
@@ -38,6 +38,7 @@ export async function spotifyOAuthAuthorizeGET(request: Request): Promise<Respon
   }
 
   const state = signSpotifyOAuthState(eventoId);
+  // Scopes definidos en `spotify-config` (playlist-modify-*, playback, biblioteca).
   const scope = SPOTIFY_MODIFY_SCOPES.join(" ");
   const auth = new URL("https://accounts.spotify.com/authorize");
   auth.searchParams.set("client_id", clientId);
@@ -78,14 +79,17 @@ export async function spotifyOAuthCallbackGET(request: Request): Promise<Respons
     return fail("No se pudo obtener el token de Spotify.");
   }
 
-  const spotifyUserId = await spotifyFetchCurrentUserId(tokens.access_token);
+  const { spotifyUserId, refreshToken: refreshToStore } = await spotifyResolveUserIdAfterAuthorization(
+    tokens.access_token,
+    tokens.refresh_token
+  );
 
   const db = await createStrictServiceClient();
   if (!db) {
     return fail("Falta SUPABASE_SERVICE_ROLE_KEY en el servidor.");
   }
 
-  const ok = await spotifyUpsertRefreshToken(db, eventoId, tokens.refresh_token, spotifyUserId);
+  const ok = await spotifyUpsertRefreshToken(db, eventoId, refreshToStore, spotifyUserId);
   if (!ok) {
     return fail("No se pudo guardar la conexión en base de datos.");
   }
