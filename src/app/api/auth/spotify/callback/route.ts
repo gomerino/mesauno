@@ -2,7 +2,6 @@ import { spotifyOAuthCallbackGET, spotifyOAuthDynamic } from "@/lib/spotify-oaut
 
 export const dynamic = spotifyOAuthDynamic;
 
-/** @deprecated Usa `/api/auth/spotify/callback` en Spotify Dashboard y en `SPOTIFY_REDIRECT_URI`. */
 export async function GET(request: Request) {
   return spotifyOAuthCallbackGET(request);
 }

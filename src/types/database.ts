@@ -73,6 +73,8 @@ export type Invitado = {
   ultimo_recordatorio_at?: string | null;
   invitacion_vista?: boolean | null;
   fecha_ultima_vista?: string | null;
+  /** Tema visual de la landing `/invitacion/*` (`themes.id`). */
+  theme_id?: string | null;
   /** URL pública `/invitacion/[token_acceso]` sin exponer `id`. */
   token_acceso?: string | null;
   /** Hash único para check-in presencial. */

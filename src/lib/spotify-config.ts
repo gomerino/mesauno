@@ -12,7 +12,7 @@ export function getSpotifyRedirectUri(): string | null {
   const v = process.env.SPOTIFY_REDIRECT_URI?.trim();
   if (v) return v;
   const base = process.env.NEXT_PUBLIC_SITE_URL?.trim() || process.env.SITE_URL?.trim();
-  if (base) return `${base.replace(/\/$/, "")}/api/spotify/callback`;
+  if (base) return `${base.replace(/\/$/, "")}/api/auth/spotify/callback`;
   return null;
 }
 
@@ -24,4 +24,8 @@ export function getSpotifyOAuthStateSecret(): string {
   );
 }
 
-export const SPOTIFY_MODIFY_SCOPES = ["playlist-modify-public", "playlist-modify-private"] as const;
+export const SPOTIFY_MODIFY_SCOPES = [
+  "playlist-modify-public",
+  "playlist-modify-private",
+  "user-read-playback-state",
+] as const;

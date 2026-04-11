@@ -65,6 +65,8 @@ export function mergeEventoParaPase(invitado: Invitado, evento: Evento | null) {
   };
 }
 
+export type MergedEventoParaPase = ReturnType<typeof mergeEventoParaPase>;
+
 export function resolveDestinoParaMapa(mergedDestino: string): string {
   const globalAddr = process.env.NEXT_PUBLIC_EVENT_ADDRESS?.trim();
   if (globalAddr) return globalAddr;

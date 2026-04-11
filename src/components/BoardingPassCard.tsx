@@ -114,6 +114,9 @@ export function BoardingPassCard({ invitado, evento, qrValue, playlists = null }
 
       <div className="px-3 py-2.5 sm:px-4 sm:py-3">
         <p className="break-words text-center text-[10px] font-medium leading-snug text-gray-800 sm:text-[11px]">
+          <span aria-hidden className="mr-0.5">
+            📍
+          </span>
           {ev.lugar_evento_linea}
         </p>
 
@@ -133,7 +136,10 @@ export function BoardingPassCard({ invitado, evento, qrValue, playlists = null }
               {nombre}
             </p>
           ))}
-          <p className="mt-1 text-[9px] text-gray-600">Clase: Primera · Dress code elegante</p>
+          <p className="mt-1.5 text-center text-[10px] font-semibold leading-snug sm:text-[11px]">
+            <span className="text-gray-600">Dress code:</span>{" "}
+            <span className="text-amber-700">Elegante</span>
+          </p>
         </div>
 
         {/* Vuelo · Embarque · Fecha · Asiento — columnas repartidas, valores en una línea */}

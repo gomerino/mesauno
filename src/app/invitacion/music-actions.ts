@@ -77,3 +77,25 @@ export async function addTrackToPlaylist(invitationAccessToken: string, track: T
 
   return { ok: true };
 }
+
+/**
+ * Añade un track a la playlist del evento usando el refresh_token guardado en servidor.
+ * Preferible pasar `meta` si viene de la búsqueda (aportes y “últimos pedidos” con detalle).
+ */
+export async function addTrackToSpotify(
+  invitationAccessToken: string,
+  trackUri: string,
+  meta?: Partial<TrackMeta>
+): Promise<AddTrackResult> {
+  const uri = trackUri?.trim() ?? "";
+  if (!TRACK_URI_RE.test(uri)) {
+    return { ok: false, error: "URI de canción inválida." };
+  }
+  return addTrackToPlaylist(invitationAccessToken, {
+    uri,
+    name: meta?.name ?? "Canción",
+    artists: meta?.artists ?? "",
+    album: meta?.album ?? "",
+    imageUrl: meta?.imageUrl ?? null,
+  });
+}

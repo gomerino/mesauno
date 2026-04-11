@@ -2,7 +2,6 @@ import { spotifySearchRouteGET } from "@/lib/spotify-search-route";
 
 export const dynamic = "force-dynamic";
 
-/** Alias de `/api/spotify/search` (misma lógica, rate limit compartido por IP). */
 export async function GET(request: Request) {
   return spotifySearchRouteGET(request);
 }

@@ -9,6 +9,8 @@ import { createPortal } from "react-dom";
 type Props = {
   invitacionToken: string;
   onUploaded: (foto: EventoFoto) => void;
+  /** Suma al `bottom` del FAB (p. ej. barra fija de check-in encima). Ej: `5.25rem`. */
+  fabBottomExtra?: string;
 };
 
 function uploadFormDataWithProgress(
@@ -37,7 +39,7 @@ function uploadFormDataWithProgress(
   });
 }
 
-export function PhotoUpload({ invitacionToken, onUploaded }: Props) {
+export function PhotoUpload({ invitacionToken, onUploaded, fabBottomExtra }: Props) {
   const inputId = useId();
   const [mounted, setMounted] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -105,11 +107,15 @@ export function PhotoUpload({ invitacionToken, onUploaded }: Props) {
 
   const showBar = busy && (compressPct !== null || uploadPct > 0);
 
+  const bottomExpr = fabBottomExtra
+    ? `calc(max(1.25rem, env(safe-area-inset-bottom, 0px)) + ${fabBottomExtra})`
+    : "max(1.25rem, env(safe-area-inset-bottom, 0px))";
+
   const shell = (
     <div
       className="pointer-events-none fixed z-[200] flex flex-col items-end gap-2"
       style={{
-        bottom: "max(1.25rem, env(safe-area-inset-bottom, 0px))",
+        bottom: bottomExpr,
         right: "max(1.25rem, env(safe-area-inset-right, 0px))",
       }}
     >

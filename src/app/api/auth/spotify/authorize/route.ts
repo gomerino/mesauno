@@ -2,7 +2,6 @@ import { spotifyOAuthAuthorizeGET, spotifyOAuthDynamic } from "@/lib/spotify-oau
 
 export const dynamic = spotifyOAuthDynamic;
 
-/** @deprecated Usa `/api/auth/spotify/authorize`; se mantiene por compatibilidad con enlaces antiguos. */
 export async function GET(request: Request) {
   return spotifyOAuthAuthorizeGET(request);
 }

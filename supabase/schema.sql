@@ -699,6 +699,7 @@ create policy "aportes_regalo_delete" on public.aportes_regalo
 
 -- Programa del evento: tabla `evento_programa_hitos` + función `programa_evento_lista_publica` — migration_evento_programa.sql
 -- Álbum de fotos: bucket `fotos_eventos`, tabla `evento_fotos`, RPC `fotos_evento_lista_publica` — migration_evento_fotos.sql
+-- Temas de invitación UI: tabla `themes`, columna `invitados.theme_id` — migration_themes_invitados.sql
 
 -- Spotify (música colaborativa): tablas `evento_spotify` y `playlist_aportes` — ejecutar también migration_spotify_music.sql
 -- Recordatorios: `log_recordatorios`, función `invitados_elegibles_recordatorio` — ejecutar migration_recordatorios.sql

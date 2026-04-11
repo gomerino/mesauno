@@ -27,7 +27,7 @@ export function SpotifyPlaylistConnect({ eventoId, spotifyConnected, initialPlay
     if (flashHandled.current) return;
     if (searchParams.get("spotify") === "connected") {
       flashHandled.current = true;
-      toast.success("Cuenta de Spotify vinculada. Ahora indica la playlist oficial.");
+      toast.success("Cuenta de Spotify vinculada. Si no había playlist, creamos una oficial automáticamente.");
       router.replace("/panel/evento");
       return;
     }
@@ -65,15 +65,16 @@ export function SpotifyPlaylistConnect({ eventoId, spotifyConnected, initialPlay
     router.refresh();
   }
 
-  const authUrl = `/api/spotify/authorize?evento_id=${encodeURIComponent(eventoId)}`;
+  const authUrl = `/api/auth/spotify/authorize?evento_id=${encodeURIComponent(eventoId)}`;
 
   return (
     <section className="space-y-4 rounded-2xl border border-green-500/25 bg-gradient-to-br from-green-950/40 to-black/40 p-5">
       <div>
         <h2 className="font-display text-lg font-semibold text-green-400">Música colaborativa (Spotify)</h2>
         <p className="mt-1 text-sm text-slate-400">
-          Los invitados podrán buscar canciones y sumarlas a una playlist. Primero autoriza a Mesa Uno con tu cuenta de
-          Spotify (solo el administrador), luego pega el enlace de la playlist oficial.
+          Los invitados podrán buscar canciones y sumarlas a la playlist oficial. Al vincular tu cuenta creamos una
+          playlist &quot;Boda: …&quot; automáticamente; podés reemplazarla pegando otro enlace si preferís una lista ya
+          existente.
         </p>
       </div>
 
@@ -91,7 +92,7 @@ export function SpotifyPlaylistConnect({ eventoId, spotifyConnected, initialPlay
 
       <form onSubmit={savePlaylist} className="space-y-3">
         <div>
-          <label className={label}>Enlace o ID de la playlist oficial</label>
+          <label className={label}>Otra playlist (enlace o ID, opcional)</label>
           <input
             className={input}
             value={playlistInput}
@@ -109,7 +110,7 @@ export function SpotifyPlaylistConnect({ eventoId, spotifyConnected, initialPlay
             disabled={!spotifyConnected || saving}
             className="rounded-full bg-white/10 px-5 py-2 text-sm font-semibold text-white hover:bg-white/15 disabled:opacity-40"
           >
-            {saving ? "Guardando…" : "Guardar playlist"}
+            {saving ? "Guardando…" : "Guardar enlace de playlist"}
           </button>
           {spotifyConnected && (
             <button

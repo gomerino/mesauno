@@ -9,6 +9,40 @@
   font-family: var(--font-bp-header), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
+/* Tema invite: mismo par oro + marino que el botón «Confirmar asistencia» */
+.bpHeader[data-palette="invite"] {
+  background: linear-gradient(165deg, #e4c55d 0%, #d4af37 45%, #c4a132 100%);
+}
+
+.bpHeader[data-palette="invite"]::before {
+  opacity: 0.55;
+  background:
+    radial-gradient(ellipse 120% 80% at 18% -15%, rgba(255, 255, 255, 0.28) 0%, transparent 42%),
+    radial-gradient(ellipse 90% 70% at 100% 100%, rgba(26, 43, 72, 0.07) 0%, transparent 48%);
+}
+
+.bpHeader[data-palette="invite"]::after {
+  opacity: 0.02;
+}
+
+.bpHeader[data-palette="invite"] .bpAirlineName {
+  color: #1a2b48;
+}
+
+.bpHeader[data-palette="invite"] .bpTagline {
+  color: rgba(26, 43, 72, 0.78);
+}
+
+.bpHeader[data-palette="invite"] .bpDivider {
+  background: rgba(26, 43, 72, 0.22);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.bpHeader[data-palette="invite"] .bpRouteCode {
+  color: #1a2b48;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
 /* Textura / brillo muy sutil (premium) */
 .bpHeader::before {
   content: "";

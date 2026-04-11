@@ -130,3 +130,33 @@ export async function spotifyFetchCurrentUserId(accessToken: string): Promise<st
   const j = (await res.json()) as { id?: string };
   return j.id ?? null;
 }
+
+export async function spotifyCreatePlaylist(
+  accessToken: string,
+  spotifyUserId: string,
+  name: string,
+  opts?: { description?: string; public?: boolean }
+): Promise<{ id: string } | null> {
+  const res = await fetch(
+    `https://api.spotify.com/v1/users/${encodeURIComponent(spotifyUserId)}/playlists`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: name.slice(0, 100),
+        public: opts?.public ?? true,
+        description: opts?.description?.slice(0, 300) ?? "",
+      }),
+    }
+  );
+  if (!res.ok) {
+    const t = await res.text();
+    console.error("[spotify] create playlist", res.status, t.slice(0, 300));
+    return null;
+  }
+  const j = (await res.json()) as { id?: string };
+  return j.id ? { id: j.id } : null;
+}
