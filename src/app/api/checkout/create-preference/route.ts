@@ -1,10 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import {
+  canUseMercadoPagoNotificationUrl,
   createMercadoPagoConfig,
   getMembershipUnitPrice,
   isMercadoPagoSandboxMode,
+  resolvePreferenceOrigin,
+  validateMercadoPagoPreferenceOrigin,
 } from "@/lib/mercadopago-server";
-import { getPublicOriginFromRequest } from "@/lib/public-origin";
 import { Preference } from "mercadopago";
 import { NextResponse } from "next/server";
 
@@ -59,7 +61,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Este evento ya tiene suscripción activa." }, { status: 400 });
   }
 
-  const origin = getPublicOriginFromRequest(request);
+  const origin = resolvePreferenceOrigin(request);
+  const originCheck = validateMercadoPagoPreferenceOrigin(origin);
+  if (!originCheck.ok) {
+    return NextResponse.json({ error: originCheck.message }, { status: 400 });
+  }
+
   const baseDash = `${origin}/dashboard/${eventoId}`;
   const notificationUrl = `${origin}/api/webhooks/mercadopago`;
 
@@ -90,7 +97,7 @@ export async function POST(request: Request) {
           pending: `${baseDash}/pago/pending`,
         },
         auto_return: "approved",
-        notification_url: notificationUrl,
+        ...(canUseMercadoPagoNotificationUrl(origin) ? { notification_url: notificationUrl } : {}),
       },
     });
 

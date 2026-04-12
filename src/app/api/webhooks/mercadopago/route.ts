@@ -1,3 +1,4 @@
+import { provisionCheckoutSessionFromPayment } from "@/lib/checkout-provision";
 import { createStrictServiceClient } from "@/lib/supabase/server";
 import {
   createMercadoPagoConfig,
@@ -69,8 +70,8 @@ type MpPaymentLike = {
 async function applyApprovedPayment(payment: MpPaymentLike): Promise<void> {
   if (payment.status !== "approved") return;
 
-  const eventoId = payment.external_reference?.trim();
-  if (!eventoId || !UUID_RE.test(eventoId)) {
+  const ref = payment.external_reference?.trim();
+  if (!ref || !UUID_RE.test(ref)) {
     console.warn("[mp-webhook] external_reference inválido o ausente", payment.external_reference);
     return;
   }
@@ -81,6 +82,17 @@ async function applyApprovedPayment(payment: MpPaymentLike): Promise<void> {
     throw new Error("service_client_missing");
   }
 
+  const { data: checkoutRow } = await supabase.from("checkout_sessions").select("id").eq("id", ref).maybeSingle();
+
+  if (checkoutRow) {
+    const result = await provisionCheckoutSessionFromPayment(payment);
+    if (!result.ok) {
+      console.warn("[mp-webhook] provision checkout_session", result.reason);
+    }
+    return;
+  }
+
+  const eventoId = ref;
   const paymentId = payment.id != null ? String(payment.id) : "";
   if (!paymentId) return;
 

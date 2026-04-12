@@ -15,6 +15,10 @@ export type Evento = {
   motivo_viaje: string | null;
   /** Línea corta bajo el encabezado del boarding pass (lugar). */
   lugar_evento_linea: string | null;
+  /** Plan de producto contratado en checkout (esencial / experiencia). */
+  plan?: "esencial" | "experiencia" | null;
+  /** Sesión de Checkout Pro que originó el evento (idempotencia). */
+  checkout_session_id?: string | null;
   /** Membresía Mesa Uno (Mercado Pago). */
   plan_status?: "trial" | "paid" | "expired" | null;
   payment_id?: string | null;
