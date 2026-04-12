@@ -1,40 +1,43 @@
-import Link from "next/link";
+import { CTA } from "@/components/marketing/CTA";
+import { DemoPreview } from "@/components/marketing/DemoPreview";
+import { Features } from "@/components/marketing/Features";
+import { Hero } from "@/components/marketing/Hero";
+import { HowItWorks } from "@/components/marketing/HowItWorks";
 import { SiteHeader } from "@/components/SiteHeader";
+import type { Metadata } from "next";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Dreams Wedding — Invitaciones boarding pass",
+  description:
+    "Invitación digital, organización de invitados, RSVP y check-in QR. Tu matrimonio, como un boarding pass.",
+};
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#020617]">
       <SiteHeader />
-      <main className="mx-auto max-w-3xl px-4 py-20 text-center">
-        <p className="mb-4 inline-block rounded-full border border-teal-400/30 bg-teal-500/10 px-4 py-1 text-sm text-teal-200">
-          Plataforma de matrimonios
-        </p>
-        <h1 className="font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
-          Tu gran día merece un <span className="text-orange-400">despegue</span> memorable
-        </h1>
-        <p className="mt-6 text-lg text-slate-300">
-          Invitaciones estilo boarding pass, RSVP con restricciones alimenticias, regalos y un
-          marketplace de proveedores — todo con Next.js 14 y Supabase.
-        </p>
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <Link
-            href="/marketplace"
-            className="rounded-full bg-teal-500 px-8 py-3 font-semibold text-white shadow-lg shadow-teal-900/40 transition hover:bg-teal-400"
-          >
-            Ver marketplace
+      <Hero />
+      <Features />
+      <DemoPreview />
+      <HowItWorks />
+      <CTA />
+      <footer className="border-t border-white/10 bg-[#020617] px-4 py-10 text-center text-xs text-slate-500">
+        <div className="mx-auto flex max-w-xl flex-wrap items-center justify-center gap-x-4 gap-y-2">
+          <Link href="/marketplace" className="hover:text-slate-300">
+            Marketplace
           </Link>
-          <Link
-            href="/login"
-            className="rounded-full border border-white/20 px-8 py-3 font-semibold text-white hover:bg-white/10"
-          >
-            Acceder al panel
+          <span className="text-slate-700">·</span>
+          <Link href="/login" className="hover:text-slate-300">
+            Panel novios
+          </Link>
+          <span className="text-slate-700">·</span>
+          <Link href="/invitacion/demo" className="hover:text-slate-300">
+            Demo invitación
           </Link>
         </div>
-        <p className="mt-12 text-sm text-slate-500">
-          Demo: usa <code className="text-teal-400">/invitacion/[token]</code> con el UUID del invitado o el
-          token de acceso (<code className="text-teal-400">token_acceso</code> en Supabase).
-        </p>
-      </main>
+        <p className="mt-4">© {new Date().getFullYear()} Dreams Wedding</p>
+      </footer>
     </div>
   );
 }

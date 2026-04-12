@@ -1,5 +1,5 @@
 /* Dreams Wedding — service worker mínimo: no cachea navegaciones (App Router / RSC). */
-const CACHE_NAME = "dreams-wedding-assets-v1";
+const CACHE_NAME = "dreams-wedding-assets-v2";
 
 self.addEventListener("install", () => {
   self.skipWaiting();
