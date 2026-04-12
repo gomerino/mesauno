@@ -1,3 +1,4 @@
+import { InvitacionClientRefresh } from "@/components/invitacion/InvitacionClientRefresh";
 import { Courier_Prime, Montserrat, Playfair_Display } from "next/font/google";
 
 const playfair = Playfair_Display({
@@ -21,6 +22,9 @@ const ticketMono = Courier_Prime({
 
 export default function InvitacionLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`${playfair.variable} ${montserrat.variable} ${ticketMono.variable}`}>{children}</div>
+    <div className={`${playfair.variable} ${montserrat.variable} ${ticketMono.variable}`}>
+      <InvitacionClientRefresh />
+      {children}
+    </div>
   );
 }

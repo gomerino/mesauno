@@ -32,7 +32,7 @@ export default async function InvitacionPage({ params, searchParams }: Props) {
   }
 
   const invitado = data as Invitado;
-  const evento = await fetchEventoForInvitado(supabase, invitado);
+  const evento = await fetchEventoForInvitado(supabase, invitado, { invitacionToken: token });
   const qrValue = boardingPassQrMapUrlMerged(invitado, evento);
   const merged = mergeEventoParaPase(invitado, evento);
   const playlists = resolveEventPlaylistEnv();

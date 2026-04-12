@@ -697,6 +697,7 @@ create policy "aportes_regalo_delete" on public.aportes_regalo
     and not public.user_is_evento_staff_centro(evento_id)
   );
 
+-- Snapshot público del evento para /invitacion (sin sesión): `evento_para_invitacion_publica` — migration_evento_invitacion_publica.sql
 -- Programa del evento: tabla `evento_programa_hitos` + función `programa_evento_lista_publica` — migration_evento_programa.sql
 -- Álbum de fotos: bucket `fotos_eventos`, tabla `evento_fotos`, RPC `fotos_evento_lista_publica` — migration_evento_fotos.sql
 -- Temas de invitación UI: tabla `themes`, columna `invitados.theme_id` — migration_themes_invitados.sql

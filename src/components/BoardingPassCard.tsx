@@ -7,38 +7,13 @@ import { EventPlaylistSection } from "@/components/EventPlaylistSection";
 import type { EventPlaylistUrls } from "@/lib/event-playlist-env";
 import { hasAnyPlaylist } from "@/lib/event-playlist-env";
 import { isMapsQrPayload } from "@/lib/event-maps";
+import { formatFechaDDMMMYY } from "@/lib/format-fecha-evento";
 import { nombresAcompanantes } from "@/lib/invitado-acompanantes";
 
 const NAVY = "#001d66";
 
 /** Ancho típico de boarding pass térmico / móvil (~82 mm a escala UI). */
 const BP_WIDTH = "min(100vw - 1.5rem, 20rem)";
-
-const MESES_CORTO = [
-  "ENE",
-  "FEB",
-  "MAR",
-  "ABR",
-  "MAY",
-  "JUN",
-  "JUL",
-  "AGO",
-  "SEP",
-  "OCT",
-  "NOV",
-  "DIC",
-] as const;
-
-/** Formato invitación: 04 ABR 27 */
-function formatFechaDDMMMYY(iso: string | null, fallback: string) {
-  if (!iso) return fallback;
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return fallback;
-  const day = String(d.getUTCDate()).padStart(2, "0");
-  const mon = MESES_CORTO[d.getUTCMonth()] ?? "---";
-  const yy = String(d.getUTCFullYear()).slice(-2);
-  return `${day} ${mon} ${yy}`;
-}
 
 function isHttpUrl(s: string): boolean {
   return s.startsWith("https://") || s.startsWith("http://");

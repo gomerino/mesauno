@@ -75,20 +75,17 @@ export function SoftAviationGuestActions({
     <div className="space-y-3">
       {ui === "pending" && (
         <button type="button" onClick={openCreate} className={primaryCtaClass}>
-          Confirmar asistencia
+          Confirma tu asistencia <span aria-hidden>✈️</span>
         </button>
       )}
 
       {ui === "confirmed" && (
         <div className="space-y-3 animate-rsvpReveal motion-reduce:animate-none">
           <div className="text-center">
-            <p className="text-[13px] font-semibold leading-snug text-[#1A2B48]">
-              <span aria-hidden>✔</span> Check-in completado
-            </p>
-            <p className="mt-1.5 text-[12px] leading-snug text-[#1A2B48]/85">
-              Tu asiento en <span className="font-semibold text-[#1A2B48]">{destinoSummary}</span> está confirmado{" "}
-              <span aria-hidden>✈️</span>
-            </p>
+            <p className="text-[13px] font-semibold leading-snug text-[#1A2B48]">Todo listo, te esperamos a bordo</p>
+            {destinoSummary !== "tu lugar" ? (
+              <p className="mt-1.5 text-[12px] leading-snug text-[#1A2B48]/80">Tu mesa está reservada</p>
+            ) : null}
           </div>
           <button type="button" onClick={openEdit} className={primaryCtaClass}>
             Editar asistencia

@@ -82,14 +82,34 @@ export function boardingPassQrMapUrlMerged(invitado: Invitado, evento: Evento | 
   return googleMapsSearchUrl(resolveDestinoParaMapa(destino));
 }
 
+async function eventoDesdeRpcInvitacionPublica(
+  db: ReturnType<typeof asLooseClient>,
+  invitacionToken: string
+): Promise<Evento | null> {
+  const { data, error } = await db.rpc("evento_para_invitacion_publica", {
+    p_token: invitacionToken,
+  });
+  if (error || data == null) {
+    return null;
+  }
+  return data as Evento;
+}
+
 export async function fetchEventoForInvitado(
   supabase: SupabaseClient,
-  invitado: Invitado
+  invitado: Invitado,
+  opts?: { invitacionToken?: string }
 ): Promise<Evento | null> {
   const db = asLooseClient(supabase);
   if (invitado.evento_id) {
     const { data } = await db.from("eventos").select("*").eq("id", invitado.evento_id).maybeSingle();
-    return (data ?? null) as Evento | null;
+    if (data) return data as Evento;
+    const token = opts?.invitacionToken?.trim();
+    if (token) {
+      const fromRpc = await eventoDesdeRpcInvitacionPublica(db, token);
+      if (fromRpc) return fromRpc;
+    }
+    return null;
   }
   if (invitado.owner_user_id) {
     const uid = invitado.owner_user_id;

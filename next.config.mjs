@@ -21,6 +21,19 @@ const nextConfig = {
   images: {
     remotePatterns: buildImageRemotePatterns(),
   },
+  async headers() {
+    return [
+      {
+        source: "/invitacion/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "private, no-cache, no-store, max-age=0, must-revalidate",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

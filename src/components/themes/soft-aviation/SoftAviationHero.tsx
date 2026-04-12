@@ -56,11 +56,6 @@ export function SoftAviationHero({
             {fechaLegible}
           </p>
         ) : null}
-        <p
-          className={`mt-1 max-w-lg font-inviteMono text-[#1A2B48]/58 ${compact ? "text-[7px] leading-snug tracking-[0.04em]" : "text-[7.5px] leading-snug tracking-[0.05em] sm:text-[8px]"}`}
-        >
-          Papel fino y pase en el celular.
-        </p>
         <SoftAviationCountdown
           fechaEvento={fechaEvento}
           horaEmbarque={horaEmbarque}
