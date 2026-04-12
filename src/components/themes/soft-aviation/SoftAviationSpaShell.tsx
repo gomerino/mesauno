@@ -13,7 +13,7 @@ import { SoftAviationRegalosPanel } from "@/components/themes/soft-aviation/Soft
 import { SoftAviationTicket } from "@/components/themes/soft-aviation/SoftAviationTicket";
 import { formatFechaEventoLarga } from "@/lib/format-fecha-evento";
 import { hasAnyPlaylist } from "@/lib/event-playlist-env";
-import { hasCompletedRsvp } from "@/lib/rsvp-ui-state";
+import { computeSoftAviationInviteFlags } from "@/lib/soft-aviation-invite-state";
 import type { LucideIcon } from "lucide-react";
 import { CalendarDays, Camera, Gift, Mail, Music2, QrCode, Ticket, X } from "lucide-react";
 import Link from "next/link";
@@ -63,21 +63,33 @@ export function SoftAviationSpaShell({
   const [checkInQrOpen, setCheckInQrOpen] = useState(false);
   const [rsvpEstadoLive, setRsvpEstadoLive] = useState<string | null>(invitado.rsvp_estado ?? null);
 
-  const navCompleta = hasCompletedRsvp(rsvpEstadoLive);
-  const navItems = useMemo(
-    () => (navCompleta ? NAV : NAV.filter((n) => n.id === "ticket")),
-    [navCompleta]
+  const { isConfirmed, isEventDay } = computeSoftAviationInviteFlags(
+    rsvpEstadoLive,
+    merged.fecha_evento,
+    invitado,
+    evento
   );
+
+  /** Pase + Carta siempre; Regalos/Música/Plan si confirmó; Fotos si es día del evento (independiente). */
+  const navItems = useMemo(() => {
+    const core = NAV.filter((n) => n.id === "ticket" || n.id === "motivo");
+    const postConfirm = isConfirmed
+      ? NAV.filter((n) => n.id === "regalos" || n.id === "playlist" || n.id === "itinerario")
+      : [];
+    const fotosTab = isEventDay ? NAV.filter((n) => n.id === "fotos") : [];
+    return [...core, ...postConfirm, ...fotosTab];
+  }, [isConfirmed, isEventDay]);
+
+  const navColumnCount = navItems.length + (isEventDay ? 1 : 0);
 
   useEffect(() => {
     setRsvpEstadoLive(invitado.rsvp_estado ?? null);
   }, [invitado.rsvp_estado]);
 
   useEffect(() => {
-    if (!navCompleta && activeTab !== "ticket") {
-      setActiveTab("ticket");
-    }
-  }, [navCompleta, activeTab]);
+    const allowed = new Set(navItems.map((n) => n.id));
+    if (!allowed.has(activeTab)) setActiveTab("ticket");
+  }, [navItems, activeTab]);
 
   const motivoText = merged.motivo_viaje?.trim() ?? "";
   const eventoId = invitado.evento_id ?? null;
@@ -140,7 +152,7 @@ export function SoftAviationSpaShell({
                 </button>
               </div>
               <div className="max-h-[min(78dvh,32rem)] overflow-y-auto overscroll-contain p-3 sm:p-4">
-                <p className="mb-2 text-center text-xs text-[#1A2B48]/60">Muestra este código el día del evento.</p>
+                <p className="mb-2 text-center text-xs text-[#1A2B48]/60">Presenta este código al ingreso</p>
                 <div className="rounded-xl border border-[#1A2B48]/10 bg-white">
                   <InvitacionCheckInQr payload={checkInPayload} fileName={checkInFileName} />
                 </div>
@@ -157,9 +169,7 @@ export function SoftAviationSpaShell({
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-row">
         {/* Desktop/tablet: rail izquierdo. Móvil: oculto (navegación abajo, más ancho útil y pulgar). */}
-        <aside
-          className={`hidden w-[4.75rem] shrink-0 flex-col border-r border-[#1A2B48]/10 bg-white/95 shadow-[2px_0_12px_rgba(26,43,72,0.04)] backdrop-blur-md supports-[backdrop-filter]:bg-white/88 md:flex ${!navCompleta ? "opacity-90" : ""}`}
-        >
+        <aside className="hidden w-[4.75rem] shrink-0 flex-col border-r border-[#1A2B48]/10 bg-white/95 shadow-[2px_0_12px_rgba(26,43,72,0.04)] backdrop-blur-md supports-[backdrop-filter]:bg-white/88 md:flex">
           <nav
             className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overflow-x-hidden px-1 py-2 [-webkit-overflow-scrolling:touch]"
             aria-label="Secciones de la invitación"
@@ -197,20 +207,20 @@ export function SoftAviationSpaShell({
             })}
           </nav>
 
-          <div className="shrink-0 border-t border-[#1A2B48]/10 px-1 py-2">
-            <button
-              type="button"
-              title="Ingreso · código QR"
-              aria-label="Ingreso: mostrar código QR"
-              onClick={() => setCheckInQrOpen(true)}
-              className="flex w-full flex-col items-center gap-0.5 rounded-lg py-2 text-[#1A2B48]/70 transition hover:bg-[#D4AF37]/15 hover:text-[#1A2B48]"
-            >
-              <QrCode className="h-[1.05rem] w-[1.05rem] shrink-0 sm:h-5 sm:w-5" strokeWidth={2} aria-hidden />
-              <span className="max-w-[3rem] text-center text-[5px] font-semibold leading-[1.05] sm:text-[6px]">
-                Ingreso
-              </span>
-            </button>
-          </div>
+          {isEventDay ? (
+            <div className="shrink-0 border-t border-[#1A2B48]/10 px-1 py-2">
+              <button
+                type="button"
+                title="Código QR de ingreso"
+                aria-label="Mostrar código QR para ingreso"
+                onClick={() => setCheckInQrOpen(true)}
+                className="flex w-full flex-col items-center gap-0.5 rounded-lg py-2 text-[#1A2B48]/70 transition hover:bg-[#D4AF37]/15 hover:text-[#1A2B48]"
+              >
+                <QrCode className="h-[1.05rem] w-[1.05rem] shrink-0 sm:h-5 sm:w-5" strokeWidth={2} aria-hidden />
+                <span className="max-w-[3rem] text-center text-[5px] font-semibold leading-[1.05] sm:text-[6px]">QR</span>
+              </button>
+            </div>
+          ) : null}
         </aside>
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -253,7 +263,7 @@ export function SoftAviationSpaShell({
                 hideOuterSection
                 albumCardClassName="rounded-2xl border border-[#1A2B48]/10 bg-white p-4 shadow-sm [&_h2]:font-inviteSerif [&_h2]:text-[#1A2B48] [&_p]:text-[#1A2B48]/70"
                 albumTitle="Bitácora compartida"
-                albumBlurb="Desliza las polaroids o sube tu foto con el botón de la cámara."
+                albumBlurb="Sube y revisa fotos del evento 📸"
               />
             ) : (
               <div className="rounded-2xl border border-dashed border-[#1A2B48]/15 bg-white/80 p-8 text-center text-sm text-[#1A2B48]/60">
@@ -268,6 +278,7 @@ export function SoftAviationSpaShell({
             key="playlist"
             className="animate-fadeIn flex min-h-full flex-col items-center justify-center px-3 py-8 text-center"
           >
+            <p className="mb-4 max-w-sm text-xs text-[#1A2B48]/65">Agrega una canción para la fiesta 🎶</p>
             <div className="flex w-full max-w-md flex-col items-center gap-5">
               {hasPlaylist ? (
                 <>
@@ -338,6 +349,7 @@ export function SoftAviationSpaShell({
 
         {activeTab === "itinerario" ? (
           <div key="itinerario" className="animate-fadeIn px-1 py-4">
+            <p className="mb-2 text-center text-xs text-[#1A2B48]/65">Revisa cómo llegar y horarios</p>
             {hasItinerario ? (
               <div className="rounded-2xl border border-[#1A2B48]/10 bg-white p-3 shadow-sm sm:p-4 [&_.font-display]:font-inviteSerif">
                 <InvitacionCronograma hitos={programaHitos} fechaEvento={merged.fecha_evento} />
@@ -354,6 +366,8 @@ export function SoftAviationSpaShell({
           <div className="shrink-0 border-t border-[#1A2B48]/8 bg-[#F4F1EA]/95 px-2 pt-2 pb-2 shadow-[0_-4px_20px_rgba(26,43,72,0.06)] backdrop-blur-md supports-[backdrop-filter]:bg-[#F4F1EA]/88 md:pb-[max(0.35rem,env(safe-area-inset-bottom,0px))]">
             <SoftAviationGuestActions
               invitadoId={invitado.id}
+              invitado={invitado}
+              evento={evento}
               initialEstado={rsvpEstadoLive ?? invitado.rsvp_estado}
               restriccionesRaw={invitado.restricciones_alimenticias}
               spotifyPlaylistUrl={spotifyUrl}
@@ -364,17 +378,16 @@ export function SoftAviationSpaShell({
 
           {/* Móvil: barra fija inferior — alcance del pulgar, contenido a ancho completo sin rail lateral. */}
           <nav
-            className={`shrink-0 border-t border-[#1A2B48]/12 bg-white/98 shadow-[0_-8px_28px_rgba(26,43,72,0.1)] md:hidden ${!navCompleta ? "opacity-[0.88]" : ""}`}
+            className="shrink-0 border-t border-[#1A2B48]/12 bg-white/98 shadow-[0_-8px_28px_rgba(26,43,72,0.1)] md:hidden"
             style={{ paddingBottom: "max(0.4rem, env(safe-area-inset-bottom))" }}
             aria-label="Secciones de la invitación"
           >
-            {!navCompleta ? (
-              <p className="px-2 pt-1.5 text-center text-[9px] leading-tight text-[#1A2B48]/55">
-                Confirma tu asistencia abajo para ver carta, regalos y el resto de la invitación.
-              </p>
+            {!isConfirmed ? (
+              <p className="px-2 pt-1.5 text-center text-[9px] leading-tight text-[#1A2B48]/55">Confirma tu asistencia ✈️</p>
             ) : null}
             <div
-              className={`grid w-full gap-0.5 px-0.5 pt-1 ${navCompleta ? "grid-cols-7" : "grid-cols-2"}`}
+              className="grid w-full gap-0.5 px-0.5 pt-1"
+              style={{ gridTemplateColumns: `repeat(${navColumnCount}, minmax(0, 1fr))` }}
             >
               {navItems.map(({ id, label, dockShort, Icon }) => {
                 const active = activeTab === id;
@@ -403,16 +416,18 @@ export function SoftAviationSpaShell({
                   </button>
                 );
               })}
-              <button
-                type="button"
-                title="Ingreso · código QR"
-                aria-label="Ingreso: mostrar código QR"
-                onClick={() => setCheckInQrOpen(true)}
-                className="flex min-h-[3.25rem] min-w-0 flex-col items-center justify-center rounded-xl py-1 text-[#1A2B48]/70 touch-manipulation transition active:scale-[0.97] active:bg-[#D4AF37]/18"
-              >
-                <QrCode className="h-[1.15rem] w-[1.15rem] shrink-0 sm:h-5 sm:w-5" strokeWidth={2} aria-hidden />
-                <span className="mt-0.5 max-w-[100%] truncate text-center text-[8px] font-semibold leading-[1.1]">QR</span>
-              </button>
+              {isEventDay ? (
+                <button
+                  type="button"
+                  title="Código QR de ingreso"
+                  aria-label="Mostrar código QR para ingreso"
+                  onClick={() => setCheckInQrOpen(true)}
+                  className="flex min-h-[3.25rem] min-w-0 flex-col items-center justify-center rounded-xl py-1 text-[#1A2B48]/70 touch-manipulation transition active:scale-[0.97] active:bg-[#D4AF37]/18"
+                >
+                  <QrCode className="h-[1.15rem] w-[1.15rem] shrink-0 sm:h-5 sm:w-5" strokeWidth={2} aria-hidden />
+                  <span className="mt-0.5 max-w-[100%] truncate text-center text-[8px] font-semibold leading-[1.1]">QR</span>
+                </button>
+              ) : null}
             </div>
           </nav>
         </div>

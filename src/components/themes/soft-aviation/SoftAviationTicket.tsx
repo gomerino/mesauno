@@ -2,6 +2,7 @@ import { BoardingPassHeader } from "@/components/BoardingPassHeader";
 import { buildCeremoniaCelebracionLines, type ScheduleLine } from "@/lib/evento-invitation-schedule";
 import type { MergedEventoParaPase } from "@/lib/evento-boarding";
 import { resolveDestinoParaMapa } from "@/lib/evento-boarding";
+import { guestSeatLines, inferGuestGrupo } from "@/lib/guest-boarding-meta";
 import { nombresAcompanantes } from "@/lib/invitado-acompanantes";
 import type { Evento, EventoProgramaHito, Invitado } from "@/types/database";
 import { MapPin, Navigation } from "lucide-react";
@@ -48,12 +49,6 @@ function formatHoraEmbarqueCell(hora: string | null | undefined) {
   return raw || "17:30";
 }
 
-function lugarCorto(line: string, max = 18): string {
-  const t = line.trim();
-  if (t.length <= max) return t;
-  return `${t.slice(0, max - 1)}…`;
-}
-
 /** Primera hora del programa (por `orden`, luego por hora). Fallback: null → usar `merged.hora_embarque`. */
 function horaInicioDesdePrograma(hitos: EventoProgramaHito[]): string | null {
   if (!hitos.length) return null;
@@ -72,18 +67,22 @@ function DashCell({
   mono,
   children,
   nowrap,
+  labelClassName,
 }: {
   label: string;
   value?: string;
   mono?: boolean;
   children?: ReactNode;
   nowrap?: boolean;
+  labelClassName?: string;
 }) {
   const v = value && value.length > 0 ? value : "—";
   const valueClass = `w-full text-[10px] font-bold leading-none text-invite-navy sm:text-[11px] ${mono ? "font-mono tracking-tight" : ""} ${nowrap ? "whitespace-nowrap" : "break-words"}`;
   return (
     <div className="flex h-full min-w-0 flex-col items-stretch border-r border-dotted border-invite-navy/25 px-0.5 py-1.5 text-center last:border-r-0 sm:px-1">
-      <p className="w-full shrink-0 text-[7px] font-semibold uppercase leading-none tracking-wide text-invite-navy/50">
+      <p
+        className={`w-full shrink-0 text-[7px] font-semibold uppercase leading-none tracking-wide text-invite-navy/50 ${labelClassName ?? ""}`}
+      >
         {label}
       </p>
       <div className="flex min-h-[1.625rem] flex-1 flex-col items-center justify-center sm:min-h-[1.75rem]">
@@ -128,9 +127,9 @@ type Props = {
 };
 
 /**
- * Boarding pass: estética aerolínea con etiquetas claras y horarios reales fuera de la metáfora.
+ * Boarding pass: estética aerolínea; DESTINO = asiento (multilínea); GRUPO inferido.
  */
-export function SoftAviationTicket({ invitado, evento: _evento, merged, mapUrl, programaHitos }: Props) {
+export function SoftAviationTicket({ invitado, evento, merged, mapUrl, programaHitos }: Props) {
   const address = resolveDestinoParaMapa(merged.destino);
   const wazeUrl = `https://waze.com/ul?q=${encodeURIComponent(address)}&navigate=yes`;
 
@@ -138,11 +137,29 @@ export function SoftAviationTicket({ invitado, evento: _evento, merged, mapUrl, 
   const embarquePrograma = horaInicioDesdePrograma(programaHitos);
   const embarque = formatHoraEmbarqueCell(embarquePrograma ?? merged.hora_embarque ?? "");
   const fecha = formatFechaDDMMMYY(merged.fecha_evento, "— — —");
-  const destinoLinea = resolveDestinoParaMapa(merged.destino);
-  const lugarBreve = lugarCorto(destinoLinea, 16);
-  const acompanantes = nombresAcompanantes(invitado);
+  const seatLines = guestSeatLines(invitado, evento);
+  const seatRaw = seatLines.join("\n");
+  const grupo = inferGuestGrupo(seatRaw);
+  const destinoDisplay =
+    seatLines.length > 0 ? (
+      <span className="whitespace-normal break-words text-[9px] font-bold leading-[1.2] text-invite-navy sm:text-[10px]">
+        {seatLines.map((line, i) => (
+          <span key={`${i}-${line}`}>
+            {i > 0 ? <br /> : null}
+            {line}
+          </span>
+        ))}
+      </span>
+    ) : (
+      <span className="text-[9px] font-semibold leading-[1.2] text-invite-navy/70 sm:text-[10px]">
+        Por asignar <span aria-hidden>✈️</span>
+      </span>
+    );
 
+  const acompanantes = nombresAcompanantes(invitado);
   const scheduleLines = buildCeremoniaCelebracionLines(programaHitos, merged.hora_embarque ?? "17:30");
+  const lugarNombre = merged.lugar_evento_linea.trim();
+  const showAddressLine = address.trim() && address.trim() !== lugarNombre;
 
   return (
     <section className="mx-auto flex w-full max-w-md flex-col items-center px-0 text-invite-navy">
@@ -157,11 +174,10 @@ export function SoftAviationTicket({ invitado, evento: _evento, merged, mapUrl, 
         />
 
         <p className="border-b border-invite-navy/10 bg-invite-sand/40 px-3 py-1.5 text-center text-[8px] leading-snug text-invite-navy/75 sm:text-[9px]">
-          Vuelo simbólico hacia nuestro matrimonio — los horarios reales están abajo.
+          Vuelo simbólico · los horarios de abajo son los oficiales.
         </p>
 
         <div className="px-3 py-2.5 sm:px-4 sm:py-3">
-          {/* 1. Invitado(a) */}
           <div className="border-b border-dashed border-invite-navy/20 pb-2.5">
             <p className="text-[8px] font-semibold uppercase tracking-[0.2em] text-invite-navy/50">Invitado / Pasajero</p>
             <p className="mt-0.5 break-words font-inviteSerif text-lg font-bold uppercase leading-tight tracking-wide text-invite-navy sm:text-xl">
@@ -181,53 +197,29 @@ export function SoftAviationTicket({ invitado, evento: _evento, merged, mapUrl, 
             </p>
           </div>
 
-          {/* 2. Metáfora compacta (no sustituye horarios de abajo) */}
-          <div className="mt-3 border-t border-invite-navy/20 pt-2" aria-label="Detalle simbólico del pase">
-            <div className="grid w-full items-stretch [grid-template-columns:minmax(0,0.88fr)_minmax(3.1rem,1.08fr)_minmax(0,1.12fr)_minmax(0,0.88fr)]">
-              <DashCell label="Código" value={vuelo} mono nowrap />
+          <div className="mt-3 border-t border-invite-navy/20 pt-2" aria-label="Detalle del pase">
+            <div className="grid w-full items-stretch [grid-template-columns:minmax(0,0.62fr)_minmax(2.65rem,0.88fr)_minmax(0,0.88fr)_minmax(0,1.05fr)_minmax(0,0.72fr)]">
+              <DashCell label="Código" nowrap>
+                <p className="w-full whitespace-nowrap px-0.5 text-center font-mono text-[8px] font-semibold leading-none text-invite-navy/45 sm:text-[9px]">
+                  {vuelo}
+                </p>
+              </DashCell>
               <DashCell label="Hora" mono nowrap>
                 <div className="flex h-full w-full min-w-0 items-center justify-center bg-invite-gold px-0.5 py-1 text-center font-mono text-[10px] font-bold leading-none text-invite-navy sm:px-1 sm:text-[11px]">
                   {embarque}
                 </div>
               </DashCell>
               <DashCell label="Fecha" value={fecha} mono nowrap />
-              <DashCell label="Lugar" value={lugarBreve} nowrap />
+              <DashCell label="DESTINO" labelClassName="tracking-tighter">
+                <div className="flex max-h-[3.25rem] min-h-[2rem] w-full items-center justify-center overflow-y-auto px-0.5 text-center">
+                  {destinoDisplay}
+                </div>
+              </DashCell>
+              <DashCell label="GRUPO" nowrap>
+                <p className="w-full break-words text-[8px] font-bold leading-tight text-invite-navy/85 sm:text-[9px]">{grupo}</p>
+              </DashCell>
             </div>
             <p className="mt-1.5 text-center text-[7px] text-invite-navy/45">Referencia simbólica · no es un vuelo real</p>
-          </div>
-
-          {/* 3. Ubicación */}
-          <div className="mt-3 border-t border-dashed border-invite-navy/20 pt-2.5">
-            <p className="text-[8px] font-semibold uppercase tracking-widest text-invite-navy/45">Ubicación</p>
-            <p className="mt-1 break-words text-center text-[11px] font-semibold leading-snug text-invite-navy sm:text-[12px]">
-              <span aria-hidden className="mr-0.5">
-                📍
-              </span>
-              {merged.lugar_evento_linea}
-            </p>
-          </div>
-
-          {/* Mapas: secundario / terciario (el CTA principal es RSVP en el footer global) */}
-          <div className="mt-4 border-t border-invite-navy/15 pt-3">
-            <p className="mb-2 text-center text-[8px] font-semibold uppercase tracking-widest text-invite-navy/40">Cómo llegar</p>
-            <a
-              href={mapUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-[46px] w-full touch-manipulation items-center justify-center gap-2 rounded-xl border-2 border-invite-navy/35 bg-white px-3 py-2.5 text-center text-[11px] font-semibold leading-snug text-invite-navy shadow-none transition hover:border-invite-navy/50 hover:bg-invite-sand/50 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-invite-navy"
-            >
-              <MapPin className="h-4 w-4 shrink-0 stroke-[2.25] text-invite-navy" aria-hidden />
-              Ver en mapa
-            </a>
-            <a
-              href={wazeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 flex w-full items-center justify-center gap-1.5 py-2 text-[11px] font-medium text-invite-navy/80 underline decoration-invite-navy/30 underline-offset-4 transition hover:text-invite-navy"
-            >
-              <Navigation className="h-3.5 w-3.5 shrink-0 text-invite-navy/70" strokeWidth={2} aria-hidden />
-              Abrir en Waze
-            </a>
           </div>
         </div>
 
@@ -236,6 +228,42 @@ export function SoftAviationTicket({ invitado, evento: _evento, merged, mapUrl, 
             Gracias por ser parte de este viaje. Nos vemos en el embarque <span aria-hidden>❤️</span>
           </p>
         </footer>
+      </div>
+
+      {/* Ubicación + acciones (fuera del bloque del ticket, jerarquía clara) */}
+      <div className="mt-4 w-full max-w-[20rem] px-0.5">
+        <p className="text-[8px] font-semibold uppercase tracking-widest text-invite-navy/45">Ubicación</p>
+        <p className="mt-1 break-words text-center text-[12px] font-semibold leading-snug text-invite-navy sm:text-[13px]">
+          <span aria-hidden className="mr-0.5">
+            📍
+          </span>
+          {lugarNombre}
+        </p>
+        {showAddressLine ? (
+          <p className="mt-1 break-words text-center text-[11px] leading-snug text-invite-navy/75">{address}</p>
+        ) : null}
+        <p className="mt-2 text-center text-[10px] text-invite-navy/55">Llega 15 min antes</p>
+
+        <div className="mt-3 flex flex-row flex-wrap items-center justify-center gap-2">
+          <a
+            href={mapUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[36px] shrink-0 items-center justify-center gap-1.5 rounded-lg border border-invite-navy/35 bg-white px-3 py-1.5 text-[11px] font-semibold text-invite-navy shadow-sm transition hover:bg-invite-sand/60 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-invite-navy"
+          >
+            <MapPin className="h-3.5 w-3.5 shrink-0 stroke-[2.25] text-invite-navy" aria-hidden />
+            Cómo llegar
+          </a>
+          <a
+            href={wazeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[36px] shrink-0 items-center justify-center gap-1.5 rounded-lg border border-invite-navy/35 bg-white px-3 py-1.5 text-[11px] font-semibold text-invite-navy shadow-sm transition hover:bg-invite-sand/60 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-invite-navy"
+          >
+            <Navigation className="h-3.5 w-3.5 shrink-0 text-invite-navy" strokeWidth={2} aria-hidden />
+            Waze
+          </a>
+        </div>
       </div>
 
       <ScheduleBlock lines={scheduleLines} />

@@ -33,6 +33,10 @@ const config: Config = {
           "40%": { transform: "scale(1.04)", filter: "brightness(1.06)" },
           "70%": { transform: "scale(1)", filter: "brightness(1)" },
         },
+        rsvpReveal: {
+          from: { opacity: "0", transform: "translateY(8px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         stampDrop: "stampDrop 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards",
@@ -40,6 +44,7 @@ const config: Config = {
         fadeIn: "fadeIn 0.22s ease-out forwards",
         ticketPrintIn: "ticketPrintIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both",
         boardingValidated: "boardingValidated 0.85s cubic-bezier(0.22, 1, 0.36, 1) both",
+        rsvpReveal: "rsvpReveal 0.26s cubic-bezier(0.22, 1, 0.36, 1) both",
       },
       colors: {
         dreams: {

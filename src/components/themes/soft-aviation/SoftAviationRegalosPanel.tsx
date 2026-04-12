@@ -6,7 +6,7 @@
  */
 const TRANSFER = {
   intro:
-    "Ya tenemos el hogar que soñamos; si quieren hacernos un regalo, pueden transferir a nuestra próxima aventura.",
+    "Si quieres acompañarnos con un regalo 🎁, puedes transferir a nuestra próxima aventura.",
   cuenta: "53-17217-05",
   banco: "Banco de Chile",
   rut: "13.468.424-0",
