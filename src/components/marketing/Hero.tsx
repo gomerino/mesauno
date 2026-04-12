@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import { CrearMiEventoLink } from "@/components/marketing/CrearMiEventoLink";
 
 export function Hero() {
   return (
@@ -14,41 +14,36 @@ export function Hero() {
       <div className="relative mx-auto flex max-w-6xl flex-col gap-10 lg:flex-row lg:items-center lg:gap-14">
         <div className="min-w-0 flex-1 text-center lg:text-left">
           <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-[#D4AF37]/90">
-            Dreams Wedding
+            Dreams · invitaciones estilo boarding pass
           </p>
           <h1 className="font-display text-[clamp(1.85rem,5vw,3.25rem)] font-bold leading-[1.12] tracking-tight text-white">
-            Tu matrimonio, como un boarding pass <span aria-hidden>✈️</span>
+            Celebra tu evento como nunca antes <span aria-hidden>✨</span>
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-slate-300 lg:mx-0 lg:text-lg">
-            Invitación digital + organización de invitados + check-in QR en un solo lugar
+            Invita, organiza y comparte cada momento con tus invitados en un solo lugar.
           </p>
           <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
-            <Link
-              href="/onboarding"
-              className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] px-8 py-3 text-sm font-semibold text-[#0f172a] shadow-lg shadow-black/30 transition hover:brightness-110 active:scale-[0.98]"
+            <CrearMiEventoLink className="w-full sm:w-auto" />
+            <a
+              href="#demo-section"
+              className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10 active:scale-[0.98] sm:w-auto"
             >
-              Crear mi invitación
-            </Link>
-            <Link
-              href="/invitacion/demo"
-              className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10 active:scale-[0.98]"
-            >
-              Ver demo
-            </Link>
+              Ver invitación real
+            </a>
           </div>
         </div>
         <div className="relative mx-auto w-full max-w-[20rem] shrink-0 lg:mx-0">
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-sm border border-white/15 bg-[#1e293b]/40 shadow-[0_24px_80px_rgba(0,0,0,0.45)] ring-1 ring-[#D4AF37]/25">
             <Image
               src="/dreams-airlines-logo.png"
-              alt="Vista previa estilo Dreams Airlines"
+              alt="Estética premium tipo pase de abordaje"
               fill
               className="object-contain object-center p-6 sm:p-8"
               sizes="(max-width: 1024px) 100vw, 320px"
               priority
             />
           </div>
-          <p className="mt-3 text-center text-[11px] text-slate-500 lg:text-left">Estética premium tipo pase de abordaje</p>
+          <p className="mt-3 text-center text-[11px] text-slate-500 lg:text-left">Bodas, cumpleaños, corporativos y más</p>
         </div>
       </div>
     </section>

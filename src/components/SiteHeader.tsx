@@ -13,7 +13,10 @@ export function SiteHeader({ compact = false }: Props) {
         </Link>
         <nav className="flex items-center gap-3 text-xs text-teal-100/90 sm:gap-6 sm:text-sm">
           <Link href="/onboarding" className="hover:text-white">
-            Crear invitación
+            Crear mi evento
+          </Link>
+          <Link href="/pricing" className="hover:text-white">
+            Planes
           </Link>
           <Link href="/marketplace" className="hover:text-white">
             Marketplace

@@ -32,7 +32,7 @@ export function OnboardingForm() {
     >
       <div>
         <label htmlFor="nombre_novios" className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
-          Nombre de los novios
+          Nombre del evento o pareja
         </label>
         <input
           id="nombre_novios"
@@ -63,7 +63,7 @@ export function OnboardingForm() {
         disabled={busy}
         className="flex w-full min-h-[48px] items-center justify-center rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] py-3 text-sm font-semibold text-[#0f172a] transition hover:brightness-110 disabled:opacity-60"
       >
-        {busy ? "Preparando tu pase…" : "Crear mi invitación"}
+        {busy ? "Preparando tu pase…" : "Ver vista previa del evento"}
       </button>
     </form>
   );

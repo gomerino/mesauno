@@ -1,49 +1,42 @@
-import { Images, QrCode, Table2, Users } from "lucide-react";
+import { LayoutDashboard, Send, Sparkles } from "lucide-react";
 
-const items = [
+const blocks = [
   {
-    title: "Confirma asistencia en segundos",
-    body: "RSVP claro para ti y para tus invitados, sin hojas sueltas.",
-    Icon: Users,
+    title: "Invita a todos en segundos",
+    body: "Envía tu invitación por WhatsApp o correo con un solo clic.",
+    Icon: Send,
   },
   {
-    title: "Asigna mesas fácilmente",
-    body: "Destino en el pase alineado con tu plan de sala y staff.",
-    Icon: Table2,
+    title: "Vive tu evento junto a tus invitados",
+    body: "Fotos en tiempo real, playlist colaborativa y programa siempre actualizado.",
+    Icon: Sparkles,
   },
   {
-    title: "Comparte música y fotos",
-    body: "Playlist colaborativa y bitácora cuando quieras activarlas.",
-    Icon: Images,
-  },
-  {
-    title: "Check-in con QR el día del evento",
-    body: "Ingreso fluido y registro en tiempo real para tu equipo.",
-    Icon: QrCode,
+    title: "Todo bajo control",
+    body: "Gestiona invitados, mesas y check-in desde un solo lugar.",
+    Icon: LayoutDashboard,
   },
 ] as const;
 
 export function Features() {
   return (
-    <section className="border-b border-white/10 bg-[#0f172a] px-4 py-16 sm:py-20">
+    <section className="border-b border-white/10 bg-[#0f172a] px-4 py-20 sm:py-24">
       <div className="mx-auto max-w-6xl">
-        <h2 className="text-center font-display text-2xl font-bold text-white sm:text-3xl">Todo lo que necesitas a bordo</h2>
-        <p className="mx-auto mt-3 max-w-2xl text-center text-sm text-slate-400">
-          Herramientas pensadas para novios que quieren una experiencia memorable, sin fricción.
+        <h2 className="text-center font-display text-2xl font-bold text-white sm:text-3xl">Valor que se nota al instante</h2>
+        <p className="mx-auto mt-4 max-w-2xl text-center text-sm leading-relaxed text-slate-400 sm:text-base">
+          Pensado para cualquier celebración que merezca una experiencia impecable, sin perseguir hojas ni grupos de WhatsApp perdidos.
         </p>
-        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:gap-6">
-          {items.map(({ title, body, Icon }) => (
+        <ul className="mx-auto mt-14 grid max-w-5xl gap-6 sm:grid-cols-3 sm:gap-8">
+          {blocks.map(({ title, body, Icon }) => (
             <li
               key={title}
-              className="group flex gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-[#D4AF37]/35 hover:bg-white/[0.05]"
+              className="flex flex-col rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-6 shadow-lg transition duration-300 hover:border-[#D4AF37]/35 hover:shadow-[0_20px_50px_rgba(0,0,0,0.25)] sm:p-8"
             >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#D4AF37]/15 text-[#D4AF37] ring-1 ring-[#D4AF37]/25">
-                <Icon className="h-5 w-5" strokeWidth={2} aria-hidden />
+              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#D4AF37]/12 text-[#D4AF37] ring-1 ring-[#D4AF37]/30">
+                <Icon className="h-6 w-6" strokeWidth={2} aria-hidden />
               </span>
-              <div>
-                <h3 className="font-semibold text-white">{title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-slate-400">{body}</p>
-              </div>
+              <h3 className="mt-5 font-display text-lg font-semibold text-white sm:text-xl">{title}</h3>
+              <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-400 sm:text-[15px]">{body}</p>
             </li>
           ))}
         </ul>

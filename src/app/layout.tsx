@@ -34,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${outfit.variable} ${dmSans.variable}`}>
+    <html lang="es" className={`scroll-smooth ${outfit.variable} ${dmSans.variable}`}>
       <body className="font-sans antialiased">
         <ServiceWorkerRegister />
         {children}
