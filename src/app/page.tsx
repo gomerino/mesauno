@@ -4,6 +4,7 @@ import { Features } from "@/components/marketing/Features";
 import { Hero } from "@/components/marketing/Hero";
 import { HowItWorks } from "@/components/marketing/HowItWorks";
 import { SiteHeader } from "@/components/SiteHeader";
+import { DEMO_INVITATION_URL } from "@/lib/demo-invitation-public-url";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -35,6 +36,15 @@ export default function HomePage() {
           <Link href="/invitacion/demo" className="hover:text-slate-300">
             Demo invitación
           </Link>
+          <span className="text-slate-700">·</span>
+          <a
+            href={DEMO_INVITATION_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-slate-300"
+          >
+            Invitación real
+          </a>
         </div>
         <p className="mt-4">© {new Date().getFullYear()} Dreams Wedding</p>
       </footer>
