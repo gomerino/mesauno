@@ -6,7 +6,7 @@
  */
 const TRANSFER = {
   intro:
-    "Ya tenemos el hogar de nuestros sueños, ¡pero si querés hacernos un regalo, podés transferir para nuestra próxima aventura!",
+    "Ya tenemos el hogar que soñamos; si quieren hacernos un regalo, pueden transferir a nuestra próxima aventura.",
   cuenta: "53-17217-05",
   banco: "Banco de Chile",
   rut: "13.468.424-0",
@@ -43,7 +43,7 @@ export function SoftAviationRegalosPanel() {
         </div>
 
         <p className="mt-3 text-center text-[11px] leading-snug text-[#1A2B48]/55">
-          Gracias por vuestra generosidad <span aria-hidden>✈️</span>
+          Gracias por su cariño <span aria-hidden>✈️</span>
         </p>
       </div>
     </div>

@@ -48,7 +48,7 @@ export function SoftAviationFotosClient({
         albumTitle={albumTitle ?? "Bitácora compartida"}
         albumBlurb={
           albumBlurb ??
-          "Captura el viaje en vivo. Las fotos aparecen aquí y puedes sumar la tuya con el botón de la cámara."
+          "Captura el día en vivo. Las fotos aparecen aquí y puedes sumar la tuya con el botón de la cámara."
         }
       />
     </>

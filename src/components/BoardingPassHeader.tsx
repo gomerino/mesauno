@@ -56,7 +56,7 @@ export function BoardingPassHeader({
             src={logoSrc}
             alt="Dreams Airlines"
             fill
-            sizes="(max-width: 379px) 120px, 140px"
+            sizes="(max-width: 379px) 92px, 100px"
             className="object-contain object-left"
             priority
           />

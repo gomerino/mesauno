@@ -5,7 +5,7 @@
   overflow: hidden;
   border-radius: 0.125rem 0.125rem 0 0;
   background: linear-gradient(165deg, #001d66 0%, #002a8f 52%, #002a8f 100%);
-  padding: 0.7rem 0.65rem 0.95rem;
+  padding: 0.55rem 0.6rem 0.8rem;
   font-family: var(--font-bp-header), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
@@ -70,20 +70,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: 0.45rem;
 }
 
+/* Caja más baja que ancha: el PNG del logo es alto; object-contain ya no domina la cabecera. */
 .bpLogoWrap {
   position: relative;
   flex-shrink: 0;
-  width: 6.25rem;
-  height: 3.85rem;
+  width: 5.25rem;
+  height: 2.35rem;
 }
 
 @media (min-width: 380px) {
   .bpLogoWrap {
-    width: 7.25rem;
-    height: 4.35rem;
+    width: 5.75rem;
+    height: 2.55rem;
   }
 }
 
@@ -131,7 +132,7 @@
   position: relative;
   z-index: 1;
   height: 1px;
-  margin: 0.65rem 0 0.7rem;
+  margin: 0.5rem 0 0.55rem;
   background: rgba(255, 255, 255, 0.22);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
 }

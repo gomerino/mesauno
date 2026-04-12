@@ -15,6 +15,8 @@ type Props = {
   onClose: () => void;
   /** Tras guardar correctamente en `/api/rsvp` (actualiza CTA en el shell). */
   onRsvpSaved?: (estado: Rsvp) => void;
+  /** `edit`: título y copia de ajuste de respuesta ya enviada. */
+  flowMode?: "create" | "edit";
 };
 
 const TAG_GLUTEN = "Sin gluten";
@@ -41,6 +43,7 @@ export function SoftAviationCheckInFlow({
   spotifyPlaylistUrl,
   onClose,
   onRsvpSaved,
+  flowMode = "create",
 }: Props) {
   const router = useRouter();
   const initialRsvp: Rsvp =
@@ -96,6 +99,13 @@ export function SoftAviationCheckInFlow({
       if (!res.ok) throw new Error(data.error ?? "Error");
       onRsvpSaved?.(rsvp);
       setDone(true);
+      if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+        try {
+          navigator.vibrate(12);
+        } catch {
+          /* noop */
+        }
+      }
       router.refresh();
     } catch (e) {
       setErr(e instanceof Error ? e.message : "No se pudo guardar");
@@ -114,7 +124,7 @@ export function SoftAviationCheckInFlow({
       <header className="flex shrink-0 items-center justify-between border-b border-[#1A2B48]/5 bg-[#F4F1EA] px-4 py-3 pt-[max(0.5rem,env(safe-area-inset-top))]">
         <div>
           <h2 id="checkin-title" className="font-inviteSerif text-xl text-[#1A2B48]">
-            Confirmar asistencia
+            {flowMode === "edit" ? "Editar asistencia" : "Confirmar asistencia"}
           </h2>
           {!done ? (
             <p className="text-xs text-[#1A2B48]/55">
@@ -150,8 +160,13 @@ export function SoftAviationCheckInFlow({
 
         {done ? (
           <div className="flex flex-col items-center py-10">
-            <div className="flex h-28 w-28 items-center justify-center rounded-full border-[3px] border-[#D4AF37]/90 bg-white text-center font-inviteSerif text-sm font-bold uppercase leading-tight text-[#1A2B48] animate-stampDrop">
-              Confirmado
+            <div className="flex h-28 w-28 items-center justify-center rounded-full border-[3px] border-[#D4AF37]/90 bg-white text-center font-inviteSerif text-sm font-bold uppercase leading-tight text-[#1A2B48] animate-stampDrop motion-reduce:animate-none">
+              <span
+                className="flex h-16 w-16 items-center justify-center rounded-full bg-[#D4AF37]/15 text-3xl text-[#1A2B48] animate-boardingValidated motion-reduce:animate-none"
+                aria-hidden
+              >
+                ✓
+              </span>
             </div>
             <p className="mt-6 max-w-xs text-center text-sm text-[#1A2B48]/70">¡Gracias! Tu respuesta ya está registrada.</p>
             <button
@@ -166,10 +181,10 @@ export function SoftAviationCheckInFlow({
           <>
             {step === 1 && (
               <div className="space-y-3">
-                <p className="text-sm font-medium text-[#1A2B48]">¿Nos acompañas en el viaje?</p>
+                <p className="text-sm font-medium text-[#1A2B48]">¿Nos acompañas en la celebración?</p>
                 {(
                   [
-                    { v: "confirmado" as const, label: "Sí, ahí estaré" },
+                    { v: "confirmado" as const, label: "Sí, asistiré" },
                     { v: "pendiente" as const, label: "Aún no lo tengo claro" },
                     { v: "declinado" as const, label: "No podré asistir" },
                   ] as const
@@ -240,7 +255,7 @@ export function SoftAviationCheckInFlow({
 
             {step === 3 && (
               <div className="space-y-4">
-                <p className="text-sm text-[#1A2B48]/75">¿Qué canción no puede faltar en el viaje?</p>
+                <p className="text-sm text-[#1A2B48]/75">¿Qué canción no puede faltar?</p>
                 <input
                   type="text"
                   value={sugerenciaMusica}
@@ -306,7 +321,7 @@ export function SoftAviationCheckInFlow({
                 onClick={() => void submit()}
                 className="ml-auto rounded-full bg-[#D4AF37] px-8 py-2.5 text-sm font-semibold text-[#1A2B48] transition hover:brightness-105 disabled:opacity-50"
               >
-                {loading ? "Guardando…" : "Confirmar asistencia"}
+                {loading ? "Guardando…" : flowMode === "edit" ? "Guardar cambios" : "Confirmar asistencia"}
               </button>
             )}
           </div>

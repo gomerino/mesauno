@@ -13,7 +13,7 @@ export function SoftAviationPostalMotivo({ motivoText }: Props) {
   const body =
     motivoText.trim().length > 0
       ? motivoText
-      : "Con todo el cariño del mundo, esperamos compartir este día inolvidable con vos.";
+      : "Con todo el cariño, esperamos compartir este día inolvidable contigo.";
 
   return (
     <div className="animate-fadeIn px-1 py-4">
@@ -31,14 +31,14 @@ export function SoftAviationPostalMotivo({ motivoText }: Props) {
           <div className="relative flex shrink-0 flex-row items-stretch justify-center border-t border-dashed border-[#1A2B48]/20 bg-[#FFF9F0]/95 px-4 py-5 sm:w-[9rem] sm:flex-col sm:border-l sm:border-t-0 sm:px-3 sm:py-6">
             <div className="flex flex-1 flex-col items-center justify-center gap-2.5 sm:flex-1 sm:gap-3">
               {/* Fondo dorado: el PNG usa líneas blancas; el logo se escala grande dentro del círculo. */}
-              <div className="relative h-[6.75rem] w-[6.75rem] shrink-0 overflow-hidden rounded-full bg-gradient-to-b from-[#f3e2a8] via-[#e8ca62] to-[#b8941f] shadow-[0_3px_12px_rgba(26,43,72,0.16)] ring-1 ring-[#1A2B48]/22 sm:h-28 sm:w-28">
-                <div className="absolute inset-0">
+              <div className="relative h-[5.25rem] w-[5.25rem] shrink-0 overflow-hidden rounded-full bg-gradient-to-b from-[#f3e2a8] via-[#e8ca62] to-[#b8941f] shadow-[0_3px_12px_rgba(26,43,72,0.16)] ring-1 ring-[#1A2B48]/22 sm:h-[5.5rem] sm:w-[5.5rem]">
+                <div className="absolute inset-0 p-1">
                   <Image
                     src="/dreams-airlines-logo.png"
                     alt="Dreams Airlines"
                     fill
-                    className="object-contain object-center [transform:translateZ(0)_scale(1.62)] sm:[transform:translateZ(0)_scale(1.7)]"
-                    sizes="(max-width: 640px) 128px, 140px"
+                    className="object-contain object-center [transform:translateZ(0)_scale(1.08)] sm:[transform:translateZ(0)_scale(1.1)]"
+                    sizes="(max-width: 640px) 96px, 104px"
                   />
                 </div>
               </div>

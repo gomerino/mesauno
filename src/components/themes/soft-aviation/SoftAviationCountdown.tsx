@@ -66,7 +66,7 @@ export function SoftAviationCountdown({ fechaEvento, horaEmbarque, variant = "bl
         className={`max-w-full whitespace-normal break-words font-mono tabular-nums tracking-tight text-[#1A2B48] ${dense ? "mt-0.5 text-[9px] sm:text-[10px]" : "mt-1.5 text-[10px] sm:text-[11px]"}`}
         aria-live="polite"
       >
-        <span className="text-[#1A2B48]/60">Check in</span>{" "}
+        <span className="text-[#1A2B48]/60">Faltan</span>{" "}
         <span className="font-semibold">{pad2(d)}</span>
         <span className="text-[#1A2B48]/45">d</span>
         <span className="text-[#1A2B48]/40"> : </span>

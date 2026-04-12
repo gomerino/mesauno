@@ -14,12 +14,16 @@ import { playlistListRecentPublic, spotifyGetCredentials } from "@/lib/spotify-c
 import type { EventoFoto, EventoProgramaHito, Invitado } from "@/types/database";
 import { notFound } from "next/navigation";
 
-type Props = { params: Promise<{ token: string }> };
+type Props = {
+  params: Promise<{ token: string }>;
+  searchParams: Promise<{ theme?: string }>;
+};
 
 export const dynamic = "force-dynamic";
 
-export default async function InvitacionPage({ params }: Props) {
+export default async function InvitacionPage({ params, searchParams }: Props) {
   const { token } = await params;
+  const { theme: themeQuery } = await searchParams;
   const supabase = await createClient();
   const { data, error } = await fetchInvitadoWithAcompanantes(supabase, token);
 
@@ -77,7 +81,7 @@ export default async function InvitacionPage({ params }: Props) {
     recentTracks,
   };
 
-  const themeId = resolveInvitacionThemeId(invitado);
+  const themeId = resolveInvitacionThemeId(invitado, themeQuery);
 
   if (themeId === "soft-aviation") {
     return <SoftAviationTheme {...themeProps} />;

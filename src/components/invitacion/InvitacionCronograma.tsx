@@ -2,11 +2,8 @@
 
 import { ProgramaIconoLucide } from "@/lib/programa-icons";
 import type { EventoProgramaHito } from "@/types/database";
-import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-
-const NAVY = "#001d66";
-const ACCENT = "#0d9488";
+import { Check, MapPin } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 function formatHora(hora: string): string {
   return hora?.slice(0, 5) ?? "";
@@ -19,6 +16,10 @@ function horaToMinutes(hora: string): number {
   return h * 60 + m;
 }
 
+function nowMinutes(d: Date): number {
+  return d.getHours() * 60 + d.getMinutes();
+}
+
 function sameLocalCalendarDay(isoDate: string | null | undefined, d: Date): boolean {
   if (!isoDate) return false;
   const day = String(isoDate).slice(0, 10);
@@ -29,10 +30,17 @@ function sameLocalCalendarDay(isoDate: string | null | undefined, d: Date): bool
   return `${y}-${mo}-${da}` === day;
 }
 
+/** Fin del tramo del hito `i` (minutos desde medianoche): hasta el inicio del siguiente, o +3h si es el último. */
+function segmentEndMinutes(hitos: EventoProgramaHito[], i: number): number {
+  const mins = hitos.map((h) => horaToMinutes(h.hora));
+  if (i + 1 < hitos.length) return mins[i + 1]!;
+  return mins[i]! + 3 * 60;
+}
+
 /** Índice del hito “en curso” el día del evento: desde hora del hito hasta la del siguiente. */
 function liveHitoIndex(hitos: EventoProgramaHito[], now: Date): number {
   if (hitos.length === 0) return -1;
-  const cur = now.getHours() * 60 + now.getMinutes();
+  const cur = nowMinutes(now);
   const mins = hitos.map((h) => horaToMinutes(h.hora));
   for (let i = 0; i < mins.length; i++) {
     const start = mins[i]!;
@@ -40,6 +48,37 @@ function liveHitoIndex(hitos: EventoProgramaHito[], now: Date): number {
     if (cur >= start && cur < end) return i;
   }
   return -1;
+}
+
+/** Próximo hito con hora de inicio estrictamente posterior a `now`. */
+function nextHitoIndex(hitos: EventoProgramaHito[], now: Date): number {
+  const cur = nowMinutes(now);
+  for (let i = 0; i < hitos.length; i++) {
+    if (horaToMinutes(hitos[i]!.hora) > cur) return i;
+  }
+  return -1;
+}
+
+function isSegmentPast(i: number, hitos: EventoProgramaHito[], cur: number): boolean {
+  return cur >= segmentEndMinutes(hitos, i);
+}
+
+type MomentState = "neutral" | "past" | "live" | "next" | "later";
+
+function getMomentState(
+  i: number,
+  hitos: EventoProgramaHito[],
+  now: Date,
+  eventDay: boolean,
+  liveIdx: number,
+  nextIdx: number
+): MomentState {
+  if (!eventDay) return "neutral";
+  const cur = nowMinutes(now);
+  if (liveIdx === i) return "live";
+  if (isSegmentPast(i, hitos, cur)) return "past";
+  if (nextIdx === i) return "next";
+  return "later";
 }
 
 type Props = {
@@ -50,9 +89,7 @@ type Props = {
 
 export function InvitacionCronograma({ hitos, fechaEvento }: Props) {
   const [now, setNow] = useState(() => new Date());
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [activeIdx, setActiveIdx] = useState(0);
+  const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 30_000);
@@ -61,167 +98,185 @@ export function InvitacionCronograma({ hitos, fechaEvento }: Props) {
 
   const eventDay = useMemo(() => sameLocalCalendarDay(fechaEvento, now), [fechaEvento, now]);
   const liveIdx = useMemo(() => (eventDay ? liveHitoIndex(hitos, now) : -1), [eventDay, hitos, now]);
+  const nextIdx = useMemo(() => (eventDay ? nextHitoIndex(hitos, now) : -1), [eventDay, hitos, now]);
 
-  const scrollToIndex = useCallback((i: number) => {
-    const clamped = Math.max(0, Math.min(hitos.length - 1, i));
-    const el = slideRefs.current[clamped];
-    el?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
-    setActiveIdx(clamped);
-  }, [hitos.length]);
-
-  /** Centrar el hito “Ahora” cuando aplique (refs ya montados). */
+  /** Centrar en vista el hito “Ahora” o, si no aplica, el “Próximo”. */
   useEffect(() => {
-    if (liveIdx < 0) return;
-    const t = window.setTimeout(() => scrollToIndex(liveIdx), 0);
+    const target = liveIdx >= 0 ? liveIdx : nextIdx >= 0 ? nextIdx : -1;
+    if (target < 0) return;
+    const t = window.setTimeout(() => {
+      itemRefs.current[target]?.scrollIntoView({ block: "center", behavior: "smooth" });
+    }, 100);
     return () => window.clearTimeout(t);
-  }, [liveIdx, scrollToIndex]);
-
-  const onScroll = useCallback(() => {
-    const root = scrollerRef.current;
-    if (!root) return;
-    const cx = root.scrollLeft + root.clientWidth / 2;
-    let best = 0;
-    let bestDist = Infinity;
-    slideRefs.current.forEach((el, i) => {
-      if (!el) return;
-      const ex = el.offsetLeft + el.offsetWidth / 2;
-      const d = Math.abs(ex - cx);
-      if (d < bestDist) {
-        bestDist = d;
-        best = i;
-      }
-    });
-    setActiveIdx(best);
-  }, []);
-
-  useEffect(() => {
-    const root = scrollerRef.current;
-    if (!root) return;
-    root.addEventListener("scroll", onScroll, { passive: true });
-    return () => root.removeEventListener("scroll", onScroll);
-  }, [onScroll, hitos.length]);
+  }, [liveIdx, nextIdx, hitos.length]);
 
   if (hitos.length === 0) return null;
+
+  const statusBanner = (() => {
+    if (!eventDay) return null;
+    if (liveIdx >= 0) {
+      const h = hitos[liveIdx]!;
+      return (
+        <p className="mt-2 rounded-lg border border-teal-300/60 bg-teal-50/95 px-3 py-2.5 text-[12px] leading-snug text-teal-950 shadow-sm">
+          <span className="font-semibold text-teal-800">Ahora · </span>
+          {h.titulo}
+          <span className="text-teal-800/80"> · {formatHora(h.hora)}</span>
+        </p>
+      );
+    }
+    if (nextIdx >= 0) {
+      const h = hitos[nextIdx]!;
+      return (
+        <p className="mt-2 rounded-lg border border-[#001d66]/15 bg-[#001d66]/[0.06] px-3 py-2.5 text-[12px] leading-snug text-[#001d66] shadow-sm">
+          <span className="font-semibold">Siguiente · </span>
+          {h.titulo}
+          <span className="opacity-85"> · {formatHora(h.hora)}</span>
+        </p>
+      );
+    }
+    return (
+      <p className="mt-2 rounded-lg border border-gray-200 bg-gray-50/90 px-3 py-2.5 text-[12px] leading-snug text-gray-600">
+        El programa de hoy ya terminó. ¡Gracias por haber sido parte!
+      </p>
+    );
+  })();
 
   return (
     <section
       className="mb-4 rounded-xl border border-[#001d66]/20 bg-gradient-to-br from-white to-[#f8f9ff] p-4 shadow-[0_2px_16px_rgba(0,29,102,0.08)] sm:p-5"
-      aria-roledescription="carrusel"
       aria-label="Itinerario del día"
     >
-      <div className="flex items-center justify-between gap-2 border-b border-[#001d66]/10 pb-3">
-        <span className="font-display text-sm font-bold tracking-wide text-[#001d66]">Itinerario</span>
-        <div className="flex gap-1">
-          <button
-            type="button"
-            aria-label="Anterior"
-            onClick={() => scrollToIndex(activeIdx - 1)}
-            disabled={activeIdx <= 0}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-[#001d66]/15 bg-white text-[#001d66] shadow-sm transition hover:bg-[#001d66]/5 disabled:pointer-events-none disabled:opacity-30"
-          >
-            <ChevronLeft className="h-4 w-4" strokeWidth={2.25} aria-hidden />
-          </button>
-          <button
-            type="button"
-            aria-label="Siguiente"
-            onClick={() => scrollToIndex(activeIdx + 1)}
-            disabled={activeIdx >= hitos.length - 1}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-[#001d66]/15 bg-white text-[#001d66] shadow-sm transition hover:bg-[#001d66]/5 disabled:pointer-events-none disabled:opacity-30"
-          >
-            <ChevronRight className="h-4 w-4" strokeWidth={2.25} aria-hidden />
-          </button>
-        </div>
+      <div className="border-b border-[#001d66]/10 pb-3">
+        <h2 className="font-display text-sm font-bold tracking-wide text-[#001d66]">Itinerario</h2>
+        <p className="mt-1 text-[11px] leading-snug text-[#001d66]/55">
+          Todos los momentos del día, en orden cronológico
+        </p>
+        {statusBanner}
       </div>
 
-      <div className="relative mt-4">
-        <div
-          ref={scrollerRef}
-          className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 pt-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]"
-        >
-          {hitos.map((h, i) => {
-            const isLive = i === liveIdx;
-            return (
-              <div
-                key={h.id}
-                role="group"
-                ref={(el) => {
-                  slideRefs.current[i] = el;
-                }}
-                className={`w-[min(calc(100vw-4.5rem),19rem)] shrink-0 snap-center snap-always sm:w-[17.5rem] ${
-                  isLive ? "rounded-xl ring-2 ring-teal-500/40 ring-offset-2 ring-offset-[#f8f9ff]" : ""
-                }`}
-              >
-                <div
-                  className={`flex h-full min-h-[12rem] flex-col rounded-xl border px-4 py-4 sm:min-h-[13rem] ${
-                    isLive
-                      ? "border-teal-500 bg-teal-50/80 shadow-sm"
-                      : "border-[#001d66]/12 bg-white/95 shadow-[0_1px_8px_rgba(0,29,102,0.06)]"
-                  }`}
+      <ol className="relative mt-4 list-none space-y-0 pl-0">
+        {hitos.map((h, i) => {
+          const state = getMomentState(i, hitos, now, eventDay, liveIdx, nextIdx);
+          const isLive = state === "live";
+          const isPast = state === "past";
+          const isNext = state === "next";
+          const isLast = i === hitos.length - 1;
+
+          const cardClass =
+            state === "live"
+              ? "border-teal-400/90 bg-teal-50/95 shadow-[0_4px_20px_rgba(20,184,166,0.18)] ring-2 ring-teal-400/30"
+              : state === "next"
+                ? "border-[#001d66]/35 bg-[#f0f4ff] shadow-[0_2px_14px_rgba(0,29,102,0.1)] ring-1 ring-[#001d66]/20"
+                : state === "past"
+                  ? "border-gray-200/90 bg-gray-50/80 opacity-[0.88]"
+                  : state === "later"
+                    ? "border-[#001d66]/10 bg-white/90 shadow-[0_1px_6px_rgba(0,29,102,0.05)]"
+                    : "border-[#001d66]/10 bg-white/90 shadow-[0_1px_6px_rgba(0,29,102,0.05)]";
+
+          const iconRing =
+            state === "live"
+              ? "border-teal-500 shadow-[0_0_0_3px_rgba(20,184,166,0.28)]"
+              : state === "next"
+                ? "border-[#001d66]/50 shadow-sm ring-2 ring-[#001d66]/15"
+                : state === "past"
+                  ? "border-gray-300 bg-gray-100"
+                  : "border-[#001d66]/25";
+
+          const lineClass =
+            state === "past"
+              ? "from-gray-300/50 to-gray-200/30"
+              : isLive || isNext
+                ? "from-teal-400/40 to-[#001d66]/15"
+                : "from-[#001d66]/28 to-[#001d66]/08";
+
+          return (
+            <li
+              key={h.id}
+              ref={(el) => {
+                itemRefs.current[i] = el;
+              }}
+              className="flex items-stretch gap-3 sm:gap-4"
+              aria-current={isLive ? "step" : undefined}
+            >
+              <div className="flex w-11 shrink-0 flex-col items-center self-stretch sm:w-12">
+                <span
+                  className={`relative z-[1] flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 bg-white shadow-sm sm:h-11 sm:w-11 ${iconRing}`}
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <span
-                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 bg-white shadow-sm"
-                      style={{
-                        borderColor: isLive ? ACCENT : `${NAVY}33`,
-                        boxShadow: isLive ? `0 0 0 3px ${ACCENT}33` : undefined,
-                      }}
-                    >
-                      <ProgramaIconoLucide nombre={h.icono} className="h-5 w-5 text-[#001d66]" />
-                    </span>
-                    {isLive ? (
-                      <span className="shrink-0 rounded-full bg-teal-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                        Ahora
-                      </span>
-                    ) : null}
-                  </div>
+                  {isPast ? (
+                    <Check className="h-4 w-4 text-gray-500 sm:h-[1.1rem] sm:w-[1.1rem]" strokeWidth={2.5} aria-hidden />
+                  ) : (
+                    <ProgramaIconoLucide
+                      nombre={h.icono}
+                      className={`h-5 w-5 sm:h-[1.35rem] sm:w-[1.35rem] ${isPast ? "text-gray-500" : "text-[#001d66]"}`}
+                    />
+                  )}
+                </span>
+                {!isLast ? (
+                  <span
+                    className={`mx-auto mt-0 w-0.5 flex-1 min-h-[1.5rem] bg-gradient-to-b ${lineClass}`}
+                    aria-hidden
+                  />
+                ) : null}
+              </div>
+
+              <div className={`min-w-0 flex-1 rounded-xl border px-3 py-3 sm:px-4 sm:py-3.5 ${cardClass} ${isLast ? "mb-0" : "mb-4"}`}>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <p
-                    className="mt-3 font-mono text-xl font-bold tabular-nums tracking-tight sm:text-2xl"
-                    style={{ color: NAVY }}
+                    className={`font-mono text-lg font-bold tabular-nums tracking-tight sm:text-xl ${
+                      isPast ? "text-gray-500" : "text-[#001d66]"
+                    }`}
                   >
                     {formatHora(h.hora)}
                   </p>
-                  <h3 className="font-display text-base font-semibold leading-snug text-gray-900">{h.titulo}</h3>
-                  {h.descripcion_corta ? (
-                    <p className="mt-2 flex-1 text-sm leading-relaxed text-gray-600">{h.descripcion_corta}</p>
-                  ) : (
-                    <div className="flex-1" />
-                  )}
-                  {h.lugar_nombre ? (
-                    <p className="mt-3 flex items-center gap-1 text-xs font-medium text-gray-500">
-                      <MapPin className="h-3.5 w-3.5 shrink-0 text-[#001d66]/70" aria-hidden />
-                      {h.lugar_nombre}
-                    </p>
+                  {isLive ? (
+                    <span className="rounded-full bg-teal-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                      Ahora
+                    </span>
                   ) : null}
-                  {h.ubicacion_url?.trim() ? (
-                    <a
-                      href={h.ubicacion_url.trim()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 inline-flex w-fit items-center rounded-full border border-[#001d66]/25 bg-[#001d66]/[0.06] px-3 py-1 text-xs font-semibold text-[#001d66] hover:bg-[#001d66]/10"
-                    >
-                      Ver mapa
-                    </a>
+                  {isNext ? (
+                    <span className="rounded-full bg-[#001d66] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                      Próximo
+                    </span>
+                  ) : null}
+                  {isPast && !isLive ? (
+                    <span className="rounded-full bg-gray-200/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-gray-600">
+                      Listo
+                    </span>
                   ) : null}
                 </div>
+                <h3
+                  className={`mt-1.5 font-display text-[15px] font-semibold leading-snug sm:text-base ${
+                    isPast ? "text-gray-600" : "text-gray-900"
+                  }`}
+                >
+                  {h.titulo}
+                </h3>
+                {h.descripcion_corta ? (
+                  <p className={`mt-2 text-[13px] leading-relaxed sm:text-sm ${isPast ? "text-gray-500" : "text-gray-600"}`}>
+                    {h.descripcion_corta}
+                  </p>
+                ) : null}
+                {h.lugar_nombre ? (
+                  <p className={`mt-3 flex items-start gap-1.5 text-xs font-medium ${isPast ? "text-gray-500" : "text-gray-500"}`}>
+                    <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#001d66]/70" aria-hidden />
+                    <span>{h.lugar_nombre}</span>
+                  </p>
+                ) : null}
+                {h.ubicacion_url?.trim() ? (
+                  <a
+                    href={h.ubicacion_url.trim()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-flex w-fit items-center rounded-full border border-[#001d66]/25 bg-[#001d66]/[0.06] px-3 py-1.5 text-xs font-semibold text-[#001d66] transition hover:bg-[#001d66]/10"
+                  >
+                    Ver mapa
+                  </a>
+                ) : null}
               </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="mt-3 flex flex-wrap items-center justify-center gap-2" aria-label="Posición en el itinerario">
-        {hitos.map((h, i) => (
-          <button
-            key={h.id}
-            type="button"
-            aria-label={`Ir a ${formatHora(h.hora)} · ${h.titulo}`}
-            onClick={() => scrollToIndex(i)}
-            className={`h-2 rounded-full transition ${
-              i === activeIdx ? "w-6 bg-[#001d66]" : "w-2 bg-[#001d66]/25 hover:bg-[#001d66]/40"
-            }`}
-          />
-        ))}
-      </div>
+            </li>
+          );
+        })}
+      </ol>
     </section>
   );
 }
