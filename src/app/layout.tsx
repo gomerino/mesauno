@@ -1,3 +1,5 @@
+import { InstallButton } from "@/components/InstallButton";
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import type { Metadata } from "next";
 import { DM_Sans, Outfit } from "next/font/google";
 import "./globals.css";
@@ -17,6 +19,13 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Dreams Wedding — Tu boda, tu viaje",
   description: "Plataforma de matrimonios con invitaciones estilo boarding pass y marketplace.",
+  manifest: "/manifest.json",
+  themeColor: "#0f172a",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Dreams Wedding",
+  },
 };
 
 export default function RootLayout({
@@ -26,7 +35,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className={`${outfit.variable} ${dmSans.variable}`}>
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        <ServiceWorkerRegister />
+        {children}
+        <InstallButton />
+      </body>
     </html>
   );
 }
