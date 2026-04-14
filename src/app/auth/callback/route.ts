@@ -34,8 +34,8 @@ async function redirectAfterAuthSession(
     return NextResponse.redirect(`${origin}/staff/check-in`);
   }
 
-  const next = nextRaw ?? "/panel";
-  const dest = next.startsWith("/") && !next.startsWith("//") ? next : "/panel";
+  const next = nextRaw ?? "/panel/overview";
+  const dest = next.startsWith("/") && !next.startsWith("//") ? next : "/panel/overview";
   return NextResponse.redirect(`${origin}${dest}`);
 }
 

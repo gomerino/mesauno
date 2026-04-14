@@ -22,7 +22,7 @@ export async function sendInvitationsFromPanelAction(eventoId: string, mode: Bul
   });
 
   if (result.ok) {
-    revalidatePath("/panel");
+    revalidatePath("/panel/overview");
     revalidatePath("/panel/invitados");
   }
 

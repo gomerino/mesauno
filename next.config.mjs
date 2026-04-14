@@ -21,6 +21,36 @@ const nextConfig = {
   images: {
     remotePatterns: buildImageRemotePatterns(),
   },
+  async redirects() {
+    return [
+      { source: "/dashboard", destination: "/panel/overview", permanent: true },
+      {
+        source: "/dashboard/:evento_id/programa",
+        destination: "/panel/programa",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/:evento_id/equipo",
+        destination: "/panel/equipo",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/:evento_id/pago/success",
+        destination: "/panel/finanzas?pago=exitoso",
+        permanent: false,
+      },
+      {
+        source: "/dashboard/:evento_id/pago/pending",
+        destination: "/panel/finanzas?pago=pendiente",
+        permanent: false,
+      },
+      {
+        source: "/dashboard/:evento_id/pago/failure",
+        destination: "/panel/finanzas?pago=fallido",
+        permanent: false,
+      },
+    ];
+  },
   async headers() {
     return [
       {

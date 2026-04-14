@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
 
 function safeNextPath(raw: string | null): string {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/panel";
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/panel/overview";
   return raw;
 }
 
@@ -19,7 +19,7 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handlePasswordLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
@@ -33,51 +33,74 @@ function LoginForm() {
     window.location.href = nextPath;
   }
 
-  async function handleMagicLink(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email) return;
+  async function handleMagicLink() {
+    if (!email.trim()) {
+      setMessage("Indica tu correo para enviarte el enlace.");
+      return;
+    }
     setLoading(true);
+    setMessage(null);
     const supabase = createClient();
+    const redirect = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
     const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      email: email.trim(),
+      options: { emailRedirectTo: redirect },
     });
     setLoading(false);
     if (error) setMessage(error.message);
-    else setMessage("Revisa tu correo para el enlace de acceso.");
+    else setMessage("Revisa tu correo y abre el enlace para entrar.");
   }
 
   return (
     <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur">
       <h1 className="font-display text-2xl font-bold text-white">Acceso</h1>
       <p className="mt-2 text-sm text-slate-400">
-        Novios y equipo del evento: entran al panel de gestión. Cuentas de administración de la
-        plataforma (email en <code className="text-teal-400">ADMIN_EMAILS</code>) van al área de
-        administración tras iniciar sesión.
-      </p>
-      <p className="mt-2 text-sm text-slate-500">
-        Usuarios y contraseñas se gestionan en Supabase Auth; también puedes usar enlace mágico.
+        Entra al panel de tu evento: invitados, invitación y regalos. Si administras la plataforma, usa el email
+        configurado como administrador.
       </p>
       {(err || message) && (
         <p className="mt-4 rounded-lg bg-orange-500/20 px-3 py-2 text-sm text-orange-200">
           {message ?? "Error de autenticación"}
         </p>
       )}
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+      <form onSubmit={handlePasswordLogin} className="mt-6 space-y-5">
         <div>
           <label className="block text-xs font-medium text-slate-400">Email</label>
           <input
             type="email"
             required
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-white outline-none ring-teal-500 focus:ring-2"
           />
         </div>
+
+        <div className="rounded-xl border border-teal-500/25 bg-teal-500/10 p-4">
+          <button
+            type="button"
+            disabled={loading || !email.trim()}
+            onClick={() => void handleMagicLink()}
+            className="w-full rounded-full bg-teal-500 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-900/30 transition hover:bg-teal-400 disabled:opacity-50"
+          >
+            {loading ? "Enviando…" : "Continuar con enlace mágico"}
+          </button>
+          <p className="mt-2 text-center text-xs text-teal-100/90">
+            Si no tienes contraseña, usa este método. Te enviamos un enlace seguro al correo.
+          </p>
+        </div>
+
+        <div className="relative flex items-center gap-3 py-1">
+          <span className="h-px flex-1 bg-white/10" />
+          <span className="text-[11px] uppercase tracking-wider text-slate-500">o con contraseña</span>
+          <span className="h-px flex-1 bg-white/10" />
+        </div>
+
         <div>
           <label className="block text-xs font-medium text-slate-400">Contraseña</label>
           <input
             type="password"
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-white outline-none ring-teal-500 focus:ring-2"
@@ -86,18 +109,9 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-full bg-teal-500 py-3 font-semibold text-white hover:bg-teal-400 disabled:opacity-50"
+          className="w-full rounded-full border border-white/20 py-3 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-50"
         >
-          {loading ? "Entrando…" : "Entrar"}
-        </button>
-      </form>
-      <form onSubmit={handleMagicLink} className="mt-4">
-        <button
-          type="submit"
-          disabled={loading || !email}
-          className="w-full rounded-full border border-white/20 py-3 text-sm text-teal-100 hover:bg-white/5 disabled:opacity-50"
-        >
-          Enviar enlace mágico
+          {loading ? "Entrando…" : "Entrar con contraseña"}
         </button>
       </form>
     </div>

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { CrearMiEventoLink } from "@/components/marketing/CrearMiEventoLink";
+import { VerPlanesCtaLink } from "@/components/marketing/VerPlanesCtaLink";
 
 export function Hero() {
   return (
@@ -22,13 +23,14 @@ export function Hero() {
           <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-slate-300 lg:mx-0 lg:text-lg">
             Invita, organiza y comparte cada momento con tus invitados en un solo lugar.
           </p>
-          <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
+          <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center lg:justify-start">
             <CrearMiEventoLink className="w-full sm:w-auto" />
+            <VerPlanesCtaLink className="w-full sm:w-auto" />
             <a
               href="#demo-section"
-              className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10 active:scale-[0.98] sm:w-auto"
+              className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full border border-white/15 bg-transparent px-8 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/5 active:scale-[0.98] sm:w-auto"
             >
-              Ver invitación real
+              Ver sección demo
             </a>
           </div>
         </div>

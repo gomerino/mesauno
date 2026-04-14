@@ -1,4 +1,5 @@
 import { CrearMiEventoLink } from "@/components/marketing/CrearMiEventoLink";
+import { VerPlanesCtaLink } from "@/components/marketing/VerPlanesCtaLink";
 
 export function CTA() {
   return (
@@ -9,8 +10,9 @@ export function CTA() {
         <p className="mt-5 text-sm leading-relaxed text-slate-400 sm:text-base">
           Invitación digital premium, organización clara y check-in sin colas. Ideal para bodas, cumpleaños, lanzamientos y celebraciones que merecen brillar.
         </p>
-        <div className="mt-10 flex justify-center">
+        <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
           <CrearMiEventoLink className="w-full max-w-sm sm:w-auto sm:px-12" />
+          <VerPlanesCtaLink className="w-full max-w-sm sm:w-auto sm:px-10" />
         </div>
       </div>
     </section>

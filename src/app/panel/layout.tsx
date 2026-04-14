@@ -1,7 +1,8 @@
-import { isAdminEmail } from "@/lib/admin-auth";
+import { MembresiaTrialBanner } from "@/components/dashboard/MembresiaTrialBanner";
 import { DashboardToaster } from "@/components/dashboard/DashboardToaster";
 import { PanelShell } from "@/components/panel/PanelShell";
 import { selectEventoForMember } from "@/lib/evento-membership";
+import { isAdminEmail } from "@/lib/admin-auth";
 import { isUserStaffOnly } from "@/lib/membership-roles";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -26,15 +27,30 @@ export default async function PanelLayout({ children }: { children: React.ReactN
     redirect("/staff/check-in");
   }
 
-  const { data: evento } = await selectEventoForMember(supabase, user.id, "id");
+  const { data: evento } = await selectEventoForMember(supabase, user.id, "id, plan_status");
   const eventoId = evento?.id as string | undefined;
-  const equipoHref = eventoId ? `/dashboard/${eventoId}/equipo` : null;
-  const programaHref = eventoId ? `/dashboard/${eventoId}/programa` : null;
+
+  let showTrialBanner = false;
+  if (eventoId && evento) {
+    const planStatus = (evento as { plan_status?: string }).plan_status ?? "trial";
+    const { data: isAdmin } = await supabase.rpc("user_is_evento_admin", { p_evento_id: eventoId });
+    showTrialBanner = planStatus !== "paid" && Boolean(isAdmin);
+  }
 
   return (
     <>
-      <PanelShell userEmail={user.email ?? ""} equipoHref={equipoHref} programaHref={programaHref}>
+      <PanelShell userEmail={user.email ?? ""}>
+        {showTrialBanner && eventoId ? (
+          <div className="mb-2 hidden md:block">
+            <MembresiaTrialBanner eventoId={eventoId} />
+          </div>
+        ) : null}
         {children}
+        {showTrialBanner && eventoId ? (
+          <div className="mt-8 md:hidden">
+            <MembresiaTrialBanner eventoId={eventoId} compact />
+          </div>
+        ) : null}
       </PanelShell>
       <DashboardToaster />
     </>

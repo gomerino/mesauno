@@ -42,11 +42,11 @@ export function InvitacionMetricasCard({
   return (
     <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-transparent p-6 shadow-[0_1px_0_0_rgba(255,255,255,0.06)_inset]">
       <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">
-        Invitaciones por correo
+        Seguimiento
       </p>
-      <h2 className="font-display mt-2 text-xl font-bold text-white">Métricas</h2>
+      <h2 className="font-display mt-2 text-xl font-bold text-white">Correos e invitación</h2>
       <p className="mt-1 text-sm text-slate-400">
-        Emails enviados frente al total, y quién ha abierto el enlace público.
+        Cuántos correos enviaste, cuántas invitaciones se abrieron y el avance general.
       </p>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -63,7 +63,7 @@ export function InvitacionMetricasCard({
           <p className="font-display mt-1 text-2xl font-bold tabular-nums text-teal-300">{invitacionesVistas}</p>
         </div>
         <div className="rounded-xl border border-white/10 bg-black/25 px-4 py-3">
-          <p className="text-[10px] uppercase tracking-wide text-slate-500">Tasa de apertura</p>
+          <p className="text-[10px] uppercase tracking-wide text-slate-500">Aperturas (si hubo correos)</p>
           <p className="font-display mt-1 text-2xl font-bold tabular-nums text-white">
             {emailsEnviados > 0 ? `${tasaPct} %` : "—"}
           </p>

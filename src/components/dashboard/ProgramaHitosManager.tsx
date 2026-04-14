@@ -5,7 +5,7 @@ import {
   deleteProgramaHito,
   reorderProgramaHitos,
   updateProgramaHito,
-} from "@/app/dashboard/actions/programa";
+} from "@/app/panel/actions/programa";
 import {
   PROGRAMA_ICONOS,
   ProgramaIconoLucide,

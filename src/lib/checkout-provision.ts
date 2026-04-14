@@ -179,7 +179,8 @@ export async function provisionCheckoutSessionFromPayment(
   return { ok: true, email, alreadyDone: false };
 }
 
-const MAGIC_LINK_NEXT = "/onboarding";
+/** Tras pago: ir al panel del evento (no a la demo de onboarding). `welcome=1` muestra banner de bienvenida. */
+const MAGIC_LINK_NEXT = "/panel/evento?welcome=1";
 
 /**
  * URL para iniciar sesión tras el pago.

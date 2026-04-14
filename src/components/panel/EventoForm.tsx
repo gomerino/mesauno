@@ -84,21 +84,22 @@ export function EventoForm({ initial }: Props) {
   return (
     <form onSubmit={onSubmit} className="mx-auto max-w-2xl space-y-10">
       <section className="space-y-4">
-        <h2 className="font-display text-lg font-semibold text-white">Novios / organizadores</h2>
+        <h2 className="font-display text-lg font-semibold text-white">Ustedes (novios u organizadores)</h2>
         <p className="text-sm text-slate-400">
-          Datos que salen en el pie del boarding pass. Otros gestores del mismo evento se añaden desde administración.
+          Así os mostramos en la invitación. Cuando hayas guardado el evento, invita a tu pareja u otras personas desde
+          el menú lateral, enlace <strong className="font-medium text-slate-300">Equipo</strong> (junto a Programa).
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className={label}>Nombre 1</label>
+            <label className={label}>Primer nombre</label>
             <input className={input} value={nombre_novio_1} onChange={(e) => setN1(e.target.value)} />
           </div>
           <div>
-            <label className={label}>Nombre 2</label>
+            <label className={label}>Segundo nombre</label>
             <input className={input} value={nombre_novio_2} onChange={(e) => setN2(e.target.value)} />
           </div>
           <div>
-            <label className={label}>Fecha de la boda</label>
+            <label className={label}>Fecha del gran día</label>
             <input
               className={input}
               type="date"
@@ -110,17 +111,17 @@ export function EventoForm({ initial }: Props) {
       </section>
 
       <section className="space-y-4">
-        <h2 className="font-display text-lg font-semibold text-white">Evento y boarding pass</h2>
+        <h2 className="font-display text-lg font-semibold text-white">Cómo se ve la invitación (pase)</h2>
         <p className="text-sm text-slate-400">
-          Válido para todas las invitaciones. El QR del mapa usa la dirección de destino.
+          Lo que pongas aquí se repite en todas las invitaciones. El enlace al mapa usa la dirección de destino.
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className={label}>Nombre del evento</label>
+            <label className={label}>Título del evento</label>
             <input className={input} value={nombre_evento} onChange={(e) => setNombreEvento(e.target.value)} />
           </div>
           <div>
-            <label className={label}>Fecha del evento</label>
+            <label className={label}>Fecha que ves en el pase</label>
             <input
               className={input}
               type="date"
@@ -138,7 +139,7 @@ export function EventoForm({ initial }: Props) {
             />
           </div>
           <div className="sm:col-span-2">
-            <label className={label}>Línea corta en el pase (bajo el logo)</label>
+            <label className={label}>Frase corta debajo del título (lugar o detalle)</label>
             <input
               className={input}
               value={lugar_evento_linea}
@@ -146,28 +147,28 @@ export function EventoForm({ initial }: Props) {
             />
           </div>
           <div>
-            <label className={label}>Código de vuelo</label>
+            <label className={label}>Referencia tipo “vuelo” (decorativa)</label>
             <input className={input} value={codigo_vuelo} onChange={(e) => setCodigo(e.target.value)} />
           </div>
           <div>
-            <label className={label}>Hora de embarque</label>
+            <label className={label}>Hora en el pase</label>
             <input className={input} value={hora_embarque} onChange={(e) => setHora(e.target.value)} />
           </div>
           <div>
-            <label className={label}>Puerta</label>
+            <label className={label}>Puerta o sala (opcional)</label>
             <input className={input} value={puerta} onChange={(e) => setPuerta(e.target.value)} />
           </div>
           <div>
-            <label className={label}>Asiento (por defecto para todos)</label>
+            <label className={label}>Asiento por defecto (si no lo cambias por invitado)</label>
             <input className={input} value={asiento_default} onChange={(e) => setAsiento(e.target.value)} />
           </div>
         </div>
       </section>
 
       <section className="space-y-4">
-        <h2 className="font-display text-lg font-semibold text-white">Motivo del viaje</h2>
+        <h2 className="font-display text-lg font-semibold text-white">Mensaje para tus invitados</h2>
         <p className="text-sm text-slate-400">
-          Texto que verán los invitados en la invitación, encima del RSVP.
+          Lo leen en la invitación, antes de confirmar si vienen.
         </p>
         <textarea
           name="motivo_viaje"
@@ -188,7 +189,7 @@ export function EventoForm({ initial }: Props) {
         disabled={saving}
         className="rounded-full bg-teal-500 px-8 py-3 text-sm font-semibold text-white hover:bg-teal-400 disabled:opacity-50"
       >
-        {saving ? "Guardando…" : "Guardar evento"}
+        {saving ? "Guardando…" : "Guardar cambios"}
       </button>
     </form>
   );

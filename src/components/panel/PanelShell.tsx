@@ -1,81 +1,109 @@
 "use client";
 
+import { PanelMobileBottomNav, PanelMobileHeader } from "@/components/panel/PanelMobileChrome";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-function buildNav(equipoHref: string | null, programaHref: string | null) {
-  const head = [
-    { href: "/panel", label: "Inicio", end: true },
-    { href: "/panel/evento", label: "Evento" },
-  ] as const;
-  const mid: { href: string; label: string }[] = [];
-  if (programaHref) mid.push({ href: programaHref, label: "Programa" });
-  if (equipoHref) mid.push({ href: equipoHref, label: "Equipo" });
-  const tail = [
-    { href: "/panel/invitados", label: "Crear invitados" },
-    { href: "/panel/vista-invitacion", label: "Ver invitación" },
-    { href: "/marketplace", label: "Marketplace" },
-    { href: "/panel/asistentes", label: "Asistentes (RSVP)" },
-    { href: "/panel/regalos", label: "Regalos y dinero" },
-  ] as const;
-  return [...head, ...mid, ...tail] as const;
-}
+const NAV_TU_EVENTO = [
+  { href: "/panel/overview", label: "Inicio", end: true },
+  { href: "/panel/evento", label: "Evento" },
+  { href: "/panel/invitados", label: "Invitados" },
+  { href: "/panel/programa", label: "Programa" },
+  { href: "/panel/equipo", label: "Equipo" },
+] as const;
+
+const NAV_GESTION = [
+  { href: "/panel/invitados/vista", label: "Vista previa" },
+  { href: "/panel/invitados/confirmaciones", label: "Confirmaciones" },
+  { href: "/panel/finanzas", label: "Finanzas" },
+] as const;
+
+const NAV_EXPLORAR = [{ href: "/marketplace", label: "Marketplace" }] as const;
 
 function navActive(pathname: string, href: string, end?: boolean) {
   if (end) {
-    return pathname === "/panel" || pathname === "/panel/";
+    return pathname === "/panel" || pathname === "/panel/" || pathname === "/panel/overview";
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+function NavLink({
+  href,
+  label,
+  active,
+}: {
+  href: string;
+  label: string;
+  active: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`rounded-lg px-3 py-2 text-sm font-medium transition md:py-2.5 ${
+        active ? "bg-[#001d66] text-white" : "text-slate-300 hover:bg-white/10 hover:text-white"
+      }`}
+    >
+      {label}
+    </Link>
+  );
+}
+
+function NavGroup({
+  title,
+  items,
+  pathname,
+}: {
+  title: string;
+  items: readonly { href: string; label: string; end?: boolean }[];
+  pathname: string;
+}) {
+  return (
+    <div className="mt-4 first:mt-0">
+      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-600">{title}</p>
+      <nav className="flex flex-row flex-wrap gap-1 md:flex-col md:flex-nowrap md:gap-0.5" aria-label={title}>
+        {items.map(({ href, label, ...rest }) => (
+          <NavLink key={href} href={href} label={label} active={navActive(pathname, href, "end" in rest ? rest.end : false)} />
+        ))}
+      </nav>
+    </div>
+  );
+}
+
 type Props = {
   userEmail: string;
-  /** Enlace a gestión de equipo del evento (solo admin/editor). */
-  equipoHref?: string | null;
-  /** Cronograma que ven los invitados (Mesa Uno /dashboard). */
-  programaHref?: string | null;
   children: React.ReactNode;
 };
 
-export function PanelShell({ userEmail, equipoHref = null, programaHref = null, children }: Props) {
+export function PanelShell({ userEmail, children }: Props) {
   const pathname = usePathname();
-  const NAV = buildNav(equipoHref, programaHref);
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
-      <aside className="shrink-0 border-b border-white/10 bg-slate-950/95 backdrop-blur md:w-64 md:border-b-0 md:border-r">
-        <div className="flex flex-col gap-1 p-4 md:sticky md:top-0 md:max-h-screen md:overflow-y-auto">
-          <Link href="/" className="mb-4 font-display text-lg font-bold tracking-tight text-white">
+      <aside className="hidden shrink-0 border-b border-white/10 bg-slate-950/95 backdrop-blur md:block md:w-64 md:border-b-0 md:border-r">
+        <div className="flex flex-col gap-0 p-4 md:sticky md:top-0 md:max-h-screen md:overflow-y-auto">
+          <Link href="/" className="mb-3 font-display text-lg font-bold tracking-tight text-white">
             Dreams Wedding
           </Link>
-          <p className="mb-3 truncate border-b border-white/10 pb-3 text-xs text-slate-500">{userEmail}</p>
-          <nav className="flex flex-row flex-wrap gap-1 md:flex-col md:flex-nowrap md:gap-0.5">
-            {NAV.map(({ href, label, ...rest }) => {
-              const active = navActive(pathname, href, "end" in rest ? rest.end : false);
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className={`rounded-lg px-3 py-2 text-sm font-medium transition md:py-2.5 ${
-                    active
-                      ? "bg-[#001d66] text-white"
-                      : "text-slate-300 hover:bg-white/10 hover:text-white"
-                  }`}
-                >
-                  {label}
-                </Link>
-              );
-            })}
-          </nav>
-          <Link
-            href="/"
-            className="mt-4 hidden text-xs text-slate-500 hover:text-teal-200 md:block"
-          >
+          <p className="mb-4 truncate border-b border-white/10 pb-3 text-xs text-slate-500">{userEmail}</p>
+
+          <NavGroup title="Tu evento" items={NAV_TU_EVENTO} pathname={pathname} />
+          <NavGroup title="Gestión" items={NAV_GESTION} pathname={pathname} />
+          <NavGroup title="Explorar" items={NAV_EXPLORAR} pathname={pathname} />
+
+          <Link href="/" className="mt-6 text-xs text-slate-500 hover:text-teal-200">
             ← Volver al sitio
           </Link>
         </div>
       </aside>
-      <div className="min-w-0 flex-1 p-4 md:p-8">{children}</div>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <PanelMobileHeader userEmail={userEmail} />
+        <div className="min-w-0 flex-1 px-4 pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))] pt-4 md:px-8 md:pb-8 md:pt-8">
+          {children}
+        </div>
+      </div>
+
+      <PanelMobileBottomNav />
     </div>
   );
 }

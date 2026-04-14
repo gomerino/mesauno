@@ -1,6 +1,6 @@
 "use client";
 
-import { addMemberToEvent, removeMemberFromEvent, type EquipoRol } from "@/app/dashboard/actions/equipo";
+import { addMemberToEvent, removeMemberFromEvent, type EquipoRol } from "@/app/panel/actions/equipo";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -19,15 +19,15 @@ type Props = {
 };
 
 const ROLES: { value: EquipoRol; label: string }[] = [
-  { value: "editor", label: "Editor (novios, planner)" },
-  { value: "staff_centro", label: "Staff centro de eventos (recepción)" },
-  { value: "admin", label: "Administrador" },
+  { value: "editor", label: "Puede editar todo el evento (novios, planner)" },
+  { value: "staff_centro", label: "Recepción o staff del lugar" },
+  { value: "admin", label: "Administrador (control total)" },
 ];
 
 function rolLabel(rol: string) {
   if (rol === "admin") return "Administrador";
   if (rol === "editor") return "Editor";
-  if (rol === "staff_centro") return "Staff centro";
+  if (rol === "staff_centro") return "Recepción / staff";
   return rol;
 }
 
@@ -48,8 +48,8 @@ export function EquipoPageClient({ eventoId, initialMiembros, isAdmin }: Props) 
       }
       toast.success(
         res.mode === "invited"
-          ? "Invitación enviada por correo (Resend)"
-          : "Miembro añadido al equipo"
+          ? "Le enviamos un correo para unirse al equipo"
+          : "Ya puede acceder y editar contigo"
       );
       setEmail("");
       router.refresh();
@@ -65,7 +65,7 @@ export function EquipoPageClient({ eventoId, initialMiembros, isAdmin }: Props) 
       toast.error(res.error);
       return;
     }
-    toast.success("Miembro eliminado");
+    toast.success("Ya no tiene acceso a este evento");
     router.refresh();
   }
 
@@ -73,14 +73,13 @@ export function EquipoPageClient({ eventoId, initialMiembros, isAdmin }: Props) 
     <div className="mt-10 space-y-10">
       {isAdmin && (
         <section className="rounded-2xl border border-white/10 bg-white/5 p-6">
-          <h2 className="font-display text-lg font-semibold text-white">Invitar colaborador</h2>
+          <h2 className="font-display text-lg font-semibold text-white">Invitar a alguien</h2>
           <p className="mt-1 text-sm text-slate-400">
-            Si ya tiene cuenta en la app, se añade al instante. Si no, recibirá un correo (Resend) con el enlace
-            de alta.
+            Si ya tiene cuenta, entra al instante. Si no, le llegará un correo para registrarse y unirse a tu evento.
           </p>
           <form onSubmit={onInvite} className="mt-4 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end">
             <label className="min-w-[200px] flex-1 flex flex-col gap-1 text-xs text-slate-400">
-              Email del colaborador
+              Correo de la persona
               <input
                 type="email"
                 required
@@ -92,7 +91,7 @@ export function EquipoPageClient({ eventoId, initialMiembros, isAdmin }: Props) 
               />
             </label>
             <label className="min-w-[220px] flex flex-col gap-1 text-xs text-slate-400">
-              Rol
+              Qué puede hacer
               <select
                 value={rol}
                 onChange={(e) => setRol(e.target.value as EquipoRol)}
@@ -110,21 +109,21 @@ export function EquipoPageClient({ eventoId, initialMiembros, isAdmin }: Props) 
               disabled={pending}
               className="rounded-full bg-teal-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-teal-900/30 hover:bg-teal-400 disabled:opacity-50"
             >
-              {pending ? "Enviando…" : "Enviar invitación"}
+              {pending ? "Enviando…" : "Invitar"}
             </button>
           </form>
         </section>
       )}
 
       <section>
-        <h2 className="font-display text-lg font-semibold text-white">Miembros actuales</h2>
+        <h2 className="font-display text-lg font-semibold text-white">Quién tiene acceso</h2>
         <div className="mt-4 overflow-x-auto rounded-2xl border border-white/10">
           <table className="w-full min-w-[320px] text-left text-sm">
             <thead>
               <tr className="border-b border-white/10 bg-black/30 text-[10px] uppercase tracking-wide text-slate-500">
                 <th className="px-4 py-3">Email</th>
                 <th className="px-4 py-3">Rol</th>
-                <th className="px-4 py-3 hidden sm:table-cell">Desde</th>
+                <th className="px-4 py-3 hidden sm:table-cell">Desde el</th>
                 {isAdmin && <th className="px-4 py-3 w-28"> </th>}
               </tr>
             </thead>
@@ -132,7 +131,7 @@ export function EquipoPageClient({ eventoId, initialMiembros, isAdmin }: Props) 
               {initialMiembros.length === 0 && (
                 <tr>
                   <td colSpan={isAdmin ? 4 : 3} className="px-4 py-8 text-center text-slate-500">
-                    No hay miembros listados.
+                    Aún no hay colaboradores. Invita arriba a tu pareja o a quien te ayude con el evento.
                   </td>
                 </tr>
               )}

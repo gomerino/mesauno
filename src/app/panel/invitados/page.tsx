@@ -1,3 +1,6 @@
+import { CouplePageHeader } from "@/components/app/CouplePageHeader";
+import { GrowthNudge } from "@/components/app/GrowthNudge";
+import { PanelSubpageChrome } from "@/components/panel/PanelSubpageChrome";
 import { createClient } from "@/lib/supabase/server";
 import { selectEventoForMember } from "@/lib/evento-membership";
 import { InvitadosManager } from "@/components/InvitadosManager";
@@ -30,36 +33,54 @@ export default async function PanelInvitadosPage() {
   }
 
   const invitados = (data ?? []) as unknown as Invitado[];
+  const hasInvitados = invitados.length > 0;
 
   return (
-    <>
-      <h1 className="font-display text-3xl font-bold text-white">Crear invitados</h1>
-      <p className="mt-2 text-slate-400">
-        Aquí solo entra cada invitado: nombre, contacto, asiento en el pase, acompañantes y alimentación. Fecha del
-        evento, vuelo, lugar y mensaje del viaje están en{" "}
-        <Link href="/panel/evento" className="text-teal-300 underline hover:text-teal-200">
-          Evento
-        </Link>
-        .
-      </p>
-      <p className="mt-2 text-sm text-slate-500">
-        Puedes crear invitados sin fila en <code className="text-teal-400">eventos</code> (quedan con tu usuario); al
-        vincular el evento, los nuevos pueden asociarse con <code className="text-teal-400">evento_id</code>.
-      </p>
+    <PanelSubpageChrome>
+      <CouplePageHeader
+        eyebrow="Invitados"
+        title="¿A quién invitamos?"
+        subtitle={
+          <>
+            Cada persona tiene su ficha: contacto, acompañantes y alimentación. Los datos generales del gran día están
+            en{" "}
+            <Link href="/panel/evento" className="text-teal-300 underline hover:text-teal-200">
+              Evento
+            </Link>
+            . Puedes ir cargando la lista aunque aún estés definiendo detalles.
+          </>
+        }
+      />
+
       {!evento && (
-        <p className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
-          Sin evento en Supabase: los invitados usan <code className="text-amber-200">owner_user_id</code> hasta que
-          crees el evento y tu membresía.
-        </p>
+        <div className="mt-6">
+          <GrowthNudge
+            message="Aún no creaste la ficha del evento. Cuando la completes, los invitados quedarán asociados automáticamente."
+            href="/panel/evento"
+            ctaLabel="Crear ficha del evento"
+          />
+        </div>
       )}
+
+      {evento && !hasInvitados && (
+        <div
+          className="mt-6 rounded-xl border border-teal-500/30 bg-teal-500/[0.12] px-4 py-3 text-sm text-teal-50"
+          role="status"
+        >
+          <strong className="font-medium text-white">Siguiente paso:</strong> añade al menos un invitado en el formulario
+          de abajo para previsualizar la invitación y enviar el enlace.
+        </div>
+      )}
+
       {invitadosError && (
-        <p className="mt-3 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
-          No se pudieron cargar los invitados: {invitadosError.message}
+        <p className="mt-6 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+          No pudimos cargar la lista. Intenta recargar la página. Si el problema continúa, contacta soporte.
         </p>
       )}
+
       <div className="mt-10">
         <InvitadosManager eventoId={evento?.id ?? null} initialInvitados={invitados} />
       </div>
-    </>
+    </PanelSubpageChrome>
   );
 }

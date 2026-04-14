@@ -11,12 +11,12 @@ export function SiteHeader({ compact = false }: Props) {
         <Link href="/" className={`font-display font-semibold tracking-tight text-white ${title}`}>
           Dreams Wedding
         </Link>
-        <nav className="flex items-center gap-3 text-xs text-teal-100/90 sm:gap-6 sm:text-sm">
+        <nav className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-xs text-teal-100/90 sm:gap-x-6 sm:text-sm">
           <Link href="/onboarding" className="hover:text-white">
-            Crear mi evento
+            Demo gratis
           </Link>
-          <Link href="/pricing" className="hover:text-white">
-            Planes
+          <Link href="/pricing" className="font-medium text-[#D4AF37]/95 hover:text-[#D4AF37]">
+            Planes y precios
           </Link>
           <Link href="/marketplace" className="hover:text-white">
             Marketplace

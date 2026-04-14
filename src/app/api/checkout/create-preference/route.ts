@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: originCheck.message }, { status: 400 });
   }
 
-  const baseDash = `${origin}/dashboard/${eventoId}`;
+  const baseFinanzas = `${origin}/panel/finanzas`;
   const notificationUrl = `${origin}/api/webhooks/mercadopago`;
 
   const novios = [evento.nombre_novio_1, evento.nombre_novio_2].filter(Boolean).join(" & ");
@@ -92,9 +92,9 @@ export async function POST(request: Request) {
         external_reference: eventoId,
         metadata: { evento_id: eventoId },
         back_urls: {
-          success: `${baseDash}/pago/success`,
-          failure: `${baseDash}/pago/failure`,
-          pending: `${baseDash}/pago/pending`,
+          success: `${baseFinanzas}?pago=exitoso`,
+          failure: `${baseFinanzas}?pago=fallido`,
+          pending: `${baseFinanzas}?pago=pendiente`,
         },
         auto_return: "approved",
         ...(canUseMercadoPagoNotificationUrl(origin) ? { notification_url: notificationUrl } : {}),

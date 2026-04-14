@@ -34,13 +34,12 @@ export default async function MarketplacePage({
       <main className="mx-auto max-w-4xl px-4 py-10">
         <h1 className="font-display text-3xl font-bold text-white">Marketplace</h1>
         <p className="mt-2 text-slate-400">
-          Servicios para tu boda desde la tabla <code className="text-teal-400">marketplace_servicios</code>
-          .
+          Encuentra proveedores para tu matrimonio: fotografía, música, catering y más. Filtra por categoría.
         </p>
 
         {error && (
           <p className="mt-4 rounded-lg bg-orange-500/20 p-4 text-sm text-orange-200">
-            No se pudieron cargar los servicios. Revisa Supabase y las políticas RLS.
+            No se pudieron cargar los servicios ahora. Intenta de nuevo en unos minutos.
           </p>
         )}
 
@@ -60,7 +59,12 @@ export default async function MarketplacePage({
               <div className="mt-4 flex items-center justify-between text-sm">
                 {s.precio_desde != null && (
                   <span className="font-semibold text-orange-300">
-                    desde {Number(s.precio_desde).toLocaleString("es-ES", { style: "currency", currency: "EUR" })}
+                    desde{" "}
+                    {Number(s.precio_desde).toLocaleString("es-CL", {
+                      style: "currency",
+                      currency: "CLP",
+                      maximumFractionDigits: 0,
+                    })}
                   </span>
                 )}
                 {s.proveedor && <span className="text-slate-500">{s.proveedor}</span>}

@@ -10,7 +10,7 @@ type Props = {
 export function CrearMiEventoLink({ className = "" }: Props) {
   return (
     <Link href="/onboarding" className={[baseClass, className].filter(Boolean).join(" ")}>
-      Crear mi evento
+      Probar demo gratis
     </Link>
   );
 }

@@ -14,7 +14,7 @@ type FormState = {
   acompanantes: string[];
   email: string;
   telefono: string;
-  /** Asiento en el boarding pass; si está vacío se usa el del evento. */
+  /** Asiento en la invitación; si está vacío se usa el del evento. */
   asiento: string;
   restricciones_alimenticias: string;
 };
@@ -266,7 +266,7 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
       if (!res.ok) {
         setSendFlash({ id, ok: false, msg: json.error ?? "No se pudo enviar" });
       } else {
-        setSendFlash({ id, ok: true, msg: "Invitación enviada." });
+        setSendFlash({ id, ok: true, msg: "Listo: invitación enviada." });
       }
     } catch {
       setSendFlash({ id, ok: false, msg: "Error de red" });
@@ -277,8 +277,8 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
 
   const rsvpLabel: Record<string, string> = {
     pendiente: "Pendiente",
-    confirmado: "Confirmado",
-    declinado: "Declinado",
+    confirmado: "Confirmó",
+    declinado: "No asiste",
   };
 
   return (
@@ -289,7 +289,7 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
           onClick={openCreate}
           className="rounded-full bg-teal-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-400"
         >
-          Nuevo invitado
+          Añadir invitado
         </button>
       </div>
 
@@ -301,7 +301,7 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Teléfono</th>
               <th className="px-4 py-3">Asiento</th>
-              <th className="px-4 py-3">RSVP</th>
+              <th className="px-4 py-3">Respuesta</th>
               <th className="px-4 py-3 text-right">Acciones</th>
             </tr>
           </thead>
@@ -309,7 +309,7 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
             {rows.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-10 text-center text-slate-500">
-                  No hay invitados. Crea el primero.
+                  Aún no hay nadie en la lista. Usa «Añadir invitado» arriba.
                 </td>
               </tr>
             ) : (
@@ -388,11 +388,11 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
             aria-labelledby="invitado-form-title"
           >
             <h2 id="invitado-form-title" className="font-display text-xl font-bold text-white">
-              {editingId ? "Editar invitado" : "Nuevo invitado"}
+              {editingId ? "Editar persona" : "Añadir invitado"}
             </h2>
             <form onSubmit={handleSave} className="mt-6 space-y-4">
               <div>
-                <label className={label}>Nombre / titular del pase</label>
+                <label className={label}>Nombre (titular de la invitación)</label>
                 <input
                   className={input}
                   value={form.nombre}
@@ -401,9 +401,9 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
                 />
               </div>
               <div>
-                <label className={label}>Acompañantes en el mismo pase (opcional)</label>
+                <label className={label}>Acompañantes en la misma invitación (opcional)</label>
                 <p className="mb-2 text-xs text-slate-500">
-                  Personas que viajan con el titular en el mismo pase (varias si hace falta).
+                  Familia o personas que comparten esta misma invitación; puedes añadir varias líneas.
                 </p>
                 <div className="space-y-2">
                   {form.acompanantes.map((line, i) => (
@@ -444,7 +444,7 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className={label}>Email (para enviar invitación)</label>
+                  <label className={label}>Correo (para enviar la invitación)</label>
                   <input
                     className={input}
                     type="email"
@@ -462,7 +462,7 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
                 </div>
               </div>
               <div>
-                <label className={label}>Asiento en el pase</label>
+                <label className={label}>Asiento en la invitación</label>
                 <input
                   className={input}
                   value={form.asiento}
@@ -471,7 +471,7 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
                   autoComplete="off"
                 />
                 <p className="mt-1 text-xs text-slate-500">
-                  Si lo dejas vacío, se usa el asiento por defecto del evento.
+                  Si lo dejas vacío, usamos el asiento por defecto que definiste en los datos del evento.
                 </p>
               </div>
               <div>
