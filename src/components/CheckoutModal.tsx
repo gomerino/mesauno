@@ -3,7 +3,7 @@
 import type { PricingPlanId } from "@/lib/pricing-plans";
 import { PRICING_PLANS } from "@/lib/pricing-plans";
 import { X } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type Props = {
   open: boolean;
@@ -11,11 +11,28 @@ type Props = {
   onClose: () => void;
 };
 
+function readBypassFromLocation(): boolean {
+  if (typeof window === "undefined") return false;
+  const p = new URLSearchParams(window.location.search);
+  const b = p.get("bypass");
+  return b === "1" || b?.toLowerCase() === "true" || b?.toLowerCase() === "yes";
+}
+
 export function CheckoutModal({ open, planId, onClose }: Props) {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [bypassFromUrl, setBypassFromUrl] = useState(false);
+
+  useEffect(() => {
+    setBypassFromUrl(readBypassFromLocation());
+  }, [open]);
+
+  const bypassUi =
+    process.env.NEXT_PUBLIC_MP_CHECKOUT_BYPASS === "1" ||
+    process.env.NEXT_PUBLIC_MP_CHECKOUT_BYPASS === "true" ||
+    bypassFromUrl;
 
   const reset = useCallback(() => {
     setNombre("");
@@ -36,16 +53,24 @@ export function CheckoutModal({ open, planId, onClose }: Props) {
     setError(null);
     setBusy(true);
     try {
-      const res = await fetch("/api/checkout/pricing-preference", {
+      const fromUrl = readBypassFromLocation();
+      const qs = fromUrl ? "?bypass=1" : "";
+      const res = await fetch(`/api/checkout/pricing-preference${qs}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: planId, nombre: nombre.trim(), email: email.trim() }),
+        body: JSON.stringify({
+          plan: planId,
+          nombre: nombre.trim(),
+          email: email.trim(),
+          ...(fromUrl ? { bypass: true } : {}),
+        }),
       });
       const json = (await res.json()) as {
         init_point?: string;
         error?: string;
         detail?: string;
         hint?: string;
+        bypass?: boolean;
       };
       if (!res.ok || !json.init_point) {
         const parts = [json.error, json.detail, json.hint].filter(Boolean);
@@ -53,7 +78,7 @@ export function CheckoutModal({ open, planId, onClose }: Props) {
         setBusy(false);
         return;
       }
-      window.location.href = json.init_point;
+      window.location.assign(json.init_point);
     } catch {
       setError("Error de red. Revisa tu conexión.");
       setBusy(false);
@@ -137,10 +162,12 @@ export function CheckoutModal({ open, planId, onClose }: Props) {
             disabled={busy}
             className="flex w-full min-h-[48px] items-center justify-center rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] py-3 text-sm font-semibold text-[#0f172a] shadow-lg transition hover:brightness-110 disabled:opacity-60"
           >
-            {busy ? "Abriendo Mercado Pago…" : "Continuar al pago"}
+            {busy ? (bypassUi ? "Continuando…" : "Abriendo Mercado Pago…") : bypassUi ? "Continuar (sin cobro — prueba)" : "Continuar al pago"}
           </button>
           <p className="text-center text-[11px] text-slate-500">
-            Serás redirigido a Mercado Pago de forma segura. Pago único en CLP.
+            {bypassUi
+              ? "Modo prueba: no se llama a Mercado Pago. Se activa tu acceso como si el pago hubiera sido aprobado."
+              : "Serás redirigido a Mercado Pago de forma segura. Pago único en CLP."}
           </p>
         </form>
       </div>

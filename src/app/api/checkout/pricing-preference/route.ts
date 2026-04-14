@@ -3,7 +3,9 @@ import {
   createMercadoPagoConfig,
   formatMercadoPagoSdkError,
   isMercadoPagoSandboxMode,
+  resolveBypassSuccessOrigin,
   resolvePreferenceOrigin,
+  shouldUseMercadoPagoCheckoutBypass,
   validateMercadoPagoPreferenceOrigin,
 } from "@/lib/mercadopago-server";
 import { isPricingPlanId, PRICING_PLANS } from "@/lib/pricing-plans";
@@ -24,21 +26,22 @@ function shouldExposeMercadoPagoDetail(): boolean {
 }
 
 export async function POST(request: Request) {
+  let body: { plan?: string; nombre?: string; email?: string; bypass?: boolean };
+  try {
+    body = (await request.json()) as typeof body;
+  } catch {
+    return NextResponse.json({ error: "Cuerpo JSON inválido." }, { status: 400 });
+  }
+
+  const bypass = shouldUseMercadoPagoCheckoutBypass(request, { bodyBypass: body.bypass === true });
   const mpConfig = createMercadoPagoConfig();
-  if (!mpConfig) {
+  if (!bypass && !mpConfig) {
     return NextResponse.json({ error: "Mercado Pago no está configurado (MP_ACCESS_TOKEN)." }, { status: 503 });
   }
 
   const supabase = await createStrictServiceClient();
   if (!supabase) {
     return NextResponse.json({ error: "Servidor sin SUPABASE_SERVICE_ROLE_KEY." }, { status: 503 });
-  }
-
-  let body: { plan?: string; nombre?: string; email?: string };
-  try {
-    body = (await request.json()) as { plan?: string; nombre?: string; email?: string };
-  } catch {
-    return NextResponse.json({ error: "Cuerpo JSON inválido." }, { status: 400 });
   }
 
   const plan = body.plan?.trim();
@@ -55,10 +58,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Email inválido." }, { status: 400 });
   }
 
-  const origin = resolvePreferenceOrigin(request);
-  const originCheck = validateMercadoPagoPreferenceOrigin(origin);
-  if (!originCheck.ok) {
-    return NextResponse.json({ error: originCheck.message }, { status: 400 });
+  const origin = bypass ? resolveBypassSuccessOrigin(request) : resolvePreferenceOrigin(request);
+  if (!bypass) {
+    const originCheck = validateMercadoPagoPreferenceOrigin(origin);
+    if (!originCheck.ok) {
+      return NextResponse.json({ error: originCheck.message }, { status: 400 });
+    }
   }
 
   const price = PRICING_PLANS[plan].priceClp;
@@ -77,9 +82,19 @@ export async function POST(request: Request) {
   }
 
   const sessionId = sessionRow.id as string;
-  const notificationUrl = `${origin}/api/webhooks/mercadopago`;
 
-  const preference = new Preference(mpConfig);
+  if (bypass) {
+    /** Ruta relativa: el navegador permanece en el mismo host (localhost o mesauno) sin forzar SITE_URL. */
+    const initPoint = `/success?mp_bypass=1&checkout_session_id=${encodeURIComponent(sessionId)}`;
+    return NextResponse.json({
+      init_point: initPoint,
+      preference_id: null,
+      bypass: true,
+    });
+  }
+
+  const notificationUrl = `${origin}/api/webhooks/mercadopago`;
+  const preference = new Preference(mpConfig!);
 
   try {
     const pref = await preference.create({

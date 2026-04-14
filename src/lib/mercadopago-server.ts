@@ -30,18 +30,110 @@ export function isMercadoPagoSandboxMode(): boolean {
   return process.env.MP_USE_SANDBOX === "1" || process.env.MP_USE_SANDBOX === "true";
 }
 
+function envTruthy(v: string | undefined): boolean {
+  if (!v) return false;
+  const t = v.trim().toLowerCase();
+  return t === "1" || t === "true" || t === "yes" || t === "on";
+}
+
+/**
+ * Omite Mercado Pago: redirección a `/success?mp_bypass=1&checkout_session_id=...`.
+ * `NEXT_PUBLIC_MP_CHECKOUT_BYPASS` funciona en Vercel; quítalo en producción cuando cobres de verdad.
+ */
+export function isMercadoPagoCheckoutBypassEnabled(): boolean {
+  return (
+    envTruthy(process.env.MP_CHECKOUT_BYPASS) ||
+    envTruthy(process.env.NEXT_PUBLIC_MP_CHECKOUT_BYPASS)
+  );
+}
+
+/** Dev local o staging explícito: permite activar bypass con `?bypass=1` sin tocar .env. */
+export function isMercadoPagoCheckoutBypassContextLoose(): boolean {
+  return (
+    process.env.NODE_ENV === "development" ||
+    envTruthy(process.env.MP_ALLOW_CLIENT_BYPASS)
+  );
+}
+
+function refererHasBypassQuery(request: Request): boolean {
+  const ref = request.headers.get("referer");
+  if (!ref) return false;
+  try {
+    const u = new URL(ref);
+    const b = u.searchParams.get("bypass");
+    return b === "1" || envTruthy(b ?? undefined);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * True si NO debemos llamar a la API de preferencias de Mercado Pago.
+ * - Siempre con MP_CHECKOUT_BYPASS / NEXT_PUBLIC_MP_CHECKOUT_BYPASS.
+ * - En `development` o con MP_ALLOW_CLIENT_BYPASS: también con
+ *   `POST /api/checkout/pricing-preference?bypass=1`, body `{ bypass: true }`, o referer `/pricing?bypass=1`.
+ */
+export function shouldUseMercadoPagoCheckoutBypass(
+  request: Request,
+  opts?: { bodyBypass?: boolean }
+): boolean {
+  if (isMercadoPagoCheckoutBypassEnabled()) return true;
+  if (!isMercadoPagoCheckoutBypassContextLoose()) return false;
+  try {
+    const u = new URL(request.url);
+    const q = u.searchParams.get("bypass");
+    if (q === "1" || envTruthy(q ?? undefined)) return true;
+  } catch {
+    /* seguir */
+  }
+  if (opts?.bodyBypass === true) return true;
+  if (refererHasBypassQuery(request)) return true;
+  return false;
+}
+
+/** Autoriza completar el flujo en `/success?mp_bypass=1` (debe coincidir con shouldUseMercadoPagoCheckoutBypass). */
+export function canProcessPricingCheckoutBypassSuccess(): boolean {
+  return isMercadoPagoCheckoutBypassEnabled() || isMercadoPagoCheckoutBypassContextLoose();
+}
+
+/**
+ * Origen público para la vuelta en modo bypass. Prioriza `AUTH_REDIRECT_ORIGIN` / `LOCAL_SITE_URL`
+ * para forzar p. ej. `http://localhost:3000` aunque el request pase por otro host.
+ */
+export function resolveBypassSuccessOrigin(request: Request): string {
+  const forced = process.env.AUTH_REDIRECT_ORIGIN?.trim() || process.env.LOCAL_SITE_URL?.trim();
+  if (forced) {
+    return forced.replace(/\/$/, "");
+  }
+  return resolvePreferenceOrigin(request);
+}
+
 /**
  * Origen para `back_urls` y `notification_url` en la preferencia MP.
- * Prioridad: `MP_BACK_URLS_ORIGIN` (túnel ngrok / dominio real) → mismo criterio que `getPublicOriginFromRequest`.
- * Así puedes probar en localhost con `MP_BACK_URLS_ORIGIN=https://tu-app.ngrok.io` sin que MP reciba http://localhost.
+ *
+ * Prioridad:
+ * 1. `MP_BACK_URLS_ORIGIN` / `MP_PUBLIC_BASE_URL` — túnel ngrok o dominio explícito.
+ * 2. Si la petición al API es desde **localhost / 127.0.0.1** — usar ese origen para que la vuelta del pago sea a tu `npm run dev`, aunque `NEXT_PUBLIC_SITE_URL` apunte a producción (ej. mesauno.vercel.app).
+ * 3. `getPublicOriginFromRequest` (SITE_URL / host del request en Vercel).
  */
 export function resolvePreferenceOrigin(request: Request): string {
-  const raw =
-    process.env.MP_BACK_URLS_ORIGIN?.trim() ||
-    process.env.MP_PUBLIC_BASE_URL?.trim();
-  if (raw) {
-    return raw.replace(/\/$/, "");
+  const explicit =
+    process.env.MP_BACK_URLS_ORIGIN?.trim() || process.env.MP_PUBLIC_BASE_URL?.trim();
+  if (explicit) {
+    return explicit.replace(/\/$/, "");
   }
+
+  try {
+    const reqUrl = new URL(request.url);
+    const host = reqUrl.hostname.toLowerCase();
+    const isLoopback = host === "localhost" || host === "127.0.0.1" || host === "::1";
+    if (isLoopback) {
+      return `${reqUrl.protocol}//${reqUrl.host}`;
+    }
+  } catch {
+    /* seguir */
+  }
+
   return getPublicOriginFromRequest(request);
 }
 
@@ -55,11 +147,15 @@ export function validateMercadoPagoPreferenceOrigin(
   try {
     const u = new URL(origin);
     if (u.protocol === "https:") return { ok: true };
+    const host = u.hostname.toLowerCase();
+    if (u.protocol === "http:" && (host === "localhost" || host === "127.0.0.1")) {
+      return { ok: true };
+    }
     if (isMercadoPagoSandboxMode()) return { ok: true };
     return {
       ok: false,
       message:
-        "Mercado Pago (producción) exige URLs HTTPS en las redirecciones. Define MP_BACK_URLS_ORIGIN o NEXT_PUBLIC_SITE_URL con tu dominio HTTPS, o usa credenciales de prueba y MP_USE_SANDBOX=1 para desarrollo en http://localhost.",
+        "Mercado Pago (producción) exige URLs HTTPS en las redirecciones (excepto localhost en desarrollo). Si usas token de producción, define MP_BACK_URLS_ORIGIN con HTTPS (ngrok) o usa credenciales de prueba y MP_USE_SANDBOX=1.",
     };
   } catch {
     return { ok: false, message: "URL base inválida para Mercado Pago." };

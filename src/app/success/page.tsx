@@ -1,5 +1,10 @@
 import { buildPostPaymentMagicLink, provisionCheckoutSessionFromPayment } from "@/lib/checkout-provision";
-import { createMercadoPagoConfig } from "@/lib/mercadopago-server";
+import {
+  canProcessPricingCheckoutBypassSuccess,
+  createMercadoPagoConfig,
+} from "@/lib/mercadopago-server";
+import { isPricingPlanId, PRICING_PLANS } from "@/lib/pricing-plans";
+import { createStrictServiceClient } from "@/lib/supabase/server";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Payment } from "mercadopago";
 import type { Metadata } from "next";
@@ -12,6 +17,8 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = "force-dynamic";
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function pickParam(
   sp: Record<string, string | string[] | undefined>,
@@ -28,6 +35,95 @@ export default async function SuccessPage({
 }: {
   searchParams: Record<string, string | string[] | undefined>;
 }) {
+  const bypassAllowed = canProcessPricingCheckoutBypassSuccess();
+  const mpBypass = pickParam(searchParams, "mp_bypass");
+  const checkoutSessionId = pickParam(searchParams, "checkout_session_id");
+
+  if (mpBypass === "1" && checkoutSessionId) {
+    if (!bypassAllowed) {
+      return (
+        <ResultShell>
+          <p className="text-slate-300">
+            El bypass de pago no está permitido en este entorno. En local usa <code className="text-slate-400">npm run dev</code>, define{" "}
+            <code className="text-slate-400">MP_CHECKOUT_BYPASS=1</code>, o <code className="text-slate-400">MP_ALLOW_CLIENT_BYPASS=1</code> con{" "}
+            <code className="text-slate-400">/pricing?bypass=1</code>.
+          </p>
+          <Link href="/pricing" className="mt-6 inline-block text-[#D4AF37] hover:underline">
+            Volver a planes
+          </Link>
+        </ResultShell>
+      );
+    }
+    if (!UUID_RE.test(checkoutSessionId)) {
+      return (
+        <ResultShell>
+          <p className="text-slate-300">Sesión de checkout inválida.</p>
+          <Link href="/pricing" className="mt-6 inline-block text-[#D4AF37] hover:underline">
+            Volver a planes
+          </Link>
+        </ResultShell>
+      );
+    }
+
+    const supabase = await createStrictServiceClient();
+    if (!supabase) {
+      return (
+        <ResultShell>
+          <p className="text-slate-300">Servidor sin SUPABASE_SERVICE_ROLE_KEY.</p>
+          <Link href="/pricing" className="mt-6 inline-block text-[#D4AF37] hover:underline">
+            Volver a planes
+          </Link>
+        </ResultShell>
+      );
+    }
+
+    const { data: sess } = await supabase
+      .from("checkout_sessions")
+      .select("plan")
+      .eq("id", checkoutSessionId)
+      .maybeSingle();
+
+    const plan = sess?.plan;
+    const amount =
+      typeof plan === "string" && isPricingPlanId(plan) ? PRICING_PLANS[plan].priceClp : null;
+
+    const provision = await provisionCheckoutSessionFromPayment({
+      id: `bypass_${checkoutSessionId}`,
+      status: "approved",
+      external_reference: checkoutSessionId,
+      transaction_amount: amount,
+    });
+
+    if (!provision.ok) {
+      return (
+        <ResultShell>
+          <p className="text-slate-300">No pudimos activar tu cuenta ({provision.reason}).</p>
+          <Link href="/pricing" className="mt-6 inline-block text-[#D4AF37] hover:underline">
+            Volver a planes
+          </Link>
+        </ResultShell>
+      );
+    }
+
+    const magic = await buildPostPaymentMagicLink(provision.email);
+    if (magic) {
+      redirect(magic);
+    }
+
+    return (
+      <ResultShell>
+        <p className="text-slate-300">
+          Bypass sin magic link. Entra con{" "}
+          <strong className="text-white">{provision.email}</strong> en{" "}
+          <Link href="/login" className="text-[#D4AF37] hover:underline">
+            /login
+          </Link>
+          .
+        </p>
+      </ResultShell>
+    );
+  }
+
   const paymentId = pickParam(searchParams, "payment_id") ?? pickParam(searchParams, "collection_id");
   const mpConfig = createMercadoPagoConfig();
 
@@ -35,6 +131,13 @@ export default async function SuccessPage({
     return (
       <ResultShell>
         <p className="text-slate-300">No encontramos el comprobante de pago en la URL.</p>
+        <p className="mt-3 text-xs text-slate-500">
+          Si estás probando sin Mercado Pago, usa el flujo con <code className="text-slate-400">MP_CHECKOUT_BYPASS=1</code> desde{" "}
+          <Link href="/pricing" className="text-[#D4AF37] hover:underline">
+            /pricing
+          </Link>
+          .
+        </p>
         <Link href="/pricing" className="mt-6 inline-block text-[#D4AF37] hover:underline">
           Volver a planes
         </Link>

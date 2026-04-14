@@ -5,6 +5,26 @@ function trimTrailingSlash(url: string): string {
 }
 
 /**
+ * Garantiza `http(s)://host[:puerto]` para `new URL()` y Supabase `redirectTo`.
+ * Acepta valores mal configurados sin esquema (p. ej. `localhost:3000`, `midominio.com`).
+ */
+export function ensureAbsoluteSiteOrigin(input: string): string {
+  const s = input.trim();
+  if (!s) return "http://localhost:3000";
+
+  const withProto = /^https?:\/\//i.test(s) ? s : `https://${s}`;
+  try {
+    const u = new URL(withProto);
+    const h = u.hostname.toLowerCase();
+    const useHttp = h === "localhost" || h === "127.0.0.1" || h === "::1";
+    const proto = useHttp ? "http:" : u.protocol === "http:" ? "http:" : "https:";
+    return `${proto}//${u.host}`;
+  } catch {
+    return "http://localhost:3000";
+  }
+}
+
+/**
  * Dominio público fijado por entorno (recomendado para enlaces de Auth/correos).
  * `SITE_URL` solo servidor; `NEXT_PUBLIC_SITE_URL` cliente + servidor.
  */
@@ -73,4 +93,37 @@ export async function getSiteOrigin(): Promise<string> {
   }
   const proto = h.get("x-forwarded-proto") ?? "http";
   return `${proto}://${host}`;
+}
+
+function isLocalLoopbackHost(hostHeader: string): boolean {
+  const host = hostHeader.split(":")[0]?.toLowerCase() ?? "";
+  return host === "localhost" || host === "127.0.0.1" || host === "::1";
+}
+
+/**
+ * Como `getSiteOrigin()`, pero si la petición llega a **localhost / 127.0.0.1** (dev),
+ * usa ese origen aunque `NEXT_PUBLIC_SITE_URL` apunte a producción. Así el magic link y
+ * `redirectTo` de Supabase no mandan a mesauno.vercel.app mientras pruebas en local.
+ */
+export async function getSiteOriginRespectingLocalhost(): Promise<string> {
+  const h = await headers();
+  const hostRaw = h.get("x-forwarded-host")?.split(",")[0]?.trim() ?? h.get("host") ?? "";
+  if (hostRaw && isLocalLoopbackHost(hostRaw)) {
+    const proto = (h.get("x-forwarded-proto") ?? "http").split(",")[0]?.trim() ?? "http";
+    const safeProto = proto === "https" ? "https" : "http";
+    return `${safeProto}://${hostRaw}`;
+  }
+  return getSiteOrigin();
+}
+
+/**
+ * `redirectTo` del magic link post-pago. Si defines `AUTH_REDIRECT_ORIGIN` o `LOCAL_SITE_URL`,
+ * gana sobre cabeceras (útil para que no vuelva a mesauno.vercel.app en local).
+ */
+export async function getMagicLinkRedirectOrigin(): Promise<string> {
+  const forced = process.env.AUTH_REDIRECT_ORIGIN?.trim() || process.env.LOCAL_SITE_URL?.trim();
+  if (forced) {
+    return ensureAbsoluteSiteOrigin(forced.replace(/\/$/, ""));
+  }
+  return ensureAbsoluteSiteOrigin(await getSiteOriginRespectingLocalhost());
 }

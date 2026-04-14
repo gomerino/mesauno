@@ -1,5 +1,5 @@
 import { createStrictServiceClient } from "@/lib/supabase/server";
-import { getSiteOrigin } from "@/lib/public-origin";
+import { getMagicLinkRedirectOrigin } from "@/lib/public-origin";
 import type { PricingPlanId } from "@/lib/pricing-plans";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -179,13 +179,19 @@ export async function provisionCheckoutSessionFromPayment(
   return { ok: true, email, alreadyDone: false };
 }
 
-/** URL mágica para establecer sesión vía /auth/callback (PKCE). */
+const MAGIC_LINK_NEXT = "/onboarding";
+
+/**
+ * URL para iniciar sesión tras el pago.
+ * `action_link` de `generateLink` no es compatible con el cliente PKCE por defecto (@supabase/ssr);
+ * usamos `token_hash` + `verifyOtp` en `/auth/callback` (mismo patrón que recomienda Supabase para este caso).
+ */
 export async function buildPostPaymentMagicLink(email: string): Promise<string | null> {
   const supabase = await createStrictServiceClient();
   if (!supabase) return null;
 
-  const origin = await getSiteOrigin();
-  const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent("/onboarding")}`;
+  const origin = await getMagicLinkRedirectOrigin();
+  const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(MAGIC_LINK_NEXT)}`;
 
   const { data, error } = await supabase.auth.admin.generateLink({
     type: "magiclink",
@@ -195,10 +201,15 @@ export async function buildPostPaymentMagicLink(email: string): Promise<string |
     },
   });
 
-  if (error || !data?.properties?.action_link) {
-    console.error("[provision] generateLink", error);
+  const hashed = data?.properties?.hashed_token;
+  if (error || !hashed || typeof hashed !== "string") {
+    console.error("[provision] generateLink", error, { hasHashed: Boolean(hashed) });
     return null;
   }
 
-  return data.properties.action_link;
+  const url = new URL(`${origin}/auth/callback`);
+  url.searchParams.set("token_hash", hashed);
+  url.searchParams.set("type", "magiclink");
+  url.searchParams.set("next", MAGIC_LINK_NEXT);
+  return url.toString();
 }
