@@ -16,7 +16,7 @@ export default async function StaffLayout({ children }: { children: React.ReactN
 
   const eventoIds = await fetchStaffEventoIds(supabase, user.id);
   if (eventoIds.length === 0) {
-    redirect("/panel/overview");
+    redirect("/panel");
   }
 
   const { data: eventos } = await supabase

@@ -23,7 +23,8 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      { source: "/dashboard", destination: "/panel/overview", permanent: true },
+      { source: "/panel/overview", destination: "/panel", permanent: true },
+      { source: "/dashboard", destination: "/panel", permanent: true },
       {
         source: "/dashboard/:evento_id/programa",
         destination: "/panel/programa",

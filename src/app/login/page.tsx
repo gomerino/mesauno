@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
 
 function safeNextPath(raw: string | null): string {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/panel/overview";
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/panel";
   return raw;
 }
 

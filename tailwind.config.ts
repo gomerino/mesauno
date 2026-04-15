@@ -27,6 +27,10 @@ const config: Config = {
           "0%": { opacity: "0", transform: "scale(0.96) translateY(10px)" },
           "100%": { opacity: "1", transform: "scale(1) translateY(0)" },
         },
+        onboardingReveal: {
+          "0%": { opacity: "0", transform: "scale(0.94) translateY(14px)" },
+          "100%": { opacity: "1", transform: "scale(1) translateY(0)" },
+        },
         /** Check-in guardado: pulso suave tipo “pase validado”. */
         boardingValidated: {
           "0%, 100%": { transform: "scale(1)", filter: "brightness(1)" },
@@ -43,6 +47,7 @@ const config: Config = {
         slideUpDrawer: "slideUpDrawer 0.28s ease-out forwards",
         fadeIn: "fadeIn 0.22s ease-out forwards",
         ticketPrintIn: "ticketPrintIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both",
+        onboardingReveal: "onboardingReveal 0.48s cubic-bezier(0.22, 1, 0.36, 1) both",
         boardingValidated: "boardingValidated 0.85s cubic-bezier(0.22, 1, 0.36, 1) both",
         rsvpReveal: "rsvpReveal 0.26s cubic-bezier(0.22, 1, 0.36, 1) both",
       },

@@ -1,17 +1,22 @@
 import Link from "next/link";
-import { panelGrowthLine } from "@/lib/panel-progress-load";
-import type { PanelStepId } from "@/lib/panel-setup-progress";
+import {
+  panelNextActionHref,
+  panelNextActionLabel,
+} from "@/lib/panel-progress-load";
+import type { JourneyStepId } from "@/lib/panel-setup-progress";
 
 type Props = {
   pct: number;
-  steps: Record<PanelStepId, boolean>;
+  headline: string;
+  nextStep: JourneyStepId | null;
   /** Barra compacta al final en móvil. */
   variant?: "default" | "compact";
 };
 
-export function PanelSlimProgress({ pct, steps, variant = "default" }: Props) {
-  const line = panelGrowthLine(pct, steps);
+export function PanelSlimProgress({ pct, headline, nextStep, variant = "default" }: Props) {
   const compact = variant === "compact";
+  const quickHref = panelNextActionHref(nextStep);
+  const quickLabel = panelNextActionLabel(nextStep);
 
   return (
     <div
@@ -30,9 +35,11 @@ export function PanelSlimProgress({ pct, steps, variant = "default" }: Props) {
                 : "text-xs font-semibold uppercase tracking-wide text-teal-400/90"
             }
           >
-            Avance del evento
+            Siguiente paso
           </p>
-          <p className={`text-slate-300 ${compact ? "mt-0.5 text-xs leading-snug" : "mt-1 text-sm"}`}>{line}</p>
+          <p className={`text-slate-300 ${compact ? "mt-0.5 text-xs leading-snug" : "mt-1 text-sm"}`}>
+            {headline}
+          </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <span
@@ -41,14 +48,14 @@ export function PanelSlimProgress({ pct, steps, variant = "default" }: Props) {
             {pct}%
           </span>
           <Link
-            href="/panel/overview"
+            href="/panel"
             className={
               compact
                 ? "rounded-full border border-white/15 px-2.5 py-1 text-[10px] font-semibold text-teal-200 hover:bg-white/5"
                 : "rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-teal-200 hover:bg-white/5"
             }
           >
-            Ver plan
+            Resumen
           </Link>
         </div>
       </div>
@@ -66,12 +73,12 @@ export function PanelSlimProgress({ pct, steps, variant = "default" }: Props) {
       </div>
       {pct < 100 ? (
         <p className={`text-center text-slate-500 ${compact ? "mt-2 text-[10px]" : "mt-3 text-xs"}`}>
-          <Link href="/panel/evento" className="text-teal-300/90 hover:text-teal-200">
-            Completar evento
+          <Link href={quickHref} className="font-medium text-teal-300/90 hover:text-teal-200">
+            {quickLabel}
           </Link>
           <span className="text-slate-600"> · </span>
-          <Link href="/panel/invitados" className="text-teal-300/90 hover:text-teal-200">
-            Agregar invitados
+          <Link href="/panel/invitacion" className="text-teal-300/90 hover:text-teal-200">
+            Invitación
           </Link>
         </p>
       ) : null}

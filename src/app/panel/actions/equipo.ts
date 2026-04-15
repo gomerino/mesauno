@@ -23,7 +23,7 @@ function parseRpcJson(data: unknown): Record<string, unknown> | null {
 
 function revalidateEquipo() {
   revalidatePath("/panel/equipo");
-  revalidatePath("/panel/overview");
+  revalidatePath("/panel");
 }
 
 export async function addMemberToEvent(

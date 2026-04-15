@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Home, ListOrdered, Menu, Users, X } from "lucide-react";
+import { CalendarDays, Home, Menu, Users, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const MORE_LINKS = [
+  { href: "/panel/invitacion", label: "Invitación" },
+  { href: "/panel/programa", label: "Programa" },
   { href: "/panel/equipo", label: "Equipo" },
   { href: "/panel/invitados/vista", label: "Vista previa" },
   { href: "/panel/invitados/confirmaciones", label: "Confirmaciones" },
@@ -28,17 +30,16 @@ type TabItem = {
 };
 
 const PRIMARY_TABS: TabItem[] = [
-  { href: "/panel/overview", label: "Inicio", icon: Home, end: true },
+  { href: "/panel", label: "Inicio", icon: Home, end: true },
   { href: "/panel/evento", label: "Evento", icon: CalendarDays },
   { href: "/panel/invitados", label: "Invitados", icon: Users },
-  { href: "/panel/programa", label: "Programa", icon: ListOrdered },
 ];
 
 export function PanelMobileHeader({ userEmail }: { userEmail: string }) {
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/90 px-4 py-3 backdrop-blur-md md:hidden">
       <div className="flex items-center justify-between gap-3">
-        <Link href="/panel/overview" className="font-display text-base font-bold tracking-tight text-white">
+        <Link href="/panel" className="font-display text-base font-bold tracking-tight text-white">
           Dreams
         </Link>
         <p className="min-w-0 truncate text-[11px] text-slate-500" title={userEmail}>

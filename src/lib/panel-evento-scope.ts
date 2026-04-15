@@ -16,7 +16,7 @@ export async function requirePanelScopedEventoId(
     p_evento_id: evento.id,
   });
   if (error || !canAccess) {
-    return { ok: false, redirect: "/panel/overview" };
+    return { ok: false, redirect: "/panel" };
   }
   return { ok: true, eventoId: evento.id as string };
 }

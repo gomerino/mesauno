@@ -14,7 +14,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   if (!isAdminEmail(user.email)) {
-    redirect("/panel/overview");
+    redirect("/panel");
   }
 
   return (

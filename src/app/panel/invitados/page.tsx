@@ -41,16 +41,26 @@ export default async function PanelInvitadosPage() {
         eyebrow="Invitados"
         title="¿A quién invitamos?"
         subtitle={
-          <>
-            Cada persona tiene su ficha: contacto, acompañantes y alimentación. Los datos generales del gran día están
-            en{" "}
+          <span className="text-slate-400">
+            Una lista clara para tu gran día. Los datos del evento están en{" "}
             <Link href="/panel/evento" className="text-teal-300 underline hover:text-teal-200">
               Evento
             </Link>
-            . Puedes ir cargando la lista aunque aún estés definiendo detalles.
-          </>
+            .
+          </span>
         }
       />
+
+      {evento && !hasInvitados && (
+        <div className="mt-4 md:hidden">
+          <a
+            href="#agregar-invitados"
+            className="flex min-h-[48px] w-full items-center justify-center rounded-full bg-teal-500 px-4 text-sm font-semibold text-white shadow-lg shadow-teal-950/30 hover:bg-teal-400"
+          >
+            Agregar invitados
+          </a>
+        </div>
+      )}
 
       {!evento && (
         <div className="mt-6">
@@ -67,8 +77,8 @@ export default async function PanelInvitadosPage() {
           className="mt-6 rounded-xl border border-teal-500/30 bg-teal-500/[0.12] px-4 py-3 text-sm text-teal-50"
           role="status"
         >
-          <strong className="font-medium text-white">Siguiente paso:</strong> añade al menos un invitado en el formulario
-          de abajo para previsualizar la invitación y enviar el enlace.
+          <strong className="font-medium text-white">Te falta un paso:</strong> añadí al menos una persona abajo para
+          generar su invitación y compartirla.
         </div>
       )}
 
@@ -78,7 +88,7 @@ export default async function PanelInvitadosPage() {
         </p>
       )}
 
-      <div className="mt-10">
+      <div id="agregar-invitados" className="mt-10 scroll-mt-28">
         <InvitadosManager eventoId={evento?.id ?? null} initialInvitados={invitados} />
       </div>
     </PanelSubpageChrome>

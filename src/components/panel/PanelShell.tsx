@@ -5,9 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV_TU_EVENTO = [
-  { href: "/panel/overview", label: "Inicio", end: true },
+  { href: "/panel", label: "Inicio", end: true },
   { href: "/panel/evento", label: "Evento" },
   { href: "/panel/invitados", label: "Invitados" },
+  { href: "/panel/invitacion", label: "Invitación" },
   { href: "/panel/programa", label: "Programa" },
   { href: "/panel/equipo", label: "Equipo" },
 ] as const;

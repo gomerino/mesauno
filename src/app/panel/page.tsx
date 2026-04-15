@@ -1,6 +1,7 @@
-import { redirect } from "next/navigation";
+import { JourneyHome } from "@/components/panel/JourneyHome";
 
-/** Entrada unificada del panel: siempre el resumen. */
-export default function PanelIndexPage() {
-  redirect("/panel/overview");
+export const dynamic = "force-dynamic";
+
+export default function PanelHomePage() {
+  return <JourneyHome />;
 }

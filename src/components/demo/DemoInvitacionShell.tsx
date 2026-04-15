@@ -129,7 +129,7 @@ export function DemoInvitacionShell({ embed = false }: Props) {
         </section>
       </main>
 
-      <PaywallModal open={paywallOpen} onClose={() => setPaywallOpen(false)} />
+      <PaywallModal open={paywallOpen} onClose={() => setPaywallOpen(false)} prefillNombre={payload.nombreNovios} />
     </div>
   );
 }

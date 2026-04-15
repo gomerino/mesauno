@@ -84,12 +84,21 @@ type Props = {
   merged: MergedEventoParaPase;
   mapUrl: string;
   programaHitos: EventoProgramaHito[];
+  /** Etiqueta de dress code (p. ej. onboarding). Por defecto "Elegante". */
+  dressCodeLabel?: string;
 };
 
 /**
  * Boarding pass: una sola tarjeta — cabecera, grid, itinerario integrado (solo líneas punteadas).
  */
-export function SoftAviationTicket({ invitado, evento, merged, mapUrl, programaHitos }: Props) {
+export function SoftAviationTicket({
+  invitado,
+  evento,
+  merged,
+  mapUrl,
+  programaHitos,
+  dressCodeLabel = "Elegante",
+}: Props) {
   const address = resolveDestinoParaMapa(merged.destino);
   const wazeUrl = `https://waze.com/ul?q=${encodeURIComponent(address)}&navigate=yes`;
 
@@ -158,7 +167,7 @@ export function SoftAviationTicket({ invitado, evento, merged, mapUrl, programaH
 
           <p className="mb-1 text-center text-[10px] font-medium leading-snug text-invite-navy/70 sm:mb-2 sm:text-[11px]">
             <span className="text-invite-navy/55">Dress code:</span>{" "}
-            <span className="font-semibold text-invite-gold">Elegante</span>
+            <span className="font-semibold text-invite-gold">{dressCodeLabel}</span>
           </p>
         </div>
 

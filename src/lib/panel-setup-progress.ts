@@ -1,22 +1,42 @@
 import type { Evento } from "@/types/database";
 
-export type PanelStepId = "evento" | "invitados" | "compartir";
+/** Pasos del journey del panel (sin tocar `/invitacion/*`). */
+export type JourneyStepId =
+  | "evento"
+  | "invitados"
+  | "invitacion_lista"
+  | "invitacion_compartida"
+  | "seguimiento";
 
-/** Pesos alineados con workflows/HU-010-panel-optimization/tech.md */
-const WEIGHT: Record<PanelStepId, number> = {
-  evento: 40,
-  invitados: 35,
-  compartir: 25,
+/** @deprecated Usa `JourneyStepId`. */
+export type PanelStepId = JourneyStepId;
+
+const ORDER: JourneyStepId[] = [
+  "evento",
+  "invitados",
+  "invitacion_lista",
+  "invitacion_compartida",
+  "seguimiento",
+];
+
+const WEIGHT: Record<JourneyStepId, number> = {
+  evento: 20,
+  invitados: 20,
+  invitacion_lista: 20,
+  invitacion_compartida: 20,
+  seguimiento: 20,
 };
 
 export type PanelSetupSummary = {
   totalInvitados: number;
   emailsEnviados: number;
   invitacionesVistas: number;
+  /** Invitados con RSVP distinto de pendiente / null. */
+  respuestasRsvp: number;
 };
 
 /**
- * Evento “completo” para el checklist: nombres de ambos novios y al menos una fecha.
+ * Evento listo: nombres de ambos novios y al menos una fecha.
  */
 export function isEventBasicsComplete(
   evento: Pick<Evento, "nombre_novio_1" | "nombre_novio_2" | "fecha_boda" | "fecha_evento"> | null
@@ -31,24 +51,67 @@ export function isEventBasicsComplete(
   return Boolean(n1 && n2 && hasDate);
 }
 
-function isShareComplete(summary: PanelSetupSummary): boolean {
+function isInvitacionLista(
+  evento: Pick<Evento, "nombre_novio_1" | "nombre_novio_2" | "fecha_boda" | "fecha_evento"> | null,
+  totalInvitados: number
+): boolean {
+  return isEventBasicsComplete(evento) && totalInvitados >= 1;
+}
+
+function isInvitacionCompartida(summary: PanelSetupSummary): boolean {
   return summary.emailsEnviados > 0 || summary.invitacionesVistas > 0;
 }
 
-export function getPanelSetupProgress(
+function isSeguimientoActivo(summary: PanelSetupSummary): boolean {
+  return summary.respuestasRsvp > 0;
+}
+
+export type JourneyProgress = {
+  pct: number;
+  steps: Record<JourneyStepId, boolean>;
+  /** Primer paso aún en false, o null si el journey está completo. */
+  nextStep: JourneyStepId | null;
+  remainingSteps: number;
+};
+
+/**
+ * Progreso y siguiente paso del journey (fuente única de verdad).
+ */
+export function getJourneyProgress(
   evento: Pick<Evento, "nombre_novio_1" | "nombre_novio_2" | "fecha_boda" | "fecha_evento"> | null,
   summary: PanelSetupSummary
-): { pct: number; steps: Record<PanelStepId, boolean> } {
-  const steps: Record<PanelStepId, boolean> = {
+): JourneyProgress {
+  const steps: Record<JourneyStepId, boolean> = {
     evento: isEventBasicsComplete(evento),
     invitados: summary.totalInvitados >= 1,
-    compartir: isShareComplete(summary),
+    invitacion_lista: isInvitacionLista(evento, summary.totalInvitados),
+    invitacion_compartida: isInvitacionCompartida(summary),
+    seguimiento: isSeguimientoActivo(summary),
   };
 
   let pct = 0;
-  (Object.keys(WEIGHT) as PanelStepId[]).forEach((id) => {
+  (Object.keys(WEIGHT) as JourneyStepId[]).forEach((id) => {
     if (steps[id]) pct += WEIGHT[id];
   });
 
-  return { pct, steps };
+  let nextStep: JourneyStepId | null = null;
+  for (const id of ORDER) {
+    if (!steps[id]) {
+      nextStep = id;
+      break;
+    }
+  }
+
+  const remainingSteps = ORDER.filter((id) => !steps[id]).length;
+
+  return { pct, steps, nextStep, remainingSteps };
+}
+
+/** Compat: nombre anterior en el código. */
+export function getPanelSetupProgress(
+  evento: Pick<Evento, "nombre_novio_1" | "nombre_novio_2" | "fecha_boda" | "fecha_evento"> | null,
+  summary: PanelSetupSummary
+): { pct: number; steps: Record<JourneyStepId, boolean> } {
+  const j = getJourneyProgress(evento, summary);
+  return { pct: j.pct, steps: j.steps };
 }

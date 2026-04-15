@@ -1,5 +1,5 @@
 import { PanelSlimProgress } from "@/components/panel/PanelSlimProgress";
-import { loadPanelProgressBundle } from "@/lib/panel-progress-load";
+import { journeyHeadline, loadPanelProgressBundle } from "@/lib/panel-progress-load";
 import { createClient } from "@/lib/supabase/server";
 import type { ReactNode } from "react";
 
@@ -17,16 +17,17 @@ export async function PanelSubpageChrome({ children }: Props) {
     return <>{children}</>;
   }
 
-  const { pct, steps } = await loadPanelProgressBundle(supabase, user.id);
+  const { pct, nextStep, remainingSteps } = await loadPanelProgressBundle(supabase, user.id);
+  const headline = journeyHeadline(nextStep, remainingSteps);
 
   return (
     <>
       <div className="mb-8 hidden md:block">
-        <PanelSlimProgress pct={pct} steps={steps} />
+        <PanelSlimProgress pct={pct} headline={headline} nextStep={nextStep} />
       </div>
       {children}
       <div className="mt-8 md:hidden">
-        <PanelSlimProgress pct={pct} steps={steps} variant="compact" />
+        <PanelSlimProgress pct={pct} headline={headline} nextStep={nextStep} variant="compact" />
       </div>
     </>
   );
