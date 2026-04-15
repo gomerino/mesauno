@@ -65,7 +65,7 @@ export function OnboardingFullClient() {
         onClick={() => setPaywallOpen(true)}
         className="mt-10 flex min-h-[52px] w-full max-w-md items-center justify-center rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] px-6 text-sm font-semibold text-[#0f172a] shadow-xl transition hover:brightness-110"
       >
-        Enviar invitaciones ✈️
+        Mandar invitaciones ✈️
       </button>
       <p className="mt-6 text-center text-xs text-slate-500">
         ¿Ya tenés cuenta?{" "}

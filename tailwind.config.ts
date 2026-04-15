@@ -41,6 +41,15 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(8px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        /** Panel journey: avión suave */
+        journeyPlaneFloat: {
+          "0%, 100%": { transform: "translateY(0) rotate(-8deg)" },
+          "50%": { transform: "translateY(-8px) rotate(4deg)" },
+        },
+        journeyGlowPulse: {
+          "0%, 100%": { opacity: "0.45" },
+          "50%": { opacity: "0.85" },
+        },
       },
       animation: {
         stampDrop: "stampDrop 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards",
@@ -50,6 +59,8 @@ const config: Config = {
         onboardingReveal: "onboardingReveal 0.48s cubic-bezier(0.22, 1, 0.36, 1) both",
         boardingValidated: "boardingValidated 0.85s cubic-bezier(0.22, 1, 0.36, 1) both",
         rsvpReveal: "rsvpReveal 0.26s cubic-bezier(0.22, 1, 0.36, 1) both",
+        journeyPlaneFloat: "journeyPlaneFloat 3.2s ease-in-out infinite",
+        journeyGlowPulse: "journeyGlowPulse 2.5s ease-in-out infinite",
       },
       colors: {
         dreams: {

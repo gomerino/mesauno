@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { useSearchParams } from "next/navigation";
-import { useState, Suspense } from "react";
+import { useEffect, useState, Suspense } from "react";
 
 function safeNextPath(raw: string | null): string {
   if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/panel";
@@ -14,7 +14,12 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const err = searchParams.get("error");
   const nextPath = safeNextPath(searchParams.get("next"));
+  const emailParam = searchParams.get("email");
   const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    if (emailParam) setEmail(emailParam);
+  }, [emailParam]);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);

@@ -39,7 +39,7 @@ export default async function PanelInvitadosPage() {
     <PanelSubpageChrome>
       <CouplePageHeader
         eyebrow="Invitados"
-        title="¿A quién invitamos?"
+        title="Ver tus invitados"
         subtitle={
           <span className="text-slate-400">
             Una lista clara para tu gran día. Los datos del evento están en{" "}

@@ -1,5 +1,5 @@
-import { MembresiaTrialBanner } from "@/components/dashboard/MembresiaTrialBanner";
 import { DashboardToaster } from "@/components/dashboard/DashboardToaster";
+import { JourneyUnlockBanner } from "@/components/panel/journey/JourneyUnlockBanner";
 import { PanelShell } from "@/components/panel/PanelShell";
 import { selectEventoForMember } from "@/lib/evento-membership";
 import { isAdminEmail } from "@/lib/admin-auth";
@@ -27,30 +27,37 @@ export default async function PanelLayout({ children }: { children: React.ReactN
     redirect("/staff/check-in");
   }
 
-  const { data: evento } = await selectEventoForMember(supabase, user.id, "id, plan_status");
+  const { data: evento } = await selectEventoForMember(
+    supabase,
+    user.id,
+    "id, plan_status, nombre_novio_1, nombre_novio_2"
+  );
   const eventoId = evento?.id as string | undefined;
 
-  let showTrialBanner = false;
+  let showUnlock = false;
+  let prefillNombre = "";
   if (eventoId && evento) {
     const planStatus = (evento as { plan_status?: string }).plan_status ?? "trial";
     const { data: isAdmin } = await supabase.rpc("user_is_evento_admin", { p_evento_id: eventoId });
-    showTrialBanner = planStatus !== "paid" && Boolean(isAdmin);
+    showUnlock = planStatus !== "paid" && Boolean(isAdmin);
+    const n1 = (evento as { nombre_novio_1?: string | null }).nombre_novio_1?.trim() ?? "";
+    const n2 = (evento as { nombre_novio_2?: string | null }).nombre_novio_2?.trim() ?? "";
+    prefillNombre = [n1, n2].filter(Boolean).join(" & ");
   }
+
+  const unlockBanner =
+    showUnlock && eventoId ? (
+      <JourneyUnlockBanner
+        eventoId={eventoId}
+        userEmail={user.email ?? ""}
+        prefillNombre={prefillNombre || "Mi evento"}
+      />
+    ) : null;
 
   return (
     <>
-      <PanelShell userEmail={user.email ?? ""}>
-        {showTrialBanner && eventoId ? (
-          <div className="mb-2 hidden md:block">
-            <MembresiaTrialBanner eventoId={eventoId} />
-          </div>
-        ) : null}
+      <PanelShell userEmail={user.email ?? ""} unlockBanner={unlockBanner}>
         {children}
-        {showTrialBanner && eventoId ? (
-          <div className="mt-8 md:hidden">
-            <MembresiaTrialBanner eventoId={eventoId} compact />
-          </div>
-        ) : null}
       </PanelShell>
       <DashboardToaster />
     </>

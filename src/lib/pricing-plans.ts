@@ -15,7 +15,7 @@ export const PRICING_PLANS = {
     features: [
       "Invitaciones digitales",
       "Envío por correo electrónico",
-      "Confirmación de asistencia (RSVP)",
+      "¿Van o no van? (RSVP)",
       "Gestión de invitados y mesas",
     ],
     cta: "Empezar con Esencial",

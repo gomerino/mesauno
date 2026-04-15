@@ -1,25 +1,14 @@
 "use client";
 
+import { JourneyHeader } from "@/components/panel/journey/JourneyHeader";
 import { PanelMobileBottomNav, PanelMobileHeader } from "@/components/panel/PanelMobileChrome";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const NAV_TU_EVENTO = [
-  { href: "/panel", label: "Inicio", end: true },
-  { href: "/panel/evento", label: "Evento" },
-  { href: "/panel/invitados", label: "Invitados" },
-  { href: "/panel/invitacion", label: "Invitación" },
-  { href: "/panel/programa", label: "Programa" },
-  { href: "/panel/equipo", label: "Equipo" },
+const NAV_MAIN = [
+  { href: "/panel", label: "Viaje", end: true },
+  { href: "/panel/equipo", label: "Ajustes" },
 ] as const;
-
-const NAV_GESTION = [
-  { href: "/panel/invitados/vista", label: "Vista previa" },
-  { href: "/panel/invitados/confirmaciones", label: "Confirmaciones" },
-  { href: "/panel/finanzas", label: "Finanzas" },
-] as const;
-
-const NAV_EXPLORAR = [{ href: "/marketplace", label: "Marketplace" }] as const;
 
 function navActive(pathname: string, href: string, end?: boolean) {
   if (end) {
@@ -40,8 +29,10 @@ function NavLink({
   return (
     <Link
       href={href}
-      className={`rounded-lg px-3 py-2 text-sm font-medium transition md:py-2.5 ${
-        active ? "bg-[#001d66] text-white" : "text-slate-300 hover:bg-white/10 hover:text-white"
+      className={`rounded-xl px-3 py-2 text-sm transition-all duration-200 ${
+        active
+          ? "border border-[#D4AF37]/30 bg-[#D4AF37]/10 font-medium text-[#D4AF37]"
+          : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
       }`}
     >
       {label}
@@ -49,58 +40,57 @@ function NavLink({
   );
 }
 
-function NavGroup({
-  title,
-  items,
-  pathname,
-}: {
-  title: string;
-  items: readonly { href: string; label: string; end?: boolean }[];
-  pathname: string;
-}) {
-  return (
-    <div className="mt-4 first:mt-0">
-      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-600">{title}</p>
-      <nav className="flex flex-row flex-wrap gap-1 md:flex-col md:flex-nowrap md:gap-0.5" aria-label={title}>
-        {items.map(({ href, label, ...rest }) => (
-          <NavLink key={href} href={href} label={label} active={navActive(pathname, href, "end" in rest ? rest.end : false)} />
-        ))}
-      </nav>
-    </div>
-  );
-}
-
 type Props = {
   userEmail: string;
   children: React.ReactNode;
+  /** Banner opcional (p. ej. activar viaje con Mercado Pago). */
+  unlockBanner?: React.ReactNode;
 };
 
-export function PanelShell({ userEmail, children }: Props) {
+export function PanelShell({ userEmail, children, unlockBanner }: Props) {
   const pathname = usePathname();
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
-      <aside className="hidden shrink-0 border-b border-white/10 bg-slate-950/95 backdrop-blur md:block md:w-64 md:border-b-0 md:border-r">
-        <div className="flex flex-col gap-0 p-4 md:sticky md:top-0 md:max-h-screen md:overflow-y-auto">
-          <Link href="/" className="mb-3 font-display text-lg font-bold tracking-tight text-white">
-            Dreams Wedding
+    <div className="flex min-h-screen flex-col bg-[#050810] md:flex-row">
+      <div
+        className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(212,175,55,0.08),transparent)]"
+        aria-hidden
+      />
+
+      <aside className="relative z-[1] hidden w-56 shrink-0 border-r border-white/[0.06] bg-[#070b14]/90 backdrop-blur-xl md:block lg:w-60">
+        <div className="flex h-full flex-col gap-1 p-4 lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto lg:py-6">
+          <Link href="/panel" className="mb-2 font-display text-lg font-bold tracking-tight text-white">
+            Dreams
           </Link>
-          <p className="mb-4 truncate border-b border-white/10 pb-3 text-xs text-slate-500">{userEmail}</p>
+          <p className="mb-4 truncate border-b border-white/[0.06] pb-3 text-[11px] text-slate-500">{userEmail}</p>
 
-          <NavGroup title="Tu evento" items={NAV_TU_EVENTO} pathname={pathname} />
-          <NavGroup title="Gestión" items={NAV_GESTION} pathname={pathname} />
-          <NavGroup title="Explorar" items={NAV_EXPLORAR} pathname={pathname} />
+          <nav className="flex flex-col gap-0.5" aria-label="Navegación principal">
+            {NAV_MAIN.map(({ href, label, ...rest }) => (
+              <NavLink
+                key={href}
+                href={href}
+                label={label}
+                active={navActive(pathname, href, "end" in rest ? rest.end : false)}
+              />
+            ))}
+          </nav>
 
-          <Link href="/" className="mt-6 text-xs text-slate-500 hover:text-teal-200">
-            ← Volver al sitio
+          <Link href="/" className="mt-8 text-[11px] text-slate-600 transition hover:text-[#D4AF37]/90">
+            ← Sitio público
           </Link>
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="relative z-[1] flex min-w-0 flex-1 flex-col">
         <PanelMobileHeader userEmail={userEmail} />
-        <div className="min-w-0 flex-1 px-4 pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))] pt-4 md:px-8 md:pb-8 md:pt-8">
-          {children}
+        <div className="min-w-0 flex-1 px-4 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] pt-3 md:px-8 md:pb-10 md:pt-8">
+          {unlockBanner ? (
+            <div id="unlock-banner" className="mb-2 scroll-mt-6 animate-fadeIn md:mb-4">
+              {unlockBanner}
+            </div>
+          ) : null}
+          {!pathname.startsWith("/panel/experiencia") ? <JourneyHeader /> : null}
+          <div className="transition-all duration-300 ease-out">{children}</div>
         </div>
       </div>
 

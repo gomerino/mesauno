@@ -69,9 +69,9 @@ export function OnboardingPaywallModal({ open, onClose, eventId, prefillNombre, 
 
   const ctaText = useMemo(() => {
     if (selected === "experiencia") {
-      return `Desbloquear Experiencia ✨ – ${formatPriceClp(PRICING_PLANS.experiencia.priceClp)}`;
+      return `Activar viaje completo ✨ – ${formatPriceClp(PRICING_PLANS.experiencia.priceClp)}`;
     }
-    return `Activar Evento Esencial – ${formatPriceClp(PRICING_PLANS.esencial.priceClp)}`;
+    return `Activar viaje esencial – ${formatPriceClp(PRICING_PLANS.esencial.priceClp)}`;
   }, [selected]);
 
   const handleCheckout = useCallback(async () => {
@@ -140,12 +140,11 @@ export function OnboardingPaywallModal({ open, onClose, eventId, prefillNombre, 
       <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-b from-[#0f172a] to-[#020617] p-6 shadow-2xl sm:p-8">
         <p className="text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AF37]/85">Dreams Wedding</p>
         <h2 id="onb-paywall-title" className="mt-2 text-center font-display text-xl font-bold text-white sm:text-2xl">
-          Tu viaje está listo <span aria-hidden>✈️</span>
+          Activa tu viaje <span aria-hidden>✈️</span>
         </h2>
 
-        <p className="mt-4 text-center text-sm leading-relaxed">
-          <span className="block font-medium text-slate-100">Tus invitados ya pueden ver su pase ✈️</span>
-          <span className="mt-1.5 block text-slate-400">Activa el envío y completa la experiencia</span>
+        <p className="mt-4 text-center text-sm leading-relaxed text-slate-300">
+          Desbloqueá la experiencia completa para tus invitados
         </p>
 
         <div

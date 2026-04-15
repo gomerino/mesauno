@@ -22,6 +22,10 @@ const benefits = [
   "Gestión de mesas",
 ] as const;
 
+function formatPriceClp(clp: number): string {
+  return `$${clp.toLocaleString("es-CL")}`;
+}
+
 function readBypassFromLocation(): boolean {
   if (typeof window === "undefined") return false;
   const p = new URLSearchParams(window.location.search);
@@ -130,7 +134,10 @@ export function PaywallModal({
 
   if (!open) return null;
 
-  const plan = PRICING_PLANS[selectedPlan];
+  const ctaPrimary =
+    selectedPlan === "experiencia"
+      ? `Activar viaje completo ✨ – ${formatPriceClp(PRICING_PLANS.experiencia.priceClp)}`
+      : `Activar viaje esencial – ${formatPriceClp(PRICING_PLANS.esencial.priceClp)}`;
 
   return (
     <div
@@ -143,10 +150,10 @@ export function PaywallModal({
       <div className="relative w-full max-w-md animate-fadeIn rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-b from-[#0f172a] to-[#020617] p-6 shadow-2xl sm:p-8">
         <p className="text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AF37]/85">Dreams Wedding</p>
         <h2 id="paywall-title" className="mt-2 text-center font-display text-xl font-bold text-white sm:text-2xl">
-          Estás listo para invitar <span aria-hidden>✈️</span>
+          Activa tu viaje <span aria-hidden>✈️</span>
         </h2>
         <p className="mt-3 text-center text-sm leading-relaxed text-slate-300">
-          Activa tu evento para enviar tu invitación a tus invitados
+          Desbloqueá la experiencia completa para tus invitados
         </p>
         <ul className="mt-6 space-y-2.5 rounded-xl border border-white/10 bg-white/[0.04] p-4">
           {benefits.map((b) => (
@@ -168,11 +175,15 @@ export function PaywallModal({
               className={[
                 "rounded-xl border px-3 py-2.5 text-left text-xs transition-all duration-200",
                 selectedPlan === id
-                  ? "border-[#D4AF37] bg-[#D4AF37]/15 text-white shadow-[0_0_24px_rgba(212,175,55,0.15)]"
+                  ? id === "experiencia"
+                    ? "border-[#D4AF37] bg-[#D4AF37]/15 text-white shadow-[0_0_28px_rgba(212,175,55,0.28)] ring-1 ring-[#D4AF37]/50"
+                    : "border-[#D4AF37] bg-[#D4AF37]/15 text-white shadow-[0_0_24px_rgba(212,175,55,0.15)]"
                   : "border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/20",
               ].join(" ")}
             >
-              <span className="block font-semibold text-[#D4AF37]">{id === "experiencia" ? "Experiencia ✨" : "Esencial ✈️"}</span>
+              <span className="block font-semibold text-[#D4AF37]">
+                {id === "experiencia" ? "Experiencia ✨" : "Básico ✈️"}
+              </span>
               <span className="mt-0.5 block text-[11px] text-slate-500">{PRICING_PLANS[id].priceLabel}</span>
             </button>
           ))}
@@ -220,7 +231,7 @@ export function PaywallModal({
           className="mt-5 w-full rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] py-3 text-sm font-semibold text-[#0f172a] transition hover:brightness-110 active:scale-[0.99] disabled:opacity-60"
           onClick={() => void handleCheckout()}
         >
-          {busy ? "Abriendo Mercado Pago…" : `${plan.cta} — ${plan.priceLabel.replace(" CLP", "")}`}
+          {busy ? "Abriendo Mercado Pago…" : ctaPrimary}
         </button>
         <button
           type="button"

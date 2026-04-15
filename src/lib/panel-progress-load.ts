@@ -14,7 +14,13 @@ export type PanelProgressBundle = {
   remainingSteps: number;
   evento: Pick<
     Evento,
-    "id" | "nombre_novio_1" | "nombre_novio_2" | "fecha_boda" | "fecha_evento"
+    | "id"
+    | "nombre_novio_1"
+    | "nombre_novio_2"
+    | "fecha_boda"
+    | "fecha_evento"
+    | "plan_status"
+    | "destino"
   > | null;
   invitados: Invitado[];
 };
@@ -29,7 +35,7 @@ export async function loadPanelProgressBundle(
   const { data: evento } = await selectEventoForMember(
     supabase,
     userId,
-    "id, nombre_novio_1, nombre_novio_2, fecha_boda, fecha_evento"
+    "id, nombre_novio_1, nombre_novio_2, fecha_boda, fecha_evento, plan_status, destino"
   );
 
   const { data: invRows } = await fetchInvitadosPanelRows(
