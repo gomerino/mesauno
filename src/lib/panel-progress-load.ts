@@ -6,6 +6,7 @@ import {
 } from "@/lib/panel-setup-progress";
 import { fetchInvitadosPanelRows } from "@/lib/panel-invitados";
 import type { Evento, Invitado } from "@/types/database";
+import { parseMockPaymentStatusFromPaymentId, type MockPaymentStatus } from "@/lib/mock-payment";
 
 export type PanelProgressBundle = {
   pct: number;
@@ -21,7 +22,9 @@ export type PanelProgressBundle = {
     | "fecha_evento"
     | "plan_status"
     | "destino"
+    | "payment_id"
   > | null;
+  mockPaymentStatus: MockPaymentStatus | null;
   invitados: Invitado[];
 };
 
@@ -35,7 +38,7 @@ export async function loadPanelProgressBundle(
   const { data: evento } = await selectEventoForMember(
     supabase,
     userId,
-    "id, nombre_novio_1, nombre_novio_2, fecha_boda, fecha_evento, plan_status, destino"
+    "id, nombre_novio_1, nombre_novio_2, fecha_boda, fecha_evento, plan_status, destino, payment_id"
   );
 
   const { data: invRows } = await fetchInvitadosPanelRows(
@@ -66,6 +69,9 @@ export async function loadPanelProgressBundle(
     nextStep: j.nextStep,
     remainingSteps: j.remainingSteps,
     evento: evento ?? null,
+    mockPaymentStatus: parseMockPaymentStatusFromPaymentId(
+      (evento as { payment_id?: string | null } | null)?.payment_id ?? null
+    ),
     invitados,
   };
 }

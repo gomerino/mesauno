@@ -27,9 +27,10 @@ export function EventoForm({ initial }: Props) {
 
   const [nombre_novio_1, setN1] = useState(initial?.nombre_novio_1 ?? "");
   const [nombre_novio_2, setN2] = useState(initial?.nombre_novio_2 ?? "");
-  const [fecha_boda, setFechaBoda] = useState(fechaInput(initial?.fecha_boda));
+  const [fecha_principal, setFechaPrincipal] = useState(
+    fechaInput(initial?.fecha_evento) || fechaInput(initial?.fecha_boda)
+  );
   const [nombre_evento, setNombreEvento] = useState(initial?.nombre_evento ?? "Boda Dreams");
-  const [fecha_evento, setFechaEvento] = useState(fechaInput(initial?.fecha_evento));
   const [destino, setDestino] = useState(initial?.destino ?? "");
   const [lugar_evento_linea, setLugarLinea] = useState(
     initial?.lugar_evento_linea ?? "Centro de eventos - La Casita de cuentos - Buin"
@@ -47,9 +48,9 @@ export function EventoForm({ initial }: Props) {
     const row = {
       nombre_novio_1: nombre_novio_1.trim() || null,
       nombre_novio_2: nombre_novio_2.trim() || null,
-      fecha_boda: fecha_boda.trim() || null,
+      fecha_boda: fecha_principal.trim() || null,
       nombre_evento: nombre_evento.trim() || null,
-      fecha_evento: fecha_evento.trim() || null,
+      fecha_evento: fecha_principal.trim() || null,
       destino: destino.trim() || null,
       lugar_evento_linea: lugar_evento_linea.trim() || null,
       codigo_vuelo: codigo_vuelo.trim() || null,
@@ -82,103 +83,102 @@ export function EventoForm({ initial }: Props) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="mx-auto max-w-2xl space-y-10">
-      <section className="space-y-4">
-        <h2 className="font-display text-lg font-semibold text-white">Ustedes (novios u organizadores)</h2>
-        <p className="text-sm text-slate-400">
-          Así os mostramos en la invitación. Cuando hayas guardado el evento, invita a tu pareja u otras personas desde
-          el menú lateral, enlace <strong className="font-medium text-slate-300">Equipo</strong> (junto a Programa).
-        </p>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className={label}>Primer nombre</label>
-            <input className={input} value={nombre_novio_1} onChange={(e) => setN1(e.target.value)} />
-          </div>
-          <div>
-            <label className={label}>Segundo nombre</label>
-            <input className={input} value={nombre_novio_2} onChange={(e) => setN2(e.target.value)} />
-          </div>
-          <div>
-            <label className={label}>Fecha del gran día</label>
-            <input
-              className={input}
-              type="date"
-              value={fecha_boda}
-              onChange={(e) => setFechaBoda(e.target.value)}
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="font-display text-lg font-semibold text-white">Cómo se ve la invitación (pase)</h2>
-        <p className="text-sm text-slate-400">
-          Lo que pongas aquí se repite en todas las invitaciones. El enlace al mapa usa la dirección de destino.
-        </p>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className={label}>Título del evento</label>
+    <form onSubmit={onSubmit} className="mx-auto max-w-4xl space-y-6">
+      <section className="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
+        <h2 className="font-display text-lg font-semibold text-white">Tu destino ✈️</h2>
+        <p className="mt-1 text-sm text-slate-400">Define la base del evento para que todos lo entiendan rápido.</p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <label className={label}>Nombre del evento</label>
             <input className={input} value={nombre_evento} onChange={(e) => setNombreEvento(e.target.value)} />
           </div>
           <div>
-            <label className={label}>Fecha que ves en el pase</label>
+            <label className={label}>Fecha</label>
             <input
               className={input}
               type="date"
-              value={fecha_evento}
-              onChange={(e) => setFechaEvento(e.target.value)}
+              value={fecha_principal}
+              onChange={(e) => setFechaPrincipal(e.target.value)}
             />
           </div>
+          <div>
+            <label className={label}>Hora</label>
+            <input className={input} value={hora_embarque} onChange={(e) => setHora(e.target.value)} />
+          </div>
           <div className="sm:col-span-2">
-            <label className={label}>Destino (dirección o texto para mapas)</label>
+            <label className={label}>Ubicación 📍</label>
             <input
               className={input}
               value={destino}
               onChange={(e) => setDestino(e.target.value)}
-              placeholder="Ej: dirección completa o nombre del lugar"
+              placeholder="Dirección"
             />
           </div>
-          <div className="sm:col-span-2">
-            <label className={label}>Frase corta debajo del título (lugar o detalle)</label>
+          <div className="mt-2 sm:col-span-2">
+            <label className={`${label} opacity-80`}>Nombre del lugar (opcional)</label>
             <input
-              className={input}
+              className={`${input} text-sm opacity-80`}
               value={lugar_evento_linea}
               onChange={(e) => setLugarLinea(e.target.value)}
+              placeholder="Ej: La Casita de Cuentos"
             />
-          </div>
-          <div>
-            <label className={label}>Referencia tipo “vuelo” (decorativa)</label>
-            <input className={input} value={codigo_vuelo} onChange={(e) => setCodigo(e.target.value)} />
-          </div>
-          <div>
-            <label className={label}>Hora en el pase</label>
-            <input className={input} value={hora_embarque} onChange={(e) => setHora(e.target.value)} />
-          </div>
-          <div>
-            <label className={label}>Puerta o sala (opcional)</label>
-            <input className={input} value={puerta} onChange={(e) => setPuerta(e.target.value)} />
-          </div>
-          <div>
-            <label className={label}>Asiento por defecto (si no lo cambias por invitado)</label>
-            <input className={input} value={asiento_default} onChange={(e) => setAsiento(e.target.value)} />
           </div>
         </div>
       </section>
 
-      <section className="space-y-4">
-        <h2 className="font-display text-lg font-semibold text-white">Mensaje para tus invitados</h2>
-        <p className="text-sm text-slate-400">
-          Lo leen en la invitación, antes de confirmar si vienen.
-        </p>
-        <textarea
-          name="motivo_viaje"
-          rows={4}
-          value={motivo_viaje}
-          onChange={(e) => setMotivo(e.target.value)}
-          placeholder="Ej: ¡Nos casamos! Ven a celebrar con nosotros…"
-          className={`${input} min-h-[100px] resize-y`}
-        />
+      <section className="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
+        <h2 className="font-display text-lg font-semibold text-white">Quiénes viajan 👥</h2>
+        <p className="mt-1 text-sm text-slate-400">Nombres principales que aparecerán en la experiencia.</p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className={label}>Nombre 1</label>
+            <input className={input} value={nombre_novio_1} onChange={(e) => setN1(e.target.value)} />
+          </div>
+          <div>
+            <label className={label}>Nombre 2</label>
+            <input className={input} value={nombre_novio_2} onChange={(e) => setN2(e.target.value)} />
+          </div>
+        </div>
       </section>
+
+      <section className="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
+        <h2 className="font-display text-lg font-semibold text-white">Tu mensaje ✨</h2>
+        <p className="mt-1 text-sm text-slate-400">Dale tono a la invitación con un mensaje personal.</p>
+        <div className="mt-4 grid gap-4">
+          <div>
+            <label className={label}>Mensaje a invitados</label>
+            <textarea
+              name="motivo_viaje"
+              rows={4}
+              value={motivo_viaje}
+              onChange={(e) => setMotivo(e.target.value)}
+              placeholder="Ej: ¡Nos casamos! Ven a celebrar con nosotros…"
+              className={`${input} min-h-[100px] resize-y`}
+            />
+          </div>
+        </div>
+      </section>
+
+      <details className="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
+        <summary className="cursor-pointer list-none font-display text-base font-semibold text-white [&::-webkit-details-marker]:hidden">
+          Personalizar detalles ✈️ (opcional)
+        </summary>
+        <p className="mt-1 text-sm text-slate-400">Detalles de tu pase ✈️ para una capa más decorativa.</p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          <div>
+            <label className={label}>Código tipo vuelo</label>
+            <input className={input} value={codigo_vuelo} onChange={(e) => setCodigo(e.target.value)} />
+          </div>
+          <div>
+            <label className={label}>Asiento</label>
+            <input className={input} value={asiento_default} onChange={(e) => setAsiento(e.target.value)} />
+          </div>
+          <div>
+            <label className={label}>Puerta</label>
+            <input className={input} value={puerta} onChange={(e) => setPuerta(e.target.value)} />
+          </div>
+        </div>
+      </details>
 
       {err && (
         <p className="rounded-lg bg-orange-500/20 px-3 py-2 text-sm text-orange-200">{err}</p>

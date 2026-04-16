@@ -6,6 +6,7 @@ import Link from "next/link";
 export type JourneyPrimaryCtaProps = {
   invitados_count: number;
   plan_status: string | null | undefined;
+  payment_status?: "approved" | "rejected" | "pending" | null;
   invitaciones_enviadas: number;
   /** Misma condición que el banner de unlock en layout (trial + admin). */
   canCheckout: boolean;
@@ -15,7 +16,7 @@ export type JourneyPrimaryCtaProps = {
 };
 
 function isPlanActive(status: string | null | undefined): boolean {
-  return status === "paid" || status === "active";
+  return status === "paid";
 }
 
 /**
@@ -24,13 +25,20 @@ function isPlanActive(status: string | null | undefined): boolean {
 export function JourneyPrimaryCta({
   invitados_count,
   plan_status,
+  payment_status,
   invitaciones_enviadas,
   canCheckout,
   eventoId,
   userEmail,
   prefillNombre,
 }: JourneyPrimaryCtaProps) {
-  const paid = isPlanActive(plan_status);
+  const isActive = isPlanActive(plan_status);
+  const paymentStatus = payment_status ?? null;
+
+  if (process.env.NODE_ENV === "development") {
+    console.log({ plan_status, paymentStatus });
+  }
+
   const hasInvitaciones = invitaciones_enviadas > 0;
 
   let title = "Siguiente paso ✈️";
@@ -39,7 +47,26 @@ export function JourneyPrimaryCta({
   let href = "/panel/invitados";
   let mode: "link" | "checkout" = "link";
 
-  if (invitados_count > 0 && !paid) {
+  // Prioridad de render explícita:
+  // 1) plan activo, 2) pending, 3) rejected, 4) default (checkout).
+  if (isActive) {
+    title = "✨ Experiencia activada";
+    ctaLabel = "🚀 Enviar invitaciones";
+    href = "/panel/invitacion";
+    text = hasInvitaciones
+      ? "Tu viaje está activo y listo para seguir compartiéndose."
+      : "Tu plan ya está activo. Ahora toca enviar tus invitaciones.";
+  } else if (paymentStatus === "pending") {
+    title = "Pago en revisión";
+    text = "Estamos esperando confirmación. Actualiza el estado en unos segundos.";
+    ctaLabel = "Actualizar estado";
+    href = "/panel?welcome=1";
+  } else if (paymentStatus === "rejected") {
+    title = "Pago no aprobado";
+    text = "No se pudo activar el plan. Puedes intentarlo nuevamente cuando quieras.";
+    ctaLabel = "Intentar nuevamente";
+    href = "/panel/finanzas";
+  } else if (invitados_count > 0) {
     title = "Desbloquea la experiencia ✨";
     text = "Todo lo que tus invitados van a vivir";
     ctaLabel = "Activar experiencia ✈️";
@@ -48,16 +75,6 @@ export function JourneyPrimaryCta({
     } else {
       href = "/panel/finanzas";
     }
-  } else if (paid && !hasInvitaciones) {
-    title = "✨ Experiencia activada";
-    text = "Tu plan ya está activo. Ahora toca enviar tus invitaciones.";
-    ctaLabel = "🚀 Enviar invitaciones";
-    href = "/panel/invitacion";
-  } else if (paid && hasInvitaciones) {
-    title = "✨ Experiencia activada";
-    text = "Tu viaje está activo y listo para seguir compartiéndose.";
-    ctaLabel = "🚀 Enviar invitaciones";
-    href = "/panel/invitacion";
   }
 
   const ctaClasses =

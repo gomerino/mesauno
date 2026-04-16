@@ -9,13 +9,24 @@ import { unstable_noStore as noStore } from "next/cache";
 type JourneyHomeProps = {
   /** Fuerza refresco del bundle (ej. retorno post-pago con `?welcome=1`). */
   forceFresh?: boolean;
+  /** Feedback post-pago visible una sola vez cuando llega `?welcome=1`. */
+  showSuccessHero?: boolean;
+  /** UX optimista para evitar flicker al simular approved por query param. */
+  optimisticPlanActive?: boolean;
+  /** Estado mock optimista desde query param (dev). */
+  optimisticPaymentStatus?: "approved" | "rejected" | "pending" | null;
 };
 
 function isPlanActive(status: string | null | undefined): boolean {
-  return status === "paid" || status === "active";
+  return status === "paid";
 }
 
-export async function JourneyHome({ forceFresh = false }: JourneyHomeProps) {
+export async function JourneyHome({
+  forceFresh = false,
+  showSuccessHero = false,
+  optimisticPlanActive = false,
+  optimisticPaymentStatus = null,
+}: JourneyHomeProps) {
   if (forceFresh) {
     noStore();
   }
@@ -31,13 +42,15 @@ export async function JourneyHome({ forceFresh = false }: JourneyHomeProps) {
 
   const bundle = await loadPanelProgressBundle(supabase, user.id);
   const invitacionesEnviadas = bundle.invitados.filter((r) => r.email_enviado === true).length;
-  const planStatus = bundle.evento?.plan_status ?? null;
+  const planStatus = optimisticPlanActive ? "paid" : bundle.evento?.plan_status ?? null;
+  const paymentStatus = optimisticPaymentStatus ?? bundle.mockPaymentStatus;
+  const hasAccess = planStatus === "paid";
 
   let canCheckout = false;
   let prefillNombre = "";
   if (bundle.evento?.id) {
     const { data: isAdmin } = await supabase.rpc("user_is_evento_admin", { p_evento_id: bundle.evento.id });
-    const ps = bundle.evento.plan_status ?? "trial";
+    const ps = optimisticPlanActive ? "paid" : bundle.evento.plan_status ?? "trial";
     canCheckout = !isPlanActive(ps) && Boolean(isAdmin);
     const n1 = bundle.evento.nombre_novio_1?.trim() ?? "";
     const n2 = bundle.evento.nombre_novio_2?.trim() ?? "";
@@ -50,15 +63,23 @@ export async function JourneyHome({ forceFresh = false }: JourneyHomeProps) {
         <>
           {/* Above the fold: un solo foco (CTA) + selector de estilo secundario */}
           <div className="flex flex-col gap-8">
-            <JourneyPrimaryCta
-              invitados_count={bundle.invitados.length}
-              plan_status={planStatus}
-              invitaciones_enviadas={invitacionesEnviadas}
-              canCheckout={canCheckout}
-              eventoId={bundle.evento.id}
-              userEmail={user.email ?? ""}
-              prefillNombre={prefillNombre || "Mi evento"}
-            />
+            {(!hasAccess || showSuccessHero) && (
+              <JourneyPrimaryCta
+                invitados_count={bundle.invitados.length}
+                plan_status={planStatus}
+                payment_status={paymentStatus}
+                invitaciones_enviadas={invitacionesEnviadas}
+                canCheckout={canCheckout}
+                eventoId={bundle.evento.id}
+                userEmail={user.email ?? ""}
+                prefillNombre={prefillNombre || "Mi evento"}
+              />
+            )}
+            {hasAccess ? (
+              <p className="text-xs font-medium tracking-wide text-[#D4AF37]/85">
+                ✨ Experiencia activa
+              </p>
+            ) : null}
             <PanelThemeSelector />
           </div>
 
