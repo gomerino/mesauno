@@ -2,6 +2,7 @@ import { DashboardToaster } from "@/components/dashboard/DashboardToaster";
 import { JourneyUnlockBanner } from "@/components/panel/journey/JourneyUnlockBanner";
 import { PanelShell } from "@/components/panel/PanelShell";
 import { selectEventoForMember } from "@/lib/evento-membership";
+import { resolveJourneyPhase } from "@/lib/journey-phases";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { isUserStaffOnly } from "@/lib/membership-roles";
 import { createClient } from "@/lib/supabase/server";
@@ -30,9 +31,13 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   const { data: evento } = await selectEventoForMember(
     supabase,
     user.id,
-    "id, plan_status, nombre_novio_1, nombre_novio_2"
+    "id, plan_status, nombre_novio_1, nombre_novio_2, fecha_boda, fecha_evento"
   );
   const eventoId = evento?.id as string | undefined;
+  const journeyPhase = resolveJourneyPhase(
+    (evento as { fecha_boda?: string | null } | null)?.fecha_boda,
+    (evento as { fecha_evento?: string | null } | null)?.fecha_evento
+  );
 
   let showUnlock = false;
   let prefillNombre = "";
@@ -56,7 +61,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
 
   return (
     <>
-      <PanelShell userEmail={user.email ?? ""} unlockBanner={unlockBanner}>
+      <PanelShell userEmail={user.email ?? ""} unlockBanner={unlockBanner} journeyPhase={journeyPhase}>
         {children}
       </PanelShell>
       <DashboardToaster />

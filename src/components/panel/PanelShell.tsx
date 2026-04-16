@@ -1,6 +1,7 @@
 "use client";
 
 import { JourneyHeader } from "@/components/panel/journey/JourneyHeader";
+import { JourneyPhasesBar } from "@/components/panel/journey/JourneyPhasesBar";
 import { panelSidebarVisibleItems } from "@/components/panel/panel-nav-config";
 import { PanelJourneyThemeContext } from "@/components/panel/panel-journey-theme-context";
 import { PanelMobileBottomNav, PanelMobileHeader } from "@/components/panel/PanelMobileChrome";
@@ -12,6 +13,7 @@ import {
   readJourneyThemeFromStorage,
   type JourneyThemeId,
 } from "@/theme/panel-themes";
+import type { JourneyPhaseId } from "@/lib/journey-phases";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -60,9 +62,10 @@ type Props = {
   children: React.ReactNode;
   /** Banner opcional (p. ej. activar viaje con Mercado Pago). */
   unlockBanner?: React.ReactNode;
+  journeyPhase: JourneyPhaseId;
 };
 
-export function PanelShell({ userEmail, children, unlockBanner }: Props) {
+export function PanelShell({ userEmail, children, unlockBanner, journeyPhase }: Props) {
   const pathname = usePathname();
   const journeyHome = isJourneyHomePath(pathname);
   const postPaymentPage = isPanelPostPaymentPath(pathname);
@@ -124,6 +127,11 @@ export function PanelShell({ userEmail, children, unlockBanner }: Props) {
               </div>
             ) : null}
             {!pathname.startsWith("/panel/experiencia") && !journeyHome && !postPaymentPage ? <JourneyHeader /> : null}
+            {!journeyHome && !postPaymentPage ? (
+              <div className="mb-6 mt-4 md:mb-8 md:mt-6">
+                <JourneyPhasesBar phase={journeyPhase} />
+              </div>
+            ) : null}
             <div className="transition-all duration-300 ease-out">{children}</div>
           </div>
         </div>

@@ -2,7 +2,9 @@ import { JourneyViajeClient } from "@/components/panel/JourneyViajeClient";
 import { JourneyPrimaryCta } from "@/components/panel/journey/JourneyPrimaryCta";
 import { PanelSlimProgress } from "@/components/panel/PanelSlimProgress";
 import { PanelThemeSelector } from "@/components/panel/PanelThemeSelector";
+import { JourneyPhasesBar } from "@/components/panel/journey/JourneyPhasesBar";
 import { journeyHeadline, loadPanelProgressBundle } from "@/lib/panel-progress-load";
+import { resolveJourneyPhase } from "@/lib/journey-phases";
 import { createClient } from "@/lib/supabase/server";
 import { unstable_noStore as noStore } from "next/cache";
 
@@ -45,6 +47,7 @@ export async function JourneyHome({
   const planStatus = optimisticPlanActive ? "paid" : bundle.evento?.plan_status ?? null;
   const paymentStatus = optimisticPaymentStatus ?? bundle.mockPaymentStatus;
   const hasAccess = planStatus === "paid";
+  const journeyPhase = resolveJourneyPhase(bundle.evento?.fecha_boda, bundle.evento?.fecha_evento);
 
   let canCheckout = false;
   let prefillNombre = "";
@@ -73,6 +76,7 @@ export async function JourneyHome({
                 eventoId={bundle.evento.id}
                 userEmail={user.email ?? ""}
                 prefillNombre={prefillNombre || "Mi evento"}
+                phase={journeyPhase}
               />
             )}
             {hasAccess ? (
@@ -80,22 +84,26 @@ export async function JourneyHome({
                 ✨ Experiencia activa
               </p>
             ) : null}
+            <JourneyPhasesBar phase={journeyPhase} className="mt-1" />
             <PanelThemeSelector />
           </div>
 
           {/* Below the fold: progreso y módulos */}
           <div className="mt-8 flex flex-col gap-8 border-t border-white/[0.06] pt-8 md:mt-10 md:pt-10">
-            <PanelSlimProgress
-              pct={bundle.pct}
-              headline={journeyHeadline(bundle.nextStep, bundle.remainingSteps)}
-              nextStep={bundle.nextStep}
-              footer="none"
-            />
+            <div className="md:hidden">
+              <PanelSlimProgress
+                pct={bundle.pct}
+                headline={journeyHeadline(bundle.nextStep, bundle.remainingSteps)}
+                nextStep={bundle.nextStep}
+                footer="none"
+              />
+            </div>
             <JourneyViajeClient evento={bundle.evento} invitadosCount={bundle.invitados.length} />
           </div>
         </>
       ) : (
         <div className="flex flex-col gap-8">
+          <JourneyPhasesBar phase={journeyPhase} />
           <PanelThemeSelector />
           <JourneyViajeClient evento={bundle.evento} invitadosCount={bundle.invitados.length} />
         </div>

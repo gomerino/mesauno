@@ -1,6 +1,7 @@
 "use client";
 
 import { JourneyUnlockCheckout } from "@/components/panel/journey/JourneyUnlockCheckout";
+import type { JourneyPhaseId } from "@/lib/journey-phases";
 import Link from "next/link";
 
 export type JourneyPrimaryCtaProps = {
@@ -13,6 +14,8 @@ export type JourneyPrimaryCtaProps = {
   eventoId: string | null;
   userEmail: string;
   prefillNombre: string;
+  /** Etapa del viaje (fecha del evento); no altera prioridad de pago/plan. */
+  phase?: JourneyPhaseId;
 };
 
 function isPlanActive(status: string | null | undefined): boolean {
@@ -31,6 +34,7 @@ export function JourneyPrimaryCta({
   eventoId,
   userEmail,
   prefillNombre,
+  phase = "check-in",
 }: JourneyPrimaryCtaProps) {
   const isActive = isPlanActive(plan_status);
   const paymentStatus = payment_status ?? null;
@@ -48,14 +52,24 @@ export function JourneyPrimaryCta({
   let mode: "link" | "checkout" = "link";
 
   // Prioridad de render explícita:
-  // 1) plan activo, 2) pending, 3) rejected, 4) default (checkout).
+  // 1) plan activo, 2) pending, 3) rejected, 4) invitados + checkout, 5) etapa + invitados 0.
   if (isActive) {
     title = "✨ Experiencia activada";
-    ctaLabel = "🚀 Enviar invitaciones";
-    href = "/panel/invitacion";
-    text = hasInvitaciones
-      ? "Tu viaje está activo y listo para seguir compartiéndose."
-      : "Tu plan ya está activo. Ahora toca enviar tus invitaciones.";
+    if (phase === "check-in") {
+      ctaLabel = "Invitar pasajeros";
+      href = "/panel/invitacion";
+      text = hasInvitaciones
+        ? "Compartí el acceso y seguí sumando quienes vuelan contigo."
+        : "Tu plan está activo: invitá y completá los detalles cuando quieras.";
+    } else if (phase === "despegue") {
+      ctaLabel = "Ver programa";
+      href = "/panel/programa";
+      text = "Coordiná últimos detalles y tené el día a mano, sin apuro.";
+    } else {
+      ctaLabel = "Ver experiencia";
+      href = "/panel/experiencia";
+      text = "Mostrá lo que armaste y compartí el momento con quienes vuelan contigo.";
+    }
   } else if (paymentStatus === "pending") {
     title = "Pago en revisión";
     text = "Estamos esperando confirmación. Actualiza el estado en unos segundos.";
@@ -68,13 +82,33 @@ export function JourneyPrimaryCta({
     href = "/panel/finanzas";
   } else if (invitados_count > 0) {
     title = "Desbloquea la experiencia ✨";
-    text = "Todo lo que tus invitados van a vivir";
+    text =
+      phase === "despegue"
+        ? "Activá el viaje y coordiná el programa con tus pasajeros."
+        : phase === "en-vuelo"
+          ? "Activá para que tus invitados disfruten la experiencia completa."
+          : "Todo lo que tus invitados van a vivir";
     ctaLabel = "Activar experiencia ✈️";
     if (canCheckout && eventoId) {
       mode = "checkout";
     } else {
       href = "/panel/finanzas";
     }
+  } else if (phase === "check-in") {
+    title = "Tu viaje comienza pronto ✈️";
+    text = "Completá la información clave e invitá cuando te sientas listo.";
+    ctaLabel = "Completar datos";
+    href = "/panel/evento";
+  } else if (phase === "despegue") {
+    title = "Todo listo para el gran día";
+    text = "Revisá el programa y coordiná con tus pasajeros sin perder el ritmo.";
+    ctaLabel = "Ver programa";
+    href = "/panel/programa";
+  } else {
+    title = "Disfruta la experiencia";
+    text = "Explorá lo que preparaste y compartilo con quien vuela contigo.";
+    ctaLabel = "Ver experiencia";
+    href = "/panel/experiencia";
   }
 
   const ctaClasses =

@@ -3,3 +3,4 @@ export { JourneyHeader } from "./JourneyHeader";
 export { JourneyProgress, type JourneyProgressProps } from "./JourneyProgress";
 export { JourneyUnlockBanner } from "./JourneyUnlockBanner";
 export { JourneyPrimaryCta, type JourneyPrimaryCtaProps } from "./JourneyPrimaryCta";
+export { JourneyPhasesBar } from "./JourneyPhasesBar";
