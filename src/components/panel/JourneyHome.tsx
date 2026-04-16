@@ -65,7 +65,7 @@ export async function JourneyHome({
       {bundle.evento ? (
         <>
           {/* Above the fold: un solo foco (CTA) + selector de estilo secundario */}
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-8 md:gap-10">
             {(!hasAccess || showSuccessHero) && (
               <JourneyPrimaryCta
                 invitados_count={bundle.invitados.length}
@@ -85,11 +85,13 @@ export async function JourneyHome({
               </p>
             ) : null}
             <JourneyPhasesBar phase={journeyPhase} className="mt-1" />
-            <PanelThemeSelector />
+            <div className="mt-6">
+              <PanelThemeSelector />
+            </div>
           </div>
 
           {/* Below the fold: progreso y módulos */}
-          <div className="mt-8 flex flex-col gap-8 border-t border-white/[0.06] pt-8 md:mt-10 md:pt-10">
+          <div className="mt-10 flex flex-col gap-8 border-t border-white/[0.06] pt-10 md:mt-12 md:gap-10 md:pt-12">
             <div className="md:hidden">
               <PanelSlimProgress
                 pct={bundle.pct}
@@ -98,14 +100,24 @@ export async function JourneyHome({
                 footer="none"
               />
             </div>
-            <JourneyViajeClient evento={bundle.evento} invitadosCount={bundle.invitados.length} />
+            <JourneyViajeClient
+              evento={bundle.evento}
+              invitadosCount={bundle.invitados.length}
+              phase={journeyPhase}
+            />
           </div>
         </>
       ) : (
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-8 md:gap-10">
           <JourneyPhasesBar phase={journeyPhase} />
-          <PanelThemeSelector />
-          <JourneyViajeClient evento={bundle.evento} invitadosCount={bundle.invitados.length} />
+          <div className="mt-2">
+            <PanelThemeSelector />
+          </div>
+          <JourneyViajeClient
+            evento={bundle.evento}
+            invitadosCount={bundle.invitados.length}
+            phase={journeyPhase}
+          />
         </div>
       )}
     </>

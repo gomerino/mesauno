@@ -2,6 +2,7 @@
 
 import { JourneyCard } from "@/components/panel/journey/JourneyCard";
 import type { PanelProgressBundle } from "@/lib/panel-progress-load";
+import type { JourneyPhaseId } from "@/lib/journey-phases";
 import { Plane } from "lucide-react";
 import Link from "next/link";
 
@@ -10,9 +11,10 @@ type EventoViaje = NonNullable<PanelProgressBundle["evento"]>;
 type Props = {
   evento: EventoViaje | null;
   invitadosCount: number;
+  phase: JourneyPhaseId;
 };
 
-export function JourneyViajeClient({ evento, invitadosCount }: Props) {
+export function JourneyViajeClient({ evento, invitadosCount, phase }: Props) {
   if (!evento) {
     return (
       <div className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-8 text-center shadow-[0_0_40px_rgba(212,175,55,0.06)] backdrop-blur-md transition-all duration-500">
@@ -32,17 +34,23 @@ export function JourneyViajeClient({ evento, invitadosCount }: Props) {
   const isPaid = evento.plan_status === "paid";
   const invitadosOk = invitadosCount > 0;
 
+  const focusEvento = phase === "check-in";
+  const focusPasajeros = phase === "check-in";
+  const focusPrograma = phase === "despegue";
+  const focusExperiencia = phase === "en-vuelo";
+
   return (
     <div className="space-y-10 animate-fadeIn">
       <section>
         <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">Navega por tu viaje</h2>
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:gap-5">
+        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:gap-6">
           <JourneyCard
             title="Evento"
             description="Tu destino ✈️"
             icon={<span aria-hidden>✈️</span>}
             status="active"
             href="/panel/evento"
+            phaseHighlight={focusEvento}
           />
           <JourneyCard
             title="Pasajeros"
@@ -50,6 +58,15 @@ export function JourneyViajeClient({ evento, invitadosCount }: Props) {
             icon={<span aria-hidden>👥</span>}
             status={invitadosOk ? "completed" : "active"}
             href="/panel/invitados"
+            phaseHighlight={focusPasajeros}
+          />
+          <JourneyCard
+            title="Programa"
+            description="Horarios y momentos clave 📋"
+            icon={<span aria-hidden>📋</span>}
+            status="active"
+            href="/panel/programa"
+            phaseHighlight={focusPrograma}
           />
           <JourneyCard
             title="Experiencia del viaje"
@@ -57,6 +74,7 @@ export function JourneyViajeClient({ evento, invitadosCount }: Props) {
             icon={<span aria-hidden>✨</span>}
             status={isPaid ? "active" : "locked"}
             href={isPaid ? "/panel/experiencia" : undefined}
+            phaseHighlight={focusExperiencia}
           />
         </div>
       </section>

@@ -12,9 +12,11 @@ type Props = {
   icon: ReactNode;
   status: JourneyCardStatus;
   href?: string;
+  /** Foco visual según etapa del viaje (borde teal + glow suave). */
+  phaseHighlight?: boolean;
 };
 
-export function JourneyCard({ title, description, icon, status, href }: Props) {
+export function JourneyCard({ title, description, icon, status, href, phaseHighlight }: Props) {
   const base =
     "group relative overflow-hidden rounded-2xl border p-5 transition-all duration-300 ease-out";
 
@@ -27,6 +29,11 @@ export function JourneyCard({ title, description, icon, status, href }: Props) {
       : status === "active"
         ? "border-[#D4AF37]/30 shadow-[0_0_36px_rgba(212,175,55,0.16)] hover:-translate-y-1 hover:border-[#D4AF37]/55 hover:shadow-[0_16px_48px_rgba(212,175,55,0.24)]"
         : "border-slate-600/45 opacity-[0.94]";
+
+  const phaseFocus =
+    "border-teal-400/55 bg-white/[0.06] shadow-[0_0_44px_rgba(45,212,191,0.18)] ring-1 ring-teal-400/25 hover:-translate-y-0.5 hover:border-teal-300/70 hover:shadow-[0_0_52px_rgba(45,212,191,0.26)]";
+
+  const surface = phaseHighlight ? `${glass} ${phaseFocus}` : `${glass} ${glow}`;
 
   const inner = (
     <>
@@ -60,11 +67,16 @@ export function JourneyCard({ title, description, icon, status, href }: Props) {
   );
 
   if (status === "locked" || !href) {
-    return <div className={`${base} ${glass} ${glow}`}>{inner}</div>;
+    return <div className={`${base} ${surface}`}>{inner}</div>;
   }
 
   return (
-    <Link href={href} className={`${base} ${glass} ${glow} block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/50`}>
+    <Link
+      href={href}
+      className={`${base} ${surface} block focus:outline-none focus-visible:ring-2 ${
+        phaseHighlight ? "focus-visible:ring-teal-400/45" : "focus-visible:ring-[#D4AF37]/50"
+      }`}
+    >
       {inner}
     </Link>
   );

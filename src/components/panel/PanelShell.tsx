@@ -128,11 +128,17 @@ export function PanelShell({ userEmail, children, unlockBanner, journeyPhase }: 
             ) : null}
             {!pathname.startsWith("/panel/experiencia") && !journeyHome && !postPaymentPage ? <JourneyHeader /> : null}
             {!journeyHome && !postPaymentPage ? (
-              <div className="mb-6 mt-4 md:mb-8 md:mt-6">
+              <div className="mt-4 md:mt-6">
                 <JourneyPhasesBar phase={journeyPhase} />
               </div>
             ) : null}
-            <div className="transition-all duration-300 ease-out">{children}</div>
+            <div
+              className={`transition-all duration-300 ease-out ${
+                !journeyHome && !postPaymentPage ? "mt-6" : ""
+              }`}
+            >
+              {children}
+            </div>
           </div>
         </div>
 

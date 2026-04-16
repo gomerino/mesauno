@@ -6,8 +6,20 @@ const PHASE_MICROCOPY: Record<JourneyPhaseId, string> = {
   "en-vuelo": "Disfruta la experiencia",
 };
 
+/** Línea emocional breve (p. ej. barra superior). */
 export function journeyPhaseMicrocopy(phase: JourneyPhaseId): string {
   return PHASE_MICROCOPY[phase];
+}
+
+const PHASE_OBJECTIVE: Record<JourneyPhaseId, string> = {
+  "check-in": "Invita a tus pasajeros y define tu destino",
+  despegue: "Confirma horarios y coordina el gran día",
+  "en-vuelo": "Disfruta y comparte la experiencia",
+};
+
+/** Objetivo claro de la etapa (debajo de la barra de fases). */
+export function journeyPhaseObjective(phase: JourneyPhaseId): string {
+  return PHASE_OBJECTIVE[phase];
 }
 
 type CalendarDay = { y: number; m: number; d: number };
