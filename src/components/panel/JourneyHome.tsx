@@ -4,8 +4,22 @@ import { PanelSlimProgress } from "@/components/panel/PanelSlimProgress";
 import { PanelThemeSelector } from "@/components/panel/PanelThemeSelector";
 import { journeyHeadline, loadPanelProgressBundle } from "@/lib/panel-progress-load";
 import { createClient } from "@/lib/supabase/server";
+import { unstable_noStore as noStore } from "next/cache";
 
-export async function JourneyHome() {
+type JourneyHomeProps = {
+  /** Fuerza refresco del bundle (ej. retorno post-pago con `?welcome=1`). */
+  forceFresh?: boolean;
+};
+
+function isPlanActive(status: string | null | undefined): boolean {
+  return status === "paid" || status === "active";
+}
+
+export async function JourneyHome({ forceFresh = false }: JourneyHomeProps) {
+  if (forceFresh) {
+    noStore();
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -24,7 +38,7 @@ export async function JourneyHome() {
   if (bundle.evento?.id) {
     const { data: isAdmin } = await supabase.rpc("user_is_evento_admin", { p_evento_id: bundle.evento.id });
     const ps = bundle.evento.plan_status ?? "trial";
-    canCheckout = ps !== "paid" && Boolean(isAdmin);
+    canCheckout = !isPlanActive(ps) && Boolean(isAdmin);
     const n1 = bundle.evento.nombre_novio_1?.trim() ?? "";
     const n2 = bundle.evento.nombre_novio_2?.trim() ?? "";
     prefillNombre = [n1, n2].filter(Boolean).join(" & ");

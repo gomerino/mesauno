@@ -14,6 +14,10 @@ export type JourneyPrimaryCtaProps = {
   prefillNombre: string;
 };
 
+function isPlanActive(status: string | null | undefined): boolean {
+  return status === "paid" || status === "active";
+}
+
 /**
  * Bloque único "Siguiente escala": título, descripción y un solo CTA (enlace o checkout).
  */
@@ -26,7 +30,7 @@ export function JourneyPrimaryCta({
   userEmail,
   prefillNombre,
 }: JourneyPrimaryCtaProps) {
-  const paid = plan_status === "paid";
+  const paid = isPlanActive(plan_status);
   const hasInvitaciones = invitaciones_enviadas > 0;
 
   let title = "Siguiente paso ✈️";
@@ -45,15 +49,15 @@ export function JourneyPrimaryCta({
       href = "/panel/finanzas";
     }
   } else if (paid && !hasInvitaciones) {
-    title = "Siguiente paso ✈️";
-    text = "Es hora de mandar tus invitaciones";
-    ctaLabel = "Mandar invitaciones ✉️";
+    title = "✨ Experiencia activada";
+    text = "Tu plan ya está activo. Ahora toca enviar tus invitaciones.";
+    ctaLabel = "🚀 Enviar invitaciones";
     href = "/panel/invitacion";
   } else if (paid && hasInvitaciones) {
-    title = "Viaje en curso 🟢";
-    text = "Tu viaje ya está activo. Revisá pasajeros y experiencia para seguir avanzando.";
-    ctaLabel = "Ver experiencia ✨";
-    href = "/panel/experiencia";
+    title = "✨ Experiencia activada";
+    text = "Tu viaje está activo y listo para seguir compartiéndose.";
+    ctaLabel = "🚀 Enviar invitaciones";
+    href = "/panel/invitacion";
   }
 
   const ctaClasses =
