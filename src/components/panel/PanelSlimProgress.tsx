@@ -11,12 +11,21 @@ type Props = {
   nextStep: JourneyStepId | null;
   /** Barra compacta al final en móvil. */
   variant?: "default" | "compact";
+  /** En inicio del panel el CTA principal vive en `JourneyPrimaryCta`; oculta enlaces duplicados abajo. */
+  footer?: "default" | "none";
 };
 
-export function PanelSlimProgress({ pct, headline, nextStep, variant = "default" }: Props) {
+export function PanelSlimProgress({
+  pct,
+  headline,
+  nextStep,
+  variant = "default",
+  footer = "default",
+}: Props) {
   const compact = variant === "compact";
   const quickHref = panelNextActionHref(nextStep);
   const quickLabel = panelNextActionLabel(nextStep);
+  const showFooter = footer === "default";
 
   return (
     <div
@@ -31,19 +40,21 @@ export function PanelSlimProgress({ pct, headline, nextStep, variant = "default"
           <p
             className={
               compact
-                ? "text-[10px] font-semibold uppercase tracking-wide text-teal-400/90"
-                : "text-xs font-semibold uppercase tracking-wide text-teal-400/90"
+                ? "text-[10px] font-semibold uppercase tracking-wide text-teal-400/60"
+                : "text-xs font-semibold uppercase tracking-wide text-teal-400/60"
             }
           >
-            Siguiente paso
+            Progreso
           </p>
-          <p className={`text-slate-300 ${compact ? "mt-0.5 text-xs leading-snug" : "mt-1 text-sm"}`}>
+          <p
+            className={`text-slate-300/60 ${compact ? "mt-0.5 text-xs leading-snug" : "mt-1 text-sm leading-snug"}`}
+          >
             {headline}
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <span
-            className={`font-display font-bold tabular-nums text-white ${compact ? "text-lg" : "text-2xl"}`}
+            className={`font-display font-bold tabular-nums text-white ${compact ? "text-lg" : "text-xl"}`}
           >
             {pct}%
           </span>
@@ -71,8 +82,8 @@ export function PanelSlimProgress({ pct, headline, nextStep, variant = "default"
           style={{ width: `${pct}%` }}
         />
       </div>
-      {pct < 100 ? (
-        <p className={`text-center text-slate-500 ${compact ? "mt-2 text-[10px]" : "mt-3 text-xs"}`}>
+      {showFooter && pct < 100 ? (
+        <p className={`text-center text-slate-500/80 ${compact ? "mt-2 text-[10px]" : "mt-3 text-xs"}`}>
           <Link href={quickHref} className="font-medium text-teal-300/90 hover:text-teal-200">
             {quickLabel}
           </Link>

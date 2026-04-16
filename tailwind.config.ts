@@ -50,6 +50,15 @@ const config: Config = {
           "0%, 100%": { opacity: "0.45" },
           "50%": { opacity: "0.85" },
         },
+        /** Checkout plan: CTA + precio al cambiar selección */
+        planCtaSync: {
+          "0%": { opacity: "0.88", transform: "scale(0.985)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        postPayReveal: {
+          from: { opacity: "0", transform: "translateY(10px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         stampDrop: "stampDrop 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards",
@@ -61,6 +70,8 @@ const config: Config = {
         rsvpReveal: "rsvpReveal 0.26s cubic-bezier(0.22, 1, 0.36, 1) both",
         journeyPlaneFloat: "journeyPlaneFloat 3.2s ease-in-out infinite",
         journeyGlowPulse: "journeyGlowPulse 2.5s ease-in-out infinite",
+        planCtaSync: "planCtaSync 0.18s ease-out both",
+        postPayReveal: "postPayReveal 0.5s ease-out both",
       },
       colors: {
         dreams: {

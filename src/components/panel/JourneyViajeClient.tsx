@@ -1,8 +1,6 @@
 "use client";
 
 import { JourneyCard } from "@/components/panel/journey/JourneyCard";
-import { NextStepCard } from "@/components/panel/journey/NextStepCard";
-import { JourneyProgress } from "@/components/panel/journey/JourneyProgress";
 import type { PanelProgressBundle } from "@/lib/panel-progress-load";
 import { Plane } from "lucide-react";
 import Link from "next/link";
@@ -12,11 +10,9 @@ type EventoViaje = NonNullable<PanelProgressBundle["evento"]>;
 type Props = {
   evento: EventoViaje | null;
   invitadosCount: number;
-  emailsEnviados: number;
 };
 
-export function JourneyViajeClient({ evento, invitadosCount, emailsEnviados }: Props) {
-
+export function JourneyViajeClient({ evento, invitadosCount }: Props) {
   if (!evento) {
     return (
       <div className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-8 text-center shadow-[0_0_40px_rgba(212,175,55,0.06)] backdrop-blur-md transition-all duration-500">
@@ -38,35 +34,26 @@ export function JourneyViajeClient({ evento, invitadosCount, emailsEnviados }: P
 
   return (
     <div className="space-y-10 animate-fadeIn">
-      <NextStepCard invitadosCount={invitadosCount} isPaid={isPaid} emailsEnviados={emailsEnviados} />
-
-      <JourneyProgress
-        eventoListo
-        invitadosListos={invitadosOk}
-        experienciaDesbloqueada={isPaid}
-        invitacionesEnviadas={emailsEnviados > 0}
-      />
-
       <section>
         <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">Navega por tu viaje</h2>
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:gap-5">
           <JourneyCard
             title="Evento"
-            description="Editar datos y la info de tu gran día."
+            description="Tu destino ✈️"
             icon={<span aria-hidden>✈️</span>}
             status="active"
             href="/panel/evento"
           />
           <JourneyCard
             title="Pasajeros"
-            description="Quién vuela con ustedes: lista y acompañantes."
+            description="Tu tripulación 👥"
             icon={<span aria-hidden>👥</span>}
             status={invitadosOk ? "completed" : "active"}
             href="/panel/invitados"
           />
           <JourneyCard
             title="Experiencia del viaje"
-            description="Boarding, música, álbum y regalos: todo lo que viven tus invitados."
+            description="Lo que vivirán ✨"
             icon={<span aria-hidden>✨</span>}
             status={isPaid ? "active" : "locked"}
             href={isPaid ? "/panel/experiencia" : undefined}

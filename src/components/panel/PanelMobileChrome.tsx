@@ -1,8 +1,10 @@
 "use client";
 
+import { PANEL_MOBILE_TABS } from "@/components/panel/panel-nav-config";
+import { journeyMobileNavActiveClass } from "@/theme/panel-themes";
+import type { JourneyThemeId } from "@/theme/panel-themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Settings2 } from "lucide-react";
 
 function pathMatches(pathname: string, href: string, end?: boolean): boolean {
   if (end) {
@@ -10,14 +12,6 @@ function pathMatches(pathname: string, href: string, end?: boolean): boolean {
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
-
-type Tab = { href: string; label: string; icon: typeof Home; end?: boolean };
-
-/** Cinco accesos directos: sin sheet “Más” (el resto vive en sidebar desktop). */
-const TABS: Tab[] = [
-  { href: "/panel", label: "Viaje", icon: Home, end: true },
-  { href: "/panel/equipo", label: "Ajustes", icon: Settings2 },
-];
 
 export function PanelMobileHeader({ userEmail }: { userEmail: string }) {
   return (
@@ -34,8 +28,9 @@ export function PanelMobileHeader({ userEmail }: { userEmail: string }) {
   );
 }
 
-export function PanelMobileBottomNav() {
+export function PanelMobileBottomNav({ theme = "relax" }: { theme?: JourneyThemeId }) {
   const pathname = usePathname();
+  const activeAccent = journeyMobileNavActiveClass(theme);
 
   return (
     <nav
@@ -43,14 +38,14 @@ export function PanelMobileBottomNav() {
       aria-label="Navegación del viaje"
     >
       <div className="mx-auto flex h-[3.5rem] max-w-lg items-end justify-between gap-0.5 px-1">
-        {TABS.map(({ href, label, icon: Icon, end }) => {
+        {PANEL_MOBILE_TABS.map(({ href, label, icon: Icon, end }) => {
           const active = pathMatches(pathname, href, end);
           return (
             <Link
               key={href}
               href={href}
               className={`flex min-w-0 flex-1 flex-col items-center justify-end gap-0.5 rounded-xl py-1 transition-colors duration-200 ${
-                active ? "text-[#D4AF37]" : "text-slate-500"
+                active ? activeAccent : "text-slate-500"
               }`}
             >
               <Icon className="h-[1.1rem] w-[1.1rem] shrink-0" strokeWidth={active ? 2.35 : 2} aria-hidden />

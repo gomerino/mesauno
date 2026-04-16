@@ -1,27 +1,63 @@
 "use client";
 
+import { createClient } from "@/lib/supabase/client";
+import type { PricingPlanId } from "@/lib/pricing-plans";
 import { useState } from "react";
 import { toast } from "sonner";
 
 type Props = {
   eventoId: string;
   className?: string;
+  /** Plan de checkout (misma API que el banner del panel). Por defecto Experiencia. */
+  plan?: PricingPlanId;
 };
 
-export function BotonPago({ eventoId, className }: Props) {
+function readBypassFromLocation(): boolean {
+  if (typeof window === "undefined") return false;
+  const p = new URLSearchParams(window.location.search);
+  const b = p.get("bypass");
+  return b === "1" || b?.toLowerCase() === "true" || b?.toLowerCase() === "yes";
+}
+
+export function BotonPago({ eventoId, className, plan = "experiencia" }: Props) {
   const [loading, setLoading] = useState(false);
 
   async function irAPagar() {
     setLoading(true);
     try {
-      const res = await fetch("/api/checkout/create-preference", {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      const email = user?.email?.trim().toLowerCase() ?? "";
+      let nombre = (typeof user?.user_metadata?.full_name === "string" ? user.user_metadata.full_name : "")
+        .trim();
+      if (nombre.length < 2 && email) {
+        const local = email.split("@")[0] ?? "";
+        if (local.length >= 2) nombre = local;
+      }
+      if (nombre.length < 2 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        toast.error("Necesitamos tu nombre y un email válido en la cuenta.");
+        return;
+      }
+
+      const fromUrl = readBypassFromLocation();
+      const qs = fromUrl ? "?bypass=1" : "";
+      const res = await fetch(`/api/checkout${qs}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ evento_id: eventoId }),
+        body: JSON.stringify({
+          plan,
+          evento_id: eventoId,
+          nombre,
+          email,
+          ...(fromUrl ? { bypass: true } : {}),
+        }),
       });
-      const data = (await res.json()) as { init_point?: string; error?: string };
+      const data = (await res.json()) as { init_point?: string; error?: string; detail?: string; hint?: string };
       if (!res.ok) {
-        toast.error(data.error ?? "No se pudo iniciar el pago");
+        const parts = [data.error, data.detail, data.hint].filter(Boolean);
+        toast.error(parts.length ? parts.join(" ") : "No se pudo iniciar el pago");
         return;
       }
       if (!data.init_point) {
@@ -46,7 +82,7 @@ export function BotonPago({ eventoId, className }: Props) {
         "rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-amber-900/20 disabled:opacity-60"
       }
     >
-      {loading ? "Abriendo checkout…" : "Activar suscripción"}
+      {loading ? "Abriendo Mercado Pago…" : "Activar suscripción"}
     </button>
   );
 }

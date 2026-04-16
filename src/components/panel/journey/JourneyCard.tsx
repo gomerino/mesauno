@@ -31,7 +31,7 @@ export function JourneyCard({ title, description, icon, status, href }: Props) {
   const inner = (
     <>
       <div
-        className={`mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-xl transition-transform duration-300 group-hover:scale-105 ${status === "locked" ? "opacity-50" : ""}`}
+        className={`mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-xl transition-transform duration-300 group-hover:scale-105 ${status === "locked" ? "opacity-80" : ""}`}
       >
         {icon}
       </div>
@@ -40,10 +40,10 @@ export function JourneyCard({ title, description, icon, status, href }: Props) {
 
       {status === "locked" ? (
         <div
-          className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-2xl bg-[#030712]/70 px-4 text-center backdrop-blur-[5px] transition-opacity duration-300"
+          className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-2xl bg-[#030712]/70 px-4 text-center backdrop-blur-sm transition-opacity duration-300"
           aria-hidden
         >
-          <Lock className="h-6 w-6 text-slate-300/80" strokeWidth={2} />
+          <Lock className="h-6 w-6 text-slate-100/80" strokeWidth={2} />
           <span className="text-[11px] font-medium text-slate-200">Disponible al activar tu viaje</span>
         </div>
       ) : null}

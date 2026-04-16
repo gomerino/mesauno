@@ -4,7 +4,7 @@ import {
   createMercadoPagoConfig,
 } from "@/lib/mercadopago-server";
 import { isPricingPlanId, PRICING_PLANS } from "@/lib/pricing-plans";
-import { createStrictServiceClient } from "@/lib/supabase/server";
+import { createClient, createStrictServiceClient } from "@/lib/supabase/server";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Payment } from "mercadopago";
 import type { Metadata } from "next";
@@ -28,6 +28,21 @@ function pickParam(
   if (typeof v === "string") return v;
   if (Array.isArray(v)) return v[0];
   return undefined;
+}
+
+/** Si ya hay sesión con el mismo email del checkout, ir al panel sin magic link. */
+async function maybeRedirectToPanelSuccess(
+  provision: { ok: true; email: string; alreadyDone: boolean },
+  paymentIdForQuery: string | null
+): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user?.email && user.email.toLowerCase() === provision.email.toLowerCase()) {
+    const q = paymentIdForQuery ? `?payment_id=${encodeURIComponent(paymentIdForQuery)}` : "";
+    redirect(`/panel/success${q}`);
+  }
 }
 
 export default async function SuccessPage({
@@ -104,6 +119,8 @@ export default async function SuccessPage({
         </ResultShell>
       );
     }
+
+    await maybeRedirectToPanelSuccess(provision, `bypass_${checkoutSessionId}`);
 
     const magic = await buildPostPaymentMagicLink(provision.email);
     if (magic) {
@@ -202,6 +219,8 @@ export default async function SuccessPage({
       </ResultShell>
     );
   }
+
+  await maybeRedirectToPanelSuccess(provision, String(payment.id));
 
   const magic = await buildPostPaymentMagicLink(provision.email);
   if (magic) {
