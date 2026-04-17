@@ -33,7 +33,7 @@ export function getJourneyPhasesProgressLines(
     if (!eventoOk) {
       hint = "Completá nombres y fecha del evento.";
     } else if (!pasajerosOk) {
-      hint = "Te falta invitar al menos a una persona.";
+      hint = "Te falta invitar 1 persona.";
     } else if (!programaOk) {
       hint = "Añadí momentos al programa del día.";
     } else if (!experienciaOk) {

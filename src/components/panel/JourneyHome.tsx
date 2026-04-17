@@ -87,7 +87,12 @@ export async function JourneyHome({
                 ✨ Experiencia activa
               </p>
             ) : null}
-            <JourneyPhasesBar phase={journeyPhase} className="mt-1" />
+            <JourneyPhasesBar
+              phase={journeyPhase}
+              className={hasAccess ? "mt-2" : "mt-1"}
+              progressPrimary={journeyProgress.primary}
+              progressHint={journeyProgress.hint}
+            />
             <div className="mt-6">
               <PanelThemeSelector />
             </div>

@@ -42,9 +42,7 @@ export function JourneyViajeClient({ evento, invitadosCount, phase }: Props) {
   return (
     <div className="space-y-10 animate-fadeIn">
       <section>
-        <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">
-          Lo que necesitas para despegar
-        </h2>
+        <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">Para despegar</h2>
         <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:gap-6">
           <JourneyCard
             title="Evento"
