@@ -40,10 +40,10 @@ export function JourneyViajeClient({ evento, invitadosCount, phase }: Props) {
   const focusExperiencia = phase === "en-vuelo";
 
   return (
-    <div className="space-y-4 md:space-y-10 animate-fadeIn">
+    <div className="space-y-3 md:space-y-4 animate-fadeIn">
       <section>
         <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">Para despegar</h2>
-        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5 lg:gap-6 md:mt-6">
+        <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 md:mt-4 md:gap-4">
           <JourneyCard
             title="Evento"
             description="Tu destino ✈️"

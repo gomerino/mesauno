@@ -23,10 +23,7 @@ export function JourneyPhasesBar({
 
   return (
     <div className={`flex flex-col ${className}`}>
-      <nav
-        className="flex min-h-8 items-end gap-4 md:min-h-9 md:gap-6"
-        aria-label="Etapas del viaje"
-      >
+      <nav className="flex min-h-8 items-end gap-4 md:min-h-9 md:gap-4" aria-label="Etapas del viaje">
         {JOURNEY_PHASES_UI.map(({ id, label, href }) => {
           const active = id === phase;
           const here = pathname === href || pathname.startsWith(`${href}/`);
@@ -48,7 +45,7 @@ export function JourneyPhasesBar({
           );
         })}
       </nav>
-      <p className="mt-1 line-clamp-2 text-xs leading-snug text-slate-400 md:mt-2 md:line-clamp-none md:text-sm">
+      <p className="mt-1 line-clamp-2 text-xs leading-snug text-slate-400 md:mt-1.5 md:line-clamp-none md:text-sm">
         {journeyPhaseObjective(phase)}
       </p>
       {progressPrimary || progressHint ? (
@@ -58,12 +55,12 @@ export function JourneyPhasesBar({
           </p>
           <div className="hidden md:block">
             {progressPrimary ? (
-              <p className="mt-1 text-xs text-slate-500" aria-live="polite">
+              <p className="mt-1 text-xs text-slate-500 md:mt-0.5" aria-live="polite">
                 {progressPrimary}
               </p>
             ) : null}
             {progressHint ? (
-              <p className="mt-1 text-xs text-slate-500" aria-live="polite">
+              <p className="mt-1 text-xs text-slate-500 md:mt-0.5" aria-live="polite">
                 {progressHint}
               </p>
             ) : null}

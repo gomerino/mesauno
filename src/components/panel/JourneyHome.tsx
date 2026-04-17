@@ -64,11 +64,11 @@ export async function JourneyHome({
   }
 
   return (
-    <>
+    <div className="mx-auto w-full max-w-4xl">
       {bundle.evento ? (
         <>
           {/* Above the fold: un solo foco (CTA) + selector de estilo secundario */}
-          <div className="flex flex-col gap-3 md:gap-8">
+          <div className="flex flex-col gap-3 md:gap-4">
             {(!hasAccess || showSuccessHero) && (
               <JourneyPrimaryCta
                 invitados_count={bundle.invitados.length}
@@ -93,13 +93,13 @@ export async function JourneyHome({
               progressPrimary={journeyProgress.primary}
               progressHint={journeyProgress.hint}
             />
-            <div className="mt-3 md:mt-6">
+            <div className="mt-3 md:mt-3">
               <PanelThemeSelector />
             </div>
           </div>
 
           {/* Below the fold: PanelSlimProgress en móvil solo si falta completar el journey; luego cards */}
-          <div className="mt-3 flex flex-col gap-3 border-t border-white/[0.06] pt-3 md:mt-12 md:gap-10 md:pt-12">
+          <div className="mt-3 flex flex-col gap-3 border-t border-white/[0.06] pt-3 md:mt-6 md:gap-4 md:pt-6">
             {bundle.pct < 100 ? (
               <div className="md:hidden">
                 <PanelSlimProgress
@@ -118,13 +118,13 @@ export async function JourneyHome({
           </div>
         </>
       ) : (
-        <div className="flex flex-col gap-3 md:gap-8">
+        <div className="flex flex-col gap-3 md:gap-4">
           <JourneyPhasesBar
             phase={journeyPhase}
             progressPrimary={journeyProgress.primary}
             progressHint={journeyProgress.hint}
           />
-          <div className="mt-3 md:mt-6">
+          <div className="mt-3 md:mt-3">
             <PanelThemeSelector />
           </div>
           <JourneyViajeClient
@@ -134,6 +134,6 @@ export async function JourneyHome({
           />
         </div>
       )}
-    </>
+    </div>
   );
 }

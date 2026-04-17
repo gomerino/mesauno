@@ -25,12 +25,12 @@ export function PanelThemeSelector() {
 
   return (
     <div
-      className="flex min-h-[36px] max-h-11 items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] py-1.5 pl-3 pr-2 md:min-h-[40px] md:max-h-[48px] md:py-2"
+      className="inline-flex w-full max-w-full min-h-[36px] max-h-11 items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] py-1.5 pl-3 pr-2 md:w-auto md:max-w-none md:min-h-[38px] md:max-h-[44px] md:py-2"
       role="group"
-      aria-label="Estilo del viaje"
+      aria-label="Temas del viaje"
     >
-      <span className="shrink-0 text-xs font-medium text-slate-400">Estilo ✨</span>
-      <div className="flex min-w-0 flex-1 flex-nowrap items-center justify-end gap-2 overflow-x-auto [-webkit-overflow-scrolling:touch] sm:justify-start">
+      <span className="shrink-0 text-xs font-medium text-slate-400">Temas ✨</span>
+      <div className="flex min-w-0 flex-1 flex-nowrap items-center justify-end gap-2 overflow-x-auto [-webkit-overflow-scrolling:touch] sm:justify-start md:flex-none md:justify-start">
         {JOURNEY_THEMES.map((t) => {
           const on = active === t.id;
           return (

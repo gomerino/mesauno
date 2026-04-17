@@ -119,11 +119,11 @@ export function JourneyPrimaryCta({
   if (isCheckout && eventoId) {
     return (
       <section
-        className="relative overflow-hidden rounded-xl border border-white/[0.07] bg-gradient-to-br from-[#0a0e18] via-[#0c101c] to-[#0f141d] p-4 shadow-none backdrop-blur-sm sm:p-5"
+        className="relative overflow-hidden rounded-xl border border-white/[0.07] bg-gradient-to-br from-[#0a0e18] via-[#0c101c] to-[#0f141d] p-4 shadow-none backdrop-blur-sm md:p-4"
         aria-label="Siguiente escala del viaje"
       >
         <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]/85">Siguiente escala</p>
-        <div className="mt-2 flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-5">
+        <div className="mt-2 flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-4">
           <div className="min-w-0 flex-1">
             <h2 className="font-display text-base font-semibold leading-snug text-white sm:text-lg">{title}</h2>
             <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-slate-400">{text}</p>
@@ -138,7 +138,7 @@ export function JourneyPrimaryCta({
 
   return (
     <section
-      className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-[#0b0f1a] via-[#0c101c] to-[#101828] p-5 shadow-[0_20px_48px_rgba(0,0,0,0.4)] backdrop-blur-md sm:p-6"
+      className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-[#0b0f1a] via-[#0c101c] to-[#101828] p-4 shadow-[0_20px_48px_rgba(0,0,0,0.4)] backdrop-blur-md md:p-4"
       aria-label="Siguiente escala del viaje"
     >
       <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[#D4AF37]/[0.06] blur-3xl" aria-hidden />
@@ -146,7 +146,7 @@ export function JourneyPrimaryCta({
       <h2 className="mt-1.5 font-display text-lg font-semibold leading-snug text-white sm:text-xl">{title}</h2>
       <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-400">{text}</p>
 
-      <div className="mt-5">
+      <div className="mt-4">
         <Link href={href} className={ctaClasses}>
           {ctaLabel}
         </Link>
