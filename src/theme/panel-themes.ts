@@ -15,18 +15,22 @@ export const JOURNEY_THEMES = [
   {
     id: "relax" as const,
     label: "✈️ Relax",
+    /** Texto corto para chips compactos en el panel. */
+    chipLabel: "Relax",
     description: "Calma y claridad",
     accent: "#2dd4bf",
   },
   {
     id: "fiesta" as const,
     label: "✨ Fiesta",
+    chipLabel: "Fiesta",
     description: "Calidez festiva",
     accent: "#D4AF37",
   },
   {
     id: "intimo" as const,
     label: "🌙 Íntimo",
+    chipLabel: "Íntimo",
     description: "Suave y cercano",
     accent: "#fb7185",
   },
