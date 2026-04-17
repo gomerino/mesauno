@@ -17,7 +17,7 @@ export async function PanelSubpageChrome({ children }: Props) {
     return <>{children}</>;
   }
 
-  const { pct, nextStep, remainingSteps } = await loadPanelProgressBundle(supabase, user.id);
+  const { pct, nextStep, remainingSteps } = await loadPanelProgressBundle(user.id);
   const headline = journeyHeadline(nextStep, remainingSteps);
 
   return (

@@ -12,33 +12,36 @@ type Props = {
   icon: ReactNode;
   status: JourneyCardStatus;
   href?: string;
-  /** Foco visual según etapa del viaje (borde teal + glow suave). */
+  /** Foco por etapa: borde teal discreto y leve degradado (sin glow fuerte). */
   phaseHighlight?: boolean;
 };
 
 export function JourneyCard({ title, description, icon, status, href, phaseHighlight }: Props) {
   const base =
-    "group relative overflow-hidden rounded-2xl border p-5 transition-all duration-300 ease-out";
+    "group relative overflow-hidden rounded-2xl border p-5 transition-[opacity,transform,border-color] duration-300 ease-out";
 
   const glass =
-    "border-white/[0.09] bg-white/[0.05] shadow-[0_8px_40px_rgba(0,0,0,0.25)] backdrop-blur-md";
+    "border-white/[0.09] bg-white/[0.05] backdrop-blur-md";
 
   const glow =
     status === "completed"
-      ? "border-emerald-400/35 shadow-[0_0_34px_rgba(52,211,153,0.2)] hover:-translate-y-0.5 hover:border-emerald-300/55 hover:shadow-[0_14px_44px_rgba(52,211,153,0.22)]"
+      ? "border-emerald-400/30 hover:border-emerald-300/45"
       : status === "active"
-        ? "border-[#D4AF37]/30 shadow-[0_0_36px_rgba(212,175,55,0.16)] hover:-translate-y-1 hover:border-[#D4AF37]/55 hover:shadow-[0_16px_48px_rgba(212,175,55,0.24)]"
-        : "border-slate-600/45 opacity-[0.94]";
+        ? "border-[#D4AF37]/25 hover:border-[#D4AF37]/40"
+        : "border-slate-600/40";
 
   const phaseFocus =
-    "border-teal-400/55 bg-white/[0.06] shadow-[0_0_44px_rgba(45,212,191,0.18)] ring-1 ring-teal-400/25 hover:-translate-y-0.5 hover:border-teal-300/70 hover:shadow-[0_0_52px_rgba(45,212,191,0.26)]";
+    "border-teal-400/40 bg-gradient-to-b from-transparent to-teal-400/5 hover:border-teal-400/55";
 
   const surface = phaseHighlight ? `${glass} ${phaseFocus}` : `${glass} ${glow}`;
+
+  const hierarchy =
+    phaseHighlight === true ? "" : "opacity-70 hover:opacity-100";
 
   const inner = (
     <>
       <div
-        className={`mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-xl transition-transform duration-300 group-hover:scale-105 ${status === "locked" ? "opacity-80" : ""}`}
+        className={`mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-xl transition-transform duration-300 group-hover:scale-[1.02] ${status === "locked" ? "opacity-80" : ""}`}
       >
         {icon}
       </div>
@@ -66,15 +69,17 @@ export function JourneyCard({ title, description, icon, status, href, phaseHighl
     </>
   );
 
+  const shellClass = `${base} ${surface} ${hierarchy}`;
+
   if (status === "locked" || !href) {
-    return <div className={`${base} ${surface}`}>{inner}</div>;
+    return <div className={shellClass}>{inner}</div>;
   }
 
   return (
     <Link
       href={href}
-      className={`${base} ${surface} block focus:outline-none focus-visible:ring-2 ${
-        phaseHighlight ? "focus-visible:ring-teal-400/45" : "focus-visible:ring-[#D4AF37]/50"
+      className={`${shellClass} block focus:outline-none focus-visible:ring-2 ${
+        phaseHighlight ? "focus-visible:ring-teal-400/35" : "focus-visible:ring-[#D4AF37]/40"
       }`}
     >
       {inner}

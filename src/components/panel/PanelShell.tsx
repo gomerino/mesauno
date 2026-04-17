@@ -63,9 +63,18 @@ type Props = {
   /** Banner opcional (p. ej. activar viaje con Mercado Pago). */
   unlockBanner?: React.ReactNode;
   journeyPhase: JourneyPhaseId;
+  journeyProgressPrimary?: string;
+  journeyProgressHint?: string | null;
 };
 
-export function PanelShell({ userEmail, children, unlockBanner, journeyPhase }: Props) {
+export function PanelShell({
+  userEmail,
+  children,
+  unlockBanner,
+  journeyPhase,
+  journeyProgressPrimary,
+  journeyProgressHint,
+}: Props) {
   const pathname = usePathname();
   const journeyHome = isJourneyHomePath(pathname);
   const postPaymentPage = isPanelPostPaymentPath(pathname);
@@ -129,7 +138,11 @@ export function PanelShell({ userEmail, children, unlockBanner, journeyPhase }: 
             {!pathname.startsWith("/panel/experiencia") && !journeyHome && !postPaymentPage ? <JourneyHeader /> : null}
             {!journeyHome && !postPaymentPage ? (
               <div className="mt-4 md:mt-6">
-                <JourneyPhasesBar phase={journeyPhase} />
+                <JourneyPhasesBar
+                  phase={journeyPhase}
+                  progressPrimary={journeyProgressPrimary}
+                  progressHint={journeyProgressHint}
+                />
               </div>
             ) : null}
             <div

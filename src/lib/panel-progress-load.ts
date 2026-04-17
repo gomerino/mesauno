@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { cache } from "react";
 import { selectEventoForMember } from "@/lib/evento-membership";
+import { createClient } from "@/lib/supabase/server";
 import {
   getJourneyProgress,
   type JourneyStepId,
@@ -26,12 +28,14 @@ export type PanelProgressBundle = {
   > | null;
   mockPaymentStatus: MockPaymentStatus | null;
   invitados: Invitado[];
+  /** Hitos en programa del día (tabla `evento_programa_hitos`). */
+  programaHitosCount: number;
 };
 
 /**
  * Una sola lectura de evento + invitados para progreso y vistas del panel.
  */
-export async function loadPanelProgressBundle(
+async function loadPanelProgressBundleInner(
   supabase: SupabaseClient,
   userId: string
 ): Promise<PanelProgressBundle> {
@@ -40,6 +44,15 @@ export async function loadPanelProgressBundle(
     userId,
     "id, nombre_novio_1, nombre_novio_2, fecha_boda, fecha_evento, plan_status, destino, payment_id"
   );
+
+  let programaHitosCount = 0;
+  if (evento?.id) {
+    const { count, error } = await supabase
+      .from("evento_programa_hitos")
+      .select("id", { count: "exact", head: true })
+      .eq("evento_id", evento.id);
+    if (!error) programaHitosCount = count ?? 0;
+  }
 
   const { data: invRows } = await fetchInvitadosPanelRows(
     supabase,
@@ -73,8 +86,17 @@ export async function loadPanelProgressBundle(
       (evento as { payment_id?: string | null } | null)?.payment_id ?? null
     ),
     invitados,
+    programaHitosCount,
   };
 }
+
+/**
+ * Una sola lectura por request de servidor (deduplicada con React `cache` por `userId`).
+ */
+export const loadPanelProgressBundle = cache(async (userId: string): Promise<PanelProgressBundle> => {
+  const supabase = await createClient();
+  return loadPanelProgressBundleInner(supabase, userId);
+});
 
 const STEP_DETAIL: Record<JourneyStepId, string> = {
   evento: "completar los datos de tu evento",

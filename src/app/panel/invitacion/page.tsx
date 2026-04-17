@@ -12,7 +12,7 @@ export default async function PanelInvitacionHubPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const bundle = await loadPanelProgressBundle(supabase, user!.id);
+  const bundle = await loadPanelProgressBundle(user!.id);
   const { steps, evento, invitados } = bundle;
 
   const firstToken = invitados.find((i) => i.token_acceso?.trim())?.token_acceso?.trim();

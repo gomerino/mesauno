@@ -3,6 +3,7 @@ import { JourneyPrimaryCta } from "@/components/panel/journey/JourneyPrimaryCta"
 import { PanelSlimProgress } from "@/components/panel/PanelSlimProgress";
 import { PanelThemeSelector } from "@/components/panel/PanelThemeSelector";
 import { JourneyPhasesBar } from "@/components/panel/journey/JourneyPhasesBar";
+import { getJourneyPhasesProgressLines } from "@/lib/journey-cards-progress";
 import { journeyHeadline, loadPanelProgressBundle } from "@/lib/panel-progress-load";
 import { resolveJourneyPhase } from "@/lib/journey-phases";
 import { createClient } from "@/lib/supabase/server";
@@ -42,12 +43,14 @@ export async function JourneyHome({
     return null;
   }
 
-  const bundle = await loadPanelProgressBundle(supabase, user.id);
+  const bundle = await loadPanelProgressBundle(user.id);
   const invitacionesEnviadas = bundle.invitados.filter((r) => r.email_enviado === true).length;
   const planStatus = optimisticPlanActive ? "paid" : bundle.evento?.plan_status ?? null;
   const paymentStatus = optimisticPaymentStatus ?? bundle.mockPaymentStatus;
   const hasAccess = planStatus === "paid";
   const journeyPhase = resolveJourneyPhase(bundle.evento?.fecha_boda, bundle.evento?.fecha_evento);
+  const planPaidForProgress = optimisticPlanActive || bundle.evento?.plan_status === "paid";
+  const journeyProgress = getJourneyPhasesProgressLines(bundle, { planPaid: planPaidForProgress });
 
   let canCheckout = false;
   let prefillNombre = "";
@@ -109,7 +112,11 @@ export async function JourneyHome({
         </>
       ) : (
         <div className="flex flex-col gap-8 md:gap-10">
-          <JourneyPhasesBar phase={journeyPhase} />
+          <JourneyPhasesBar
+            phase={journeyPhase}
+            progressPrimary={journeyProgress.primary}
+            progressHint={journeyProgress.hint}
+          />
           <div className="mt-2">
             <PanelThemeSelector />
           </div>

@@ -12,7 +12,7 @@ export function journeyPhaseMicrocopy(phase: JourneyPhaseId): string {
 }
 
 const PHASE_OBJECTIVE: Record<JourneyPhaseId, string> = {
-  "check-in": "Invita a tus pasajeros y define tu destino",
+  "check-in": "Arma tu viaje: define el destino e invita a tu tripulación",
   despegue: "Confirma horarios y coordina el gran día",
   "en-vuelo": "Disfruta y comparte la experiencia",
 };

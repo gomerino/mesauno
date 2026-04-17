@@ -1,7 +1,8 @@
 import { DashboardToaster } from "@/components/dashboard/DashboardToaster";
 import { JourneyUnlockBanner } from "@/components/panel/journey/JourneyUnlockBanner";
 import { PanelShell } from "@/components/panel/PanelShell";
-import { selectEventoForMember } from "@/lib/evento-membership";
+import { getJourneyPhasesProgressLines } from "@/lib/journey-cards-progress";
+import { loadPanelProgressBundle } from "@/lib/panel-progress-load";
 import { resolveJourneyPhase } from "@/lib/journey-phases";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { isUserStaffOnly } from "@/lib/membership-roles";
@@ -28,16 +29,11 @@ export default async function PanelLayout({ children }: { children: React.ReactN
     redirect("/staff/check-in");
   }
 
-  const { data: evento } = await selectEventoForMember(
-    supabase,
-    user.id,
-    "id, plan_status, nombre_novio_1, nombre_novio_2, fecha_boda, fecha_evento"
-  );
+  const bundle = await loadPanelProgressBundle(user.id);
+  const evento = bundle.evento;
   const eventoId = evento?.id as string | undefined;
-  const journeyPhase = resolveJourneyPhase(
-    (evento as { fecha_boda?: string | null } | null)?.fecha_boda,
-    (evento as { fecha_evento?: string | null } | null)?.fecha_evento
-  );
+  const journeyPhase = resolveJourneyPhase(evento?.fecha_boda, evento?.fecha_evento);
+  const { primary: journeyProgressPrimary, hint: journeyProgressHint } = getJourneyPhasesProgressLines(bundle);
 
   let showUnlock = false;
   let prefillNombre = "";
@@ -61,7 +57,13 @@ export default async function PanelLayout({ children }: { children: React.ReactN
 
   return (
     <>
-      <PanelShell userEmail={user.email ?? ""} unlockBanner={unlockBanner} journeyPhase={journeyPhase}>
+      <PanelShell
+        userEmail={user.email ?? ""}
+        unlockBanner={unlockBanner}
+        journeyPhase={journeyPhase}
+        journeyProgressPrimary={journeyProgressPrimary}
+        journeyProgressHint={journeyProgressHint}
+      >
         {children}
       </PanelShell>
       <DashboardToaster />

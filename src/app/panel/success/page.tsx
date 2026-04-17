@@ -50,7 +50,7 @@ export default async function PanelSuccessPage({
     redirect("/panel");
   }
 
-  const bundle = await loadPanelProgressBundle(supabase, user.id);
+  const bundle = await loadPanelProgressBundle(user.id);
   const invitadosCount = bundle.invitados.length;
 
   const planRaw = evento.plan?.trim();

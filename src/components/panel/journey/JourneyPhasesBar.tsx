@@ -7,9 +7,17 @@ import { usePathname } from "next/navigation";
 type Props = {
   phase: JourneyPhaseId;
   className?: string;
+  /** p. ej. "2 de 4 listo" */
+  progressPrimary?: string;
+  progressHint?: string | null;
 };
 
-export function JourneyPhasesBar({ phase, className = "" }: Props) {
+export function JourneyPhasesBar({
+  phase,
+  className = "",
+  progressPrimary,
+  progressHint,
+}: Props) {
   const pathname = usePathname();
 
   return (
@@ -37,6 +45,16 @@ export function JourneyPhasesBar({ phase, className = "" }: Props) {
         })}
       </nav>
       <p className="mt-2 text-sm text-slate-400">{journeyPhaseObjective(phase)}</p>
+      {progressPrimary ? (
+        <p className="mt-1 text-xs text-slate-500" aria-live="polite">
+          {progressPrimary}
+        </p>
+      ) : null}
+      {progressHint ? (
+        <p className="mt-1 text-xs text-slate-500" aria-live="polite">
+          {progressHint}
+        </p>
+      ) : null}
     </div>
   );
 }

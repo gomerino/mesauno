@@ -27,7 +27,7 @@ export default async function PanelEventoPage({
   } = await supabase.auth.getUser();
 
   const { data: evento } = await selectEventoForMember(supabase, user!.id, "*");
-  const { pct, nextStep } = await loadPanelProgressBundle(supabase, user!.id);
+  const { pct, nextStep } = await loadPanelProgressBundle(user!.id);
   const progressHref = panelNextActionHref(nextStep);
 
   const eventoForProgress = (evento ?? null) as Evento | null;
