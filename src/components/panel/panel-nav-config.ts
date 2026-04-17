@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { CalendarDays, Home, Mail, MapPin, Settings2 } from "lucide-react";
+import { CalendarDays, MapPin, Plane, Settings, Users } from "lucide-react";
 
 /** Entradas de navegación desktop: rutas siguen existiendo; algunas se ocultan del menú (acceso vía cards en inicio). */
 export type PanelSidebarItem = {
@@ -32,9 +32,9 @@ export function panelSidebarVisibleItems(): PanelSidebarItem[] {
 export type PanelMobileTab = { href: string; label: string; icon: LucideIcon; end?: boolean };
 
 export const PANEL_MOBILE_TABS: PanelMobileTab[] = [
-  { href: "/panel", label: "Viaje", icon: Home, end: true },
-  { href: "/panel/evento", label: "Evento", icon: MapPin },
+  { href: "/panel", label: "Viaje", icon: Plane, end: true },
+  { href: "/panel/evento", label: "Destino", icon: MapPin },
   { href: "/panel/programa", label: "Día", icon: CalendarDays },
-  { href: "/panel/invitacion", label: "Invit.", icon: Mail },
-  { href: "/panel/equipo", label: "Ajustes", icon: Settings2 },
+  { href: "/panel/invitados", label: "Invitados", icon: Users },
+  { href: "/panel/equipo", label: "Ajustes", icon: Settings },
 ];

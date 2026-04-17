@@ -1,8 +1,6 @@
 "use client";
 
 import { PANEL_MOBILE_TABS } from "@/components/panel/panel-nav-config";
-import { journeyMobileNavActiveClass } from "@/theme/panel-themes";
-import type { JourneyThemeId } from "@/theme/panel-themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -28,28 +26,27 @@ export function PanelMobileHeader({ userEmail }: { userEmail: string }) {
   );
 }
 
-export function PanelMobileBottomNav({ theme = "relax" }: { theme?: JourneyThemeId }) {
+export function PanelMobileBottomNav() {
   const pathname = usePathname();
-  const activeAccent = journeyMobileNavActiveClass(theme);
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.08] bg-[#070b14]/95 pb-[env(safe-area-inset-bottom)] pt-1.5 backdrop-blur-xl md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.08] bg-[#070b14]/95 pb-[env(safe-area-inset-bottom)] pt-1 backdrop-blur-xl md:hidden"
       aria-label="Navegación del viaje"
     >
-      <div className="mx-auto flex h-[3.5rem] max-w-lg items-end justify-between gap-0.5 px-1">
+      <div className="mx-auto flex h-14 max-w-lg items-center justify-between gap-1 px-1">
         {PANEL_MOBILE_TABS.map(({ href, label, icon: Icon, end }) => {
           const active = pathMatches(pathname, href, end);
           return (
             <Link
               key={href}
               href={href}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-end gap-0.5 rounded-xl py-1 transition-colors duration-200 ${
-                active ? activeAccent : "text-slate-500"
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-lg py-0.5 transition-colors duration-200 ${
+                active ? "text-teal-400" : "text-white/40"
               }`}
             >
-              <Icon className="h-[1.1rem] w-[1.1rem] shrink-0" strokeWidth={active ? 2.35 : 2} aria-hidden />
-              <span className="max-w-full truncate px-0.5 text-[9px] font-semibold leading-tight">{label}</span>
+              <Icon className="h-[1.15rem] w-[1.15rem] shrink-0" strokeWidth={active ? 2.5 : 2} aria-hidden />
+              <span className="max-w-full truncate px-0.5 text-[11px] font-semibold leading-tight">{label}</span>
             </Link>
           );
         })}

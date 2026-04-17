@@ -129,7 +129,7 @@ export function PanelShell({
 
         <div className="relative z-[1] flex min-w-0 flex-1 flex-col">
           <PanelMobileHeader userEmail={userEmail} />
-          <div className="min-w-0 flex-1 px-4 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] pt-3 md:px-8 md:pb-10 md:pt-8">
+          <div className="min-w-0 flex-1 px-4 pb-[calc(3.75rem+env(safe-area-inset-bottom,0px))] pt-3 md:px-8 md:pb-10 md:pt-8">
             {unlockBanner && !journeyHome ? (
               <div id="unlock-banner" className="mb-2 scroll-mt-6 animate-fadeIn md:mb-4">
                 {unlockBanner}
@@ -155,7 +155,7 @@ export function PanelShell({
           </div>
         </div>
 
-        <PanelMobileBottomNav theme={theme} />
+        <PanelMobileBottomNav />
       </div>
     </PanelJourneyThemeContext.Provider>
   );
