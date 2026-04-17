@@ -25,7 +25,7 @@ export function PanelThemeSelector() {
 
   return (
     <div
-      className="flex min-h-[40px] max-h-[48px] items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] py-2 pl-3 pr-2"
+      className="flex min-h-[36px] max-h-11 items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] py-1.5 pl-3 pr-2 md:min-h-[40px] md:max-h-[48px] md:py-2"
       role="group"
       aria-label="Estilo del viaje"
     >

@@ -68,7 +68,7 @@ export async function JourneyHome({
       {bundle.evento ? (
         <>
           {/* Above the fold: un solo foco (CTA) + selector de estilo secundario */}
-          <div className="flex flex-col gap-8 md:gap-10">
+          <div className="flex flex-col gap-3 md:gap-8">
             {(!hasAccess || showSuccessHero) && (
               <JourneyPrimaryCta
                 invitados_count={bundle.invitados.length}
@@ -89,25 +89,27 @@ export async function JourneyHome({
             ) : null}
             <JourneyPhasesBar
               phase={journeyPhase}
-              className={hasAccess ? "mt-2" : "mt-1"}
+              className={hasAccess ? "mt-1.5 md:mt-2" : ""}
               progressPrimary={journeyProgress.primary}
               progressHint={journeyProgress.hint}
             />
-            <div className="mt-6">
+            <div className="mt-3 md:mt-6">
               <PanelThemeSelector />
             </div>
           </div>
 
-          {/* Below the fold: progreso y módulos */}
-          <div className="mt-10 flex flex-col gap-8 border-t border-white/[0.06] pt-10 md:mt-12 md:gap-10 md:pt-12">
-            <div className="md:hidden">
-              <PanelSlimProgress
-                pct={bundle.pct}
-                headline={journeyHeadline(bundle.nextStep, bundle.remainingSteps)}
-                nextStep={bundle.nextStep}
-                footer="none"
-              />
-            </div>
+          {/* Below the fold: PanelSlimProgress en móvil solo si falta completar el journey; luego cards */}
+          <div className="mt-3 flex flex-col gap-3 border-t border-white/[0.06] pt-3 md:mt-12 md:gap-10 md:pt-12">
+            {bundle.pct < 100 ? (
+              <div className="md:hidden">
+                <PanelSlimProgress
+                  pct={bundle.pct}
+                  headline={journeyHeadline(bundle.nextStep, bundle.remainingSteps)}
+                  nextStep={bundle.nextStep}
+                  footer="none"
+                />
+              </div>
+            ) : null}
             <JourneyViajeClient
               evento={bundle.evento}
               invitadosCount={bundle.invitados.length}
@@ -116,13 +118,13 @@ export async function JourneyHome({
           </div>
         </>
       ) : (
-        <div className="flex flex-col gap-8 md:gap-10">
+        <div className="flex flex-col gap-3 md:gap-8">
           <JourneyPhasesBar
             phase={journeyPhase}
             progressPrimary={journeyProgress.primary}
             progressHint={journeyProgress.hint}
           />
-          <div className="mt-2">
+          <div className="mt-3 md:mt-6">
             <PanelThemeSelector />
           </div>
           <JourneyViajeClient

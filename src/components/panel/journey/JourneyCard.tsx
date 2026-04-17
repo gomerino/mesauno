@@ -18,7 +18,7 @@ type Props = {
 
 export function JourneyCard({ title, description, icon, status, href, phaseHighlight }: Props) {
   const base =
-    "group relative overflow-hidden rounded-2xl border p-5 transition-[opacity,transform,border-color] duration-300 ease-out";
+    "group relative overflow-hidden rounded-2xl border p-4 transition-[opacity,transform,border-color] duration-300 ease-out md:p-5";
 
   const glass =
     "border-white/[0.09] bg-white/[0.05] backdrop-blur-md";

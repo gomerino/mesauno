@@ -15,7 +15,7 @@ function pathMatches(pathname: string, href: string, end?: boolean): boolean {
 
 export function PanelMobileHeader({ userEmail }: { userEmail: string }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#070b14]/85 px-4 py-3 backdrop-blur-xl md:hidden">
+    <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#070b14]/85 px-4 py-2 backdrop-blur-xl md:hidden">
       <div className="flex items-center justify-between gap-3">
         <Link href="/panel" className="font-display text-base font-bold tracking-tight text-white">
           Dreams

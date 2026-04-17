@@ -19,10 +19,14 @@ export function JourneyPhasesBar({
   progressHint,
 }: Props) {
   const pathname = usePathname();
+  const progressCombined = [progressPrimary, progressHint].filter(Boolean).join(" · ");
 
   return (
     <div className={`flex flex-col ${className}`}>
-      <nav className="flex min-h-9 items-end gap-6" aria-label="Etapas del viaje">
+      <nav
+        className="flex min-h-8 items-end gap-4 md:min-h-9 md:gap-6"
+        aria-label="Etapas del viaje"
+      >
         {JOURNEY_PHASES_UI.map(({ id, label, href }) => {
           const active = id === phase;
           const here = pathname === href || pathname.startsWith(`${href}/`);
@@ -30,7 +34,7 @@ export function JourneyPhasesBar({
             <Link
               key={id}
               href={href}
-              className={`relative border-b-2 pb-1 text-base font-medium transition-colors ${
+              className={`relative border-b-2 pb-0.5 text-sm font-medium transition-colors md:pb-1 md:text-base ${
                 active
                   ? "border-teal-400 text-white"
                   : here
@@ -44,16 +48,27 @@ export function JourneyPhasesBar({
           );
         })}
       </nav>
-      <p className="mt-2 text-sm text-slate-400">{journeyPhaseObjective(phase)}</p>
-      {progressPrimary ? (
-        <p className="mt-1 text-xs text-slate-500" aria-live="polite">
-          {progressPrimary}
-        </p>
-      ) : null}
-      {progressHint ? (
-        <p className="mt-1 text-xs text-slate-500" aria-live="polite">
-          {progressHint}
-        </p>
+      <p className="mt-1 line-clamp-2 text-xs leading-snug text-slate-400 md:mt-2 md:line-clamp-none md:text-sm">
+        {journeyPhaseObjective(phase)}
+      </p>
+      {progressPrimary || progressHint ? (
+        <>
+          <p className="mt-1 line-clamp-2 text-xs text-slate-500 md:hidden" aria-live="polite">
+            {progressCombined}
+          </p>
+          <div className="hidden md:block">
+            {progressPrimary ? (
+              <p className="mt-1 text-xs text-slate-500" aria-live="polite">
+                {progressPrimary}
+              </p>
+            ) : null}
+            {progressHint ? (
+              <p className="mt-1 text-xs text-slate-500" aria-live="polite">
+                {progressHint}
+              </p>
+            ) : null}
+          </div>
+        </>
       ) : null}
     </div>
   );
