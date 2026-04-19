@@ -1,4 +1,4 @@
-import { spotifyClientCredentialsAccessToken, spotifySearchTracks } from "@/lib/spotify-api";
+import { spotifyClientCredentialsAccessToken, spotifySearchTracksDetailed } from "@/lib/spotify-api";
 import { getSpotifyClientId, getSpotifyClientSecret } from "@/lib/spotify-config";
 import { rateLimitSpotifySearch } from "@/lib/spotify-rate-limit";
 import { NextResponse } from "next/server";
@@ -32,6 +32,19 @@ export async function spotifySearchRouteGET(request: Request): Promise<Response>
     return NextResponse.json({ error: "No se pudo autenticar con Spotify." }, { status: 502 });
   }
 
-  const tracks = await spotifySearchTracks(token, q, 8);
-  return NextResponse.json({ tracks });
+  const first = await spotifySearchTracksDetailed(token, q, 8);
+  if (first.ok) {
+    return NextResponse.json({ tracks: first.tracks });
+  }
+
+  // Recuperación defensiva ante 401 intermitente de Spotify (token recién emitido inválido/expirado).
+  if (first.status === 401) {
+    const retryToken = await spotifyClientCredentialsAccessToken();
+    if (retryToken) {
+      const second = await spotifySearchTracksDetailed(retryToken, q, 8);
+      if (second.ok) return NextResponse.json({ tracks: second.tracks });
+    }
+  }
+
+  return NextResponse.json({ error: "No pudimos consultar Spotify ahora. Intenta en unos segundos." }, { status: 502 });
 }

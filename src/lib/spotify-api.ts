@@ -67,9 +67,17 @@ export async function spotifyExchangeCode(code: string, redirectUri: string): Pr
   return postForm("https://accounts.spotify.com/api/token", body.toString(), { Authorization: `Basic ${basic}` });
 }
 
-export async function spotifySearchTracks(accessToken: string, query: string, limit = 8): Promise<SpotifySearchTrack[]> {
+export type SpotifySearchTracksResult =
+  | { ok: true; tracks: SpotifySearchTrack[] }
+  | { ok: false; status: number; spotifyMessage: string };
+
+export async function spotifySearchTracksDetailed(
+  accessToken: string,
+  query: string,
+  limit = 8
+): Promise<SpotifySearchTracksResult> {
   const q = query.trim();
-  if (!q || q.length > 200) return [];
+  if (!q || q.length > 200) return { ok: true, tracks: [] };
   const params = new URLSearchParams({ q, type: "track", limit: String(limit) });
   const res = await fetch(`https://api.spotify.com/v1/search?${params}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
@@ -78,7 +86,7 @@ export async function spotifySearchTracks(accessToken: string, query: string, li
   const bodyText = await res.text();
   if (!res.ok) {
     logSpotifyApiError("api/search", res.status, bodyText);
-    return [];
+    return { ok: false, status: res.status, spotifyMessage: extractSpotifyWebApiErrorMessage(bodyText) };
   }
   const json = JSON.parse(bodyText) as {
     tracks?: {
@@ -92,14 +100,22 @@ export async function spotifySearchTracks(accessToken: string, query: string, li
     };
   };
   const items = json.tracks?.items ?? [];
-  return items.map((t) => ({
+  return {
+    ok: true,
+    tracks: items.map((t) => ({
     uri: t.uri,
     id: t.id,
     name: t.name,
     artists: (t.artists ?? []).map((a) => a.name).filter(Boolean).join(", "),
     album: t.album?.name ?? "",
     imageUrl: t.album?.images?.[0]?.url ?? t.album?.images?.[1]?.url ?? null,
-  }));
+    })),
+  };
+}
+
+export async function spotifySearchTracks(accessToken: string, query: string, limit = 8): Promise<SpotifySearchTrack[]> {
+  const res = await spotifySearchTracksDetailed(accessToken, query, limit);
+  return res.ok ? res.tracks : [];
 }
 
 export type SpotifyAddTracksResult = { ok: true } | { ok: false; status: number; spotifyMessage: string };
@@ -182,9 +198,8 @@ export function mensajeUsuarioSpotifyAddTrack(status: number, spotifyMessage: st
       return "Spotify no permite editar esta lista con la cuenta vinculada. Crea una playlist nueva con esa cuenta en Spotify y pégala en el panel, o usa la lista que creó la app al conectar.";
     }
     return (
-      "Spotify rechazó añadir la canción (403). Lo más habitual: la app está en modo desarrollo y falta tu usuario en «Users and access» en developer.spotify.com; " +
-      "o la playlist no es de la cuenta que vinculaste (crea una lista nueva con esa cuenta y actualízala en el panel). " +
-      "También ayuda pulsar de nuevo «Vincular Spotify» en el panel."
+      "Spotify no permitió añadir la canción. Quien organiza el evento puede revisar la ayuda de «Música colaborativa» en el panel: " +
+      "usuario en el dashboard de desarrolladores, playlist propia de la cuenta vinculada y volver a autorizar Spotify."
     );
   }
   if (status === 400) {

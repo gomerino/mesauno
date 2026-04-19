@@ -76,6 +76,34 @@ export function SpotifyPlaylistConnect({ eventoId, spotifyConnected, initialPlay
           playlist &quot;Boda: …&quot; automáticamente; puedes reemplazarla pegando otro enlace si prefieres una lista
           existente.
         </p>
+        <details className="mt-3 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-left text-xs text-slate-400">
+          <summary className="cursor-pointer font-medium text-slate-300">
+            Si los invitados ven error al añadir canciones (403)
+          </summary>
+          <ol className="mt-2 list-decimal space-y-1.5 pl-4 leading-relaxed text-slate-400">
+            <li>
+              En{" "}
+              <a
+                href="https://developer.spotify.com/dashboard"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-green-400 underline underline-offset-2 hover:text-green-300"
+              >
+                Spotify for Developers
+              </a>
+              , abre tu app → <strong className="text-slate-300">Users and access</strong> y añade el correo de la
+              misma cuenta de Spotify que vinculaste (modo desarrollo).
+            </li>
+            <li>
+              La playlist debe ser <strong className="text-slate-300">de esa cuenta</strong> (o la que creó la app al
+              conectar). Listas de otro usuario o solo de lectura suelen fallar.
+            </li>
+            <li>
+              Pulsa <strong className="text-slate-300">Volver a autorizar Spotify</strong> arriba y guarda de nuevo el
+              enlace de la playlist si la cambiaste.
+            </li>
+          </ol>
+        </details>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
