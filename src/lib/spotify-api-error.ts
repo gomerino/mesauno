@@ -19,7 +19,11 @@ export function logSpotifyApiError(context: string, status: number, bodyText: st
   if (status !== 403) return;
 
   const flat = typeof data === "string" ? data : JSON.stringify(data);
-  if (/not registered in the Developer Dashboard|not registered/i.test(flat)) {
+  if (
+    /not registered in the Developer Dashboard|may not be registered|developer\.spotify\.com\/dashboard|not registered/i.test(
+      flat
+    )
+  ) {
     console.error(
       "[spotify] 403: posible causa — la cuenta de Spotify no está en “Users and access” de la app en developer.spotify.com."
     );

@@ -11,9 +11,10 @@ import {
 } from "@/lib/spotify-credentials";
 import {
   mensajeUsuarioSpotifyAddTrack,
+  spotifyAccessTokenAllowsPlaylistModify,
+  spotifyAccessTokenJwtScopes,
   spotifyAddTracksToPlaylist,
   spotifyFetchPlaylistOwner,
-  spotifyGrantedScopesIncludePlaylistModify,
   spotifyRefreshAccessToken,
   type SpotifyPlaylistMetaResult,
 } from "@/lib/spotify-api";
@@ -74,11 +75,11 @@ export async function addTrackToPlaylist(invitationAccessToken: string, track: T
     return { ok: false, error: "No se pudo autorizar con Spotify. Los novios deben volver a conectar." };
   }
 
-  if (
-    refreshed.scope != null &&
-    String(refreshed.scope).trim() !== "" &&
-    !spotifyGrantedScopesIncludePlaylistModify(refreshed.scope)
-  ) {
+  if (!spotifyAccessTokenAllowsPlaylistModify(refreshed.access_token, refreshed.scope)) {
+    console.error("[spotify] add track: token sin playlist-modify-*", {
+      refresh_scope: refreshed.scope ?? "(omitido)",
+      jwt_scopes: spotifyAccessTokenJwtScopes(refreshed.access_token)?.join(" ") ?? "(opaco o sin scp)",
+    });
     return {
       ok: false,
       error:
@@ -119,6 +120,13 @@ export async function addTrackToPlaylist(invitationAccessToken: string, track: T
 
   const added = await spotifyAddTracksToPlaylist(refreshed.access_token, playlistId, [uri]);
   if (!added.ok) {
+    if (added.status === 403) {
+      console.error("[spotify] add track 403", {
+        spotifyMessage: added.spotifyMessage?.slice(0, 300),
+        refresh_scope: refreshed.scope ?? "(omitido)",
+        jwt_scopes: spotifyAccessTokenJwtScopes(refreshed.access_token)?.join(" ") ?? "(opaco o sin scp)",
+      });
+    }
     let error = mensajeUsuarioSpotifyAddTrack(added.status, added.spotifyMessage);
     if (added.status === 403 && playlistMeta?.ok && playlistMeta.collaborative && ownerMatches) {
       error +=

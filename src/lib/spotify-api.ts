@@ -39,6 +39,51 @@ export function spotifyGrantedScopesIncludePlaylistModify(scope: string | null |
   return parts.includes("playlist-modify-public") || parts.includes("playlist-modify-private");
 }
 
+function tryDecodeSpotifyJwtPayload(accessToken: string): Record<string, unknown> | null {
+  const parts = accessToken.trim().split(".");
+  if (parts.length !== 3) return null;
+  try {
+    const b64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const json = Buffer.from(b64, "base64").toString("utf8");
+    return JSON.parse(json) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Scopes embebidos en el JWT del access token (`scp` / `scope`), si el token no es opaco.
+ * `null` = no se pudieron leer (no implica que falten permisos).
+ */
+export function spotifyAccessTokenJwtScopes(accessToken: string): string[] | null {
+  const p = tryDecodeSpotifyJwtPayload(accessToken);
+  if (!p) return null;
+  const scp = p.scp;
+  if (Array.isArray(scp)) {
+    const s = scp.filter((x): x is string => typeof x === "string");
+    return s.length ? s : null;
+  }
+  if (typeof scp === "string" && scp.trim()) return scp.trim().split(/\s+/).filter(Boolean);
+  const scope = p.scope;
+  if (typeof scope === "string" && scope.trim()) return scope.trim().split(/\s+/).filter(Boolean);
+  return null;
+}
+
+/**
+ * Combina `scope` del POST /token (si viene) con claims del JWT. Si el JWT lista scopes explícitos
+ * y no incluye `playlist-modify-*`, devuelve false aunque Spotify omita `scope` en el refresh.
+ */
+export function spotifyAccessTokenAllowsPlaylistModify(
+  accessToken: string,
+  refreshResponseScope?: string | null
+): boolean {
+  const rs = refreshResponseScope?.trim();
+  if (rs) return spotifyGrantedScopesIncludePlaylistModify(rs);
+  const jwtScopes = spotifyAccessTokenJwtScopes(accessToken);
+  if (jwtScopes == null) return true;
+  return jwtScopes.includes("playlist-modify-public") || jwtScopes.includes("playlist-modify-private");
+}
+
 export async function spotifyClientCredentialsAccessToken(): Promise<string | null> {
   const id = getSpotifyClientId();
   const secret = getSpotifyClientSecret();
@@ -142,7 +187,9 @@ export async function spotifyAddTracksToPlaylist(
     return { ok: false, status: 400, spotifyMessage: "empty uris" };
   }
   const id = playlistId.trim();
-  const res = await fetch(`https://api.spotify.com/v1/playlists/${encodeURIComponent(id)}/tracks`, {
+  const urlBase = `https://api.spotify.com/v1/playlists/${encodeURIComponent(id)}/tracks`;
+
+  const res1 = await fetch(urlBase, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -150,7 +197,21 @@ export async function spotifyAddTracksToPlaylist(
     },
     body: JSON.stringify({ uris: trackUris }),
   });
-  const bodyText = await res.text();
+  let res = res1;
+  let bodyText = await res1.text();
+
+  if (!res.ok && res.status === 403) {
+    const qs = new URLSearchParams({ uris: trackUris.join(",") });
+    const res2 = await fetch(`${urlBase}?${qs}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    const t2 = await res2.text();
+    if (res2.ok) return { ok: true };
+    res = res2;
+    bodyText = t2;
+  }
+
   if (!res.ok) {
     logSpotifyApiError("api/playlists/tracks (POST)", res.status, bodyText);
     const spotifyMessage = extractSpotifyWebApiErrorMessage(bodyText);
@@ -165,11 +226,16 @@ export function extractSpotifyWebApiErrorMessage(bodyText: string): string {
   if (!raw) return "";
   try {
     const j = JSON.parse(raw) as Record<string, unknown>;
+    if (typeof j.error_description === "string") return j.error_description.slice(0, 500);
+    if (typeof j.message === "string") return j.message.slice(0, 500);
     const err = j.error;
     if (typeof err === "string") return err.slice(0, 500);
     if (err && typeof err === "object") {
       const o = err as Record<string, unknown>;
-      if (typeof o.message === "string") return o.message.slice(0, 500);
+      const parts: string[] = [];
+      if (typeof o.message === "string") parts.push(o.message);
+      if (typeof o.reason === "string") parts.push(o.reason);
+      if (parts.length) return parts.join(" — ").slice(0, 500);
       const nested = o.error;
       if (nested && typeof nested === "object" && typeof (nested as { message?: string }).message === "string") {
         return String((nested as { message: string }).message).slice(0, 500);
@@ -203,8 +269,12 @@ export function mensajeUsuarioSpotifyAddTrack(status: number, spotifyMessage: st
     if (/scope|insufficient|privilege|permission/i.test(m)) {
       return "Spotify no permitió modificar la playlist (faltan permisos). Pulsa «Volver a autorizar Spotify» en el panel del evento y acepta los permisos.";
     }
-    if (/registered|developer dashboard|not registered|not allowed/i.test(m)) {
-      return "Spotify bloqueó la acción: en modo desarrollo, tu cuenta debe figurar en «Users and access» de la app en developer.spotify.com (mismo correo que la cuenta de Spotify vinculada).";
+    if (
+      /registered|developer dashboard|not registered|not allowed|may not be registered|check settings on developer|developer\.spotify\.com/i.test(
+        m
+      )
+    ) {
+      return "Spotify bloqueó la acción: en modo desarrollo, el correo de tu cuenta Spotify tiene que estar en «Users and access» de la app en developer.spotify.com (misma app que el Client ID configurado en Vercel). Guarda y vuelve a vincular Spotify desde el panel.";
     }
     if (/restriction|market|territory|not available in/i.test(m)) {
       return "Spotify no permite añadir esta canción en tu región o a esta playlist. Prueba con otra pista.";
