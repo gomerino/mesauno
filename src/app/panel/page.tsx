@@ -14,6 +14,7 @@ export default function PanelHomePage({
   const welcome = searchParams?.welcome;
   const mockPayment = searchParams?.mockPayment;
   const celebrate = searchParams?.celebrate;
+  const resultado = searchParams?.resultado;
   const focus = searchParams?.focus;
 
   const forceFreshFromWelcome =
@@ -28,16 +29,30 @@ export default function PanelHomePage({
 
   const celebrateRaw =
     typeof celebrate === "string" ? celebrate : Array.isArray(celebrate) ? celebrate[0] : undefined;
+  const resultadoRaw =
+    typeof resultado === "string" ? resultado : Array.isArray(resultado) ? resultado[0] : undefined;
   const celebrateToSuccess =
     process.env.NODE_ENV === "development" &&
     mockPaymentStatus === "approved" &&
     (celebrateRaw === "1" || celebrateRaw === "true");
+  const resultadoFinanzas =
+    process.env.NODE_ENV === "development" &&
+    (resultadoRaw === "1" || resultadoRaw === "true");
+
+  let redirectAfterMockTo: string | null = null;
+  if (celebrateToSuccess) {
+    redirectAfterMockTo = "/panel/success";
+  } else if (resultadoFinanzas && mockPaymentStatus === "rejected") {
+    redirectAfterMockTo = "/panel/finanzas?pago=fallido";
+  } else if (resultadoFinanzas && mockPaymentStatus === "pending") {
+    redirectAfterMockTo = "/panel/finanzas?pago=pendiente";
+  }
 
   return (
     <>
       <PanelMockPaymentActivator
         status={process.env.NODE_ENV === "development" ? mockPaymentStatus : null}
-        redirectAfterApprovedTo={celebrateToSuccess ? "/panel/success" : null}
+        redirectAfterMockTo={redirectAfterMockTo}
       />
       <PanelWelcomeCleanup enabled={forceFreshFromWelcome} />
       <JourneyHome

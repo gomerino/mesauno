@@ -6,18 +6,19 @@ import { useEffect, useRef } from "react";
 type Props = {
   status: "approved" | "rejected" | "pending" | null;
   /**
-   * Solo desarrollo: si el mock es `approved`, tras guardar en DB redirige aquí
-   * en lugar de `?welcome=1`. Útil para probar la microceremonia en `/panel/success`.
-   * Ej.: `/panel?mockPayment=approved&celebrate=1`
+   * Solo desarrollo: tras POST OK, redirige aquí en lugar de `?welcome=1`.
+   * - Aprobado + `/panel/success`: `?mockPayment=approved&celebrate=1`
+   * - Rechazado + finanzas: `?mockPayment=rejected&resultado=1` → banner `pago=fallido`
+   * - Pendiente + finanzas: `?mockPayment=pending&resultado=1` → `pago=pendiente`
    */
-  redirectAfterApprovedTo?: string | null;
+  redirectAfterMockTo?: string | null;
 };
 
 /**
  * En desarrollo, permite simular pago con `?mockPayment=approved|rejected|pending`.
  * Guarda estado mock en DB y refresca estado del panel.
  */
-export function PanelMockPaymentActivator({ status, redirectAfterApprovedTo = null }: Props) {
+export function PanelMockPaymentActivator({ status, redirectAfterMockTo = null }: Props) {
   const firedRef = useRef(false);
   const router = useRouter();
   const pathname = usePathname();
@@ -34,8 +35,8 @@ export function PanelMockPaymentActivator({ status, redirectAfterApprovedTo = nu
           body: JSON.stringify({ status }),
         });
         if (!res.ok) return;
-        if (status === "approved" && redirectAfterApprovedTo) {
-          router.replace(redirectAfterApprovedTo);
+        if (redirectAfterMockTo) {
+          router.replace(redirectAfterMockTo);
         } else {
           router.replace(`${pathname}?welcome=1`);
         }
@@ -44,7 +45,7 @@ export function PanelMockPaymentActivator({ status, redirectAfterApprovedTo = nu
         /* red silenciosa: mock solo dev */
       }
     })();
-  }, [status, pathname, router, redirectAfterApprovedTo]);
+  }, [status, pathname, router, redirectAfterMockTo]);
 
   return null;
 }
