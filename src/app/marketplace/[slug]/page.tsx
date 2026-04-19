@@ -11,6 +11,7 @@ import {
   obtenerProveedorPorSlug,
   parseMotivoSuspension,
 } from "@/lib/proveedores";
+import { MarketplaceSolicitudContacto } from "@/components/marketplace/MarketplaceSolicitudContacto";
 import type { ProveedorMedio } from "@/types/database";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -235,6 +236,13 @@ export default async function MarketplaceProveedorPage({ params }: Props) {
             </p>
           )}
         </section>
+
+        <MarketplaceSolicitudContacto
+          proveedorId={proveedor.id}
+          slug={proveedor.slug}
+          isLoggedIn={Boolean(user)}
+          mostrar={esPublico && !esDueno}
+        />
 
         <div className="mt-10 flex flex-wrap gap-4 border-t border-white/10 pt-8 text-sm">
           <Link href="/marketplace" className="text-teal-400 hover:text-teal-300">

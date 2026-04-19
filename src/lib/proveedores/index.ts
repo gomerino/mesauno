@@ -22,10 +22,21 @@ export {
 export {
   crearSolicitud,
   CrearSolicitudError,
+  listarSolicitudesRecibidasProveedor,
   type CrearSolicitudInput,
   type CrearSolicitudErrorCode,
   type CrearSolicitudResult,
 } from "./solicitudes";
+
+export {
+  listarServiciosProveedorPropio,
+  crearServicioProveedorPropio,
+  actualizarServicioProveedorPropio,
+  eliminarServicioProveedorPropio,
+  ServicioProveedorError,
+  type CrearServicioProveedorInput,
+  type ActualizarServicioProveedorInput,
+} from "./servicios-crud";
 
 export {
   agregarFavorito,

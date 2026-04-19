@@ -73,6 +73,17 @@ export async function actualizarProveedorPropio(
       payload[campo] = raw as ProveedorCategoria;
       continue;
     }
+    if (campo === "nombre_negocio" && typeof raw === "string") {
+      const t = raw.trim();
+      if (t.length < 2) {
+        throw new ActualizarProveedorError(
+          "input-invalido",
+          "Indica el nombre del negocio.",
+        );
+      }
+      payload[campo] = t;
+      continue;
+    }
     if (typeof raw === "string") {
       const t = raw.trim();
       payload[campo] = t.length === 0 ? null : t;

@@ -8,6 +8,7 @@ import {
   CAP_SOLICITUDES_DIA_POR_REMITENTE,
   CAP_SOLICITUDES_MES_FREE,
 } from "./constants";
+import { obtenerProveedorPropio } from "./queries";
 
 /**
  * Lógica de creación de solicitudes novio → proveedor.
@@ -155,4 +156,28 @@ function inicioDiaUtcIso(): string {
     ),
   );
   return inicio.toISOString();
+}
+
+/**
+ * Solicitudes recibidas por el proveedor autenticado (panel `/proveedor`).
+ */
+export async function listarSolicitudesRecibidasProveedor(
+  supabase: SupabaseClient,
+  userId: string,
+  limit = 50,
+): Promise<ProveedorSolicitud[]> {
+  const prov = await obtenerProveedorPropio(supabase, userId);
+  if (!prov) return [];
+
+  const { data, error } = await supabase
+    .from("proveedor_solicitudes")
+    .select("*")
+    .eq("proveedor_id", prov.id)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  return (data ?? []) as ProveedorSolicitud[];
 }
