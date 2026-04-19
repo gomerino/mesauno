@@ -5,9 +5,10 @@ import type { PanelProgressBundle } from "@/lib/panel-progress-load";
 import type { JourneyPhaseId } from "@/lib/journey-phases";
 import { guestMissionCtaLabel, type GuestMissionState } from "@/lib/guest-mission";
 import { trackEvent } from "@/lib/analytics";
+import { getPhaseBaseOrder, type JourneyCardKey } from "@/lib/journey-card-order";
 import { Plane } from "lucide-react";
 import Link from "next/link";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 type EventoViaje = NonNullable<PanelProgressBundle["evento"]>;
 
@@ -105,18 +106,8 @@ export function JourneyViajeClient({
   const programaMissionStatus: MissionStatus = tieneHitos ? "in_progress" : "empty";
   const experienciaMissionStatus: MissionStatus = isPaid ? "empty" : "locked";
 
-  /** Base por fase: menor = más arriba. Refleja el foco natural del viaje. */
-  const phaseBase: Record<CardKey, number> = (() => {
-    switch (phase) {
-      case "despegue":
-        return { programa: 0, pasajeros: 1, evento: 2, experiencia: 3 };
-      case "en-vuelo":
-        return { experiencia: 0, programa: 1, pasajeros: 2, evento: 3 };
-      case "check-in":
-      default:
-        return { evento: 0, pasajeros: 1, programa: 2, experiencia: 3 };
-    }
-  })();
+  /** Base por fase: menor = más arriba. Tabla única en `getPhaseBaseOrder` (JUR-51). */
+  const phaseBase = getPhaseBaseOrder(phase);
 
   /** Penalización por estado: lo ya resuelto cae al final sin desaparecer. */
   function statusPenalty(s: MissionStatus): number {
@@ -132,10 +123,8 @@ export function JourneyViajeClient({
     }
   }
 
-  type CardKey = "evento" | "pasajeros" | "programa" | "experiencia";
-
   type CardSpec = {
-    key: CardKey;
+    key: JourneyCardKey;
     status: MissionStatus;
     rank: number;
     node: ReactNode;
@@ -244,7 +233,25 @@ export function JourneyViajeClient({
   ];
 
   const ordered = [...cards].sort((a, b) => a.rank - b.rank);
-  const orderKeys = ordered.map((c) => c.key).join("|");
+  const topActionable = ordered.find((c) => c.status === "empty" || c.status === "in_progress");
+
+  const [isNarrowViewport, setIsNarrowViewport] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const sync = () => setIsNarrowViewport(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  /** Mobile: la tarjeta “Siguiente” arriba del todo; desktop/tablet: orden por fase + penalización. */
+  const displayOrdered = useMemo(() => {
+    if (!isNarrowViewport || !topActionable) return ordered;
+    if (ordered[0]?.key === topActionable.key) return ordered;
+    return [topActionable, ...ordered.filter((c) => c.key !== topActionable.key)];
+  }, [isNarrowViewport, ordered, topActionable]);
+
+  const orderKeys = displayOrdered.map((c) => c.key).join("|");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -257,8 +264,6 @@ export function JourneyViajeClient({
       // no-op
     }
   }, [phase, orderKeys]);
-
-  const topActionable = ordered.find((c) => c.status === "empty" || c.status === "in_progress");
 
   if (!evento) {
     return (
@@ -288,14 +293,14 @@ export function JourneyViajeClient({
           ) : null}
         </div>
         <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 md:mt-4 md:gap-4">
-          {ordered.map((c) => c.node)}
+          {displayOrdered.map((c) => c.node)}
         </div>
       </section>
     </div>
   );
 }
 
-function labelForKey(key: "evento" | "pasajeros" | "programa" | "experiencia"): string {
+function labelForKey(key: JourneyCardKey): string {
   switch (key) {
     case "evento":
       return "Evento";
