@@ -34,9 +34,10 @@ Fecha de cierre técnico: 2026-04-19. Fuente: revisión del repo actual.
 
 ### “Votos” vs aportes
 
-- Hoy no hay UI de votación ni ranking. Lo que existe es **log de aportes** (`playlist_aportes`) + **playlist real en Spotify** actualizada al agregar.
-- **MVP honesto:** contar `playlist_aportes` por `track_uri` para mostrar “más pedidas” en UI (solo lectura agregada).
-- **Fase 2:** votos sin escribir en Spotify hasta aprobación de la pareja (tabla nueva o flags en `playlist_aportes`).
+- **Aportes:** `playlist_aportes` (invitado + track + metadata) cuando Spotify acepta el alta en lista (o solo registro si el flujo no llama a Spotify).
+- **Apoyos / ranking:** tabla `playlist_apoyos` (único por evento + invitado + `track_uri`) + UI «Las más pedidas» (`MasPedidasPlaylist`) y agregación en `playlistListTopPublic`.
+- **Playlist real en Spotify:** sigue dependiendo de permisos OAuth y política de la app (modo Development).
+- **Fase 2:** cola de moderación antes de escribir en Spotify; notificaciones a la pareja.
 
 ### Riesgos / día del evento
 
@@ -48,6 +49,7 @@ Fecha de cierre técnico: 2026-04-19. Fuente: revisión del repo actual.
 1. ~~Montar UI en panel~~ **Hecho** (evento + enlace desde experiencia).
 2. Opcional: mostrar en panel **últimos aportes** (`playlist_aportes`) o estado “playlist activa” sin abrir Spotify.
 3. Opcional: métricas `trackEvent` al conectar / guardar playlist.
+4. Operativo: **Users and access** en developer.spotify.com + mismo Client ID que Vercel para evitar 403 al `POST` tracks en prod.
 
 ---
 
@@ -86,10 +88,10 @@ Fecha de cierre técnico: 2026-04-19. Fuente: revisión del repo actual.
 
 ### Recomendación para B02-05
 
-1. **Definir TZ del evento** explícita en `eventos` si aún no está (o usar una constante producto por fase).
-2. **v0:** asociación automática por **`created_at`** + ventanas entre hitos (documentar Δ en minutos, p. ej. 45).
-3. **Migración opcional:** `capturada_at timestamptz` + extracción EXIF en front al subir (JPEG) en un segundo sprint.
-4. **Una vista “en vuelo”:** combinar RPC existentes `programa_evento_lista_publica` + lista de fotos filtradas por ventanas (nueva RPC o lógica en servidor).
+1. **TZ v0:** constante `America/Santiago` en RPC (migración `migration_programa_con_fotos_publica.sql`); **fase 2:** columna TZ en `eventos` si hace falta multi-región.
+2. **v0 implementado:** RPC **`programa_con_fotos_ventanas_publica(p_token)`** → JSON `{ ok, fecha_evento, zonahoraria, hitos: [{ hito_*, ventana_*, fotos: [...] }] }` usando ventanas `[t_i - 45m, t_{i+1} - 1m]` (último hito +3h).
+3. **Migración opcional:** `capturada_at timestamptz` + EXIF en cliente al subir.
+4. **UI “en vuelo”:** consumir esta RPC en invitación (sustituir o complementar `programa_evento_lista_publica` + `fotos_evento_lista_publica`).
 
 ---
 
@@ -125,24 +127,29 @@ Fecha de cierre técnico: 2026-04-19. Fuente: revisión del repo actual.
 
 ---
 
-## Checklist de salida (para cerrar issues Linear)
+## Checklist de salida (cierre spikes Linear)
 
-- [ ] **JUR-59 (S1):** decisión explícita: integrar `SpotifyPlaylistConnect` en panel (ruta) + alcance card Experiencia.
-- [ ] **JUR-60 (S2):** elegir v0 = ventanas por `created_at` + TZ; EXIF opcional documentado.
-- [ ] **JUR-61 (S3):** copy aprobado para UI y doc interna 1:1 vs API.
+- [x] **B02-S1:** panel + invitación + tablas aportes/apoyos; riesgo 403 Spotify documentado.
+- [x] **B02-S2:** v0 = ventanas `created_at` + TZ fija en RPC `programa_con_fotos_ventanas_publica`.
+- [x] **B02-S3:** doc 1:1 vs masivo API; sin prometer masivo en UI.
+
+**Script:** `node scripts/linear-b02-spike-close.mjs` (comentario + Done en issues que matcheen título).
 
 ---
 
 ## Referencias rápidas de archivos
 
 ```
-src/lib/spotify-config.ts          # scopes OAuth
-src/lib/spotify-oauth.ts           # authorize + callback + playlist auto
-src/lib/spotify-search-route.ts    # búsqueda client credentials
+src/lib/spotify-config.ts
+src/lib/spotify-oauth.ts
+src/lib/spotify-search-route.ts
 src/app/invitacion/music-actions.ts
-src/components/panel/SpotifyPlaylistConnect.tsx   # sin uso en pages
-src/app/panel/evento/page.tsx      # sin Spotify UI
+src/components/panel/SpotifyPlaylistConnect.tsx
+src/app/panel/evento/page.tsx                    # bloque #musica-spotify
+src/components/invitacion/MasPedidasPlaylist.tsx
 src/components/dashboard/WhatsAppInviteButton.tsx
 supabase/migration_evento_fotos.sql
 supabase/migration_evento_programa.sql
+supabase/migration_programa_con_fotos_publica.sql   # programa + fotos por ventana
+supabase/migration_playlist_apoyos.sql
 ```

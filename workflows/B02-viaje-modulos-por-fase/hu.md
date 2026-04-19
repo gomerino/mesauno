@@ -79,6 +79,8 @@
 **Quiero** ver el programa y el contenido vivo en un solo lugar  
 **Para** no abrir tres pantallas
 
+**Avance técnico (2026-04-19):** RPC `programa_con_fotos_ventanas_publica` en `supabase/migration_programa_con_fotos_publica.sql` (hitos + fotos por ventana de tiempo). Pendiente: integrar en UI de invitación / hub en vuelo.
+
 **Dependencias:** spike fotos+hora; decisión moderación.
 
 ---
