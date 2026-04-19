@@ -14,7 +14,7 @@
 | **Tu gran día** | `despegue` | Coordinar el día | Programa, Invitación, confirmaciones |
 | **Experiencia** | `en-vuelo` | Vivir y compartir | Experiencia, finanzas si aplica |
 
-La **reordenación de tarjetas** en home debe quedar **derivada de la fase activa** (ya hay `phaseBase` en `JourneyViajeClient`) y auditada para que **ningún orden contradiga** la historia del momento.
+La **reordenación de tarjetas** en home queda **derivada de la fase activa** vía `getPhaseBaseOrder` en `journey-card-order.ts` y auditada para que **ningún orden contradiga** la historia del momento.
 
 ---
 
