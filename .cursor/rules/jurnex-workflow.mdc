@@ -1,0 +1,34 @@
+---
+description: Patrón de documentación por HU en /workflows. Cuando edites archivos de workflow, respetá esta estructura.
+globs: workflows/**/*.md
+alwaysApply: false
+---
+
+# Patrón de workflow por HU
+
+Cada carpeta en `workflows/<ID>-<kebab-slug>/` documenta una HU y contiene **7 archivos fijos** (todos opcionales pero preferible completos):
+
+| Archivo | Rol dueño | Contenido mínimo |
+|---|---|---|
+| `hu.md` | PM | User story · Acceptance criteria numerados · Edge cases · Out of scope · Dependencies |
+| `ux.md` | UX | Flow ASCII · Screen inventory · Friction audit (S/M/L) · Copy tone · Mobile spec |
+| `tech.md` | Tech Lead + Dev | Domain model · API sketch · DDL/migration · Types · Risks |
+| `data.md` | Data | Event dictionary (tabla) · Metrics · Quality rules · Guardrails |
+| `qa.md` | QA | Cases tabla con ID · Non-functional · Security · Sign-off checklist |
+| `growth.md` | Growth | Funnel · Hypotheses HG1/HG2/… · Tactics · Guardrails (no dark patterns) |
+| `validation.md` | PM + Tech | Problem · Success criteria · Validation checklist · Rollout |
+
+## Reglas al editar workflows
+
+- **No dupliques** información entre archivos; cada uno tiene ownership claro.
+- `hu.md` es la fuente de verdad del scope; si cambia, actualizá `validation.md`.
+- `tech.md` cambios de schema → crear migración en `supabase/YYYY-MM-DD_*.sql` en el mismo PR.
+- IDs de test (`Q1`, `Q2`…) y de hipótesis (`HG1`, `HG2`…) son estables; nunca los renumeres retroactivamente.
+- Copy warm: revisar tono con los lineamientos de `.cursor/rules/jurnex-roles.mdc`.
+- Mantener wireframes en ASCII o Markdown; no embeber imágenes en workflows.
+
+## Ejemplos de referencia
+
+- `workflows/M01-providers-schema/` — completo, buen template.
+- `workflows/HU-010-panel-optimization/` — incluye `idea.md` opcional.
+- `workflows/HU-001-agenda-proveedor/` — más verboso, pre-rediseño.

@@ -30,6 +30,8 @@ export type Evento = {
   recordatorios_activos?: boolean | null;
   /** Primer día (inclusive) en que el cron puede enviar recordatorios. null = sin aplazamiento. */
   fecha_inicio_recordatorios?: string | null;
+  /** Tema visual de las invitaciones (`themes.id`). Se propaga a todos los invitados del evento. */
+  theme_id?: string | null;
   created_at?: string | null;
 };
 
@@ -119,6 +121,7 @@ export type EventoFoto = {
   created_at: string;
 };
 
+/** @deprecated Reemplazada por `Provider` + `ProviderService` (M01). Se mantiene temporalmente durante transición. */
 export type MarketplaceServicio = {
   id: string;
   nombre: string;
@@ -127,4 +130,139 @@ export type MarketplaceServicio = {
   precio_desde: number | null;
   imagen_url: string | null;
   proveedor: string | null;
+};
+
+// ─── Marketplace proveedores (M01 — workflows/M01-providers-schema) ────────
+//
+// Convención: nombres de tabla/columna en español (patrón del resto del
+// schema). Enum values en español cuando es natural (`pendiente/aprobado`,
+// `imagen/video`, `en_app/email/whatsapp`); términos comerciales (`free`,
+// `premium`) y códigos compactos (`lt-500k`) quedan en inglés.
+
+export type ProveedorEstado = "pendiente" | "aprobado" | "suspendido";
+export type ProveedorPlan = "free" | "premium";
+
+/**
+ * Categorías canónicas del marketplace. La columna DB es `text` (no enum) para
+ * permitir agregar categorías sin migración, pero el app layer debe usar este
+ * set como fuente de verdad para filtros y badges.
+ */
+export type ProveedorCategoria =
+  | "fotografia"
+  | "video"
+  | "catering"
+  | "musica"
+  | "lugar"
+  | "decoracion"
+  | "flores"
+  | "coordinacion";
+
+export type Proveedor = {
+  id: string;
+  user_id: string;
+  slug: string;
+  nombre_negocio: string;
+  eslogan: string | null;
+  biografia: string | null;
+  region: string;
+  ciudad: string | null;
+  categoria_principal: ProveedorCategoria;
+  telefono: string | null;
+  email: string | null;
+  sitio_web: string | null;
+  instagram: string | null;
+  /** Formato E.164 (ej. `+56912345678`). Validar en la capa API. */
+  whatsapp: string | null;
+  estado: ProveedorEstado;
+  /** Motivo (código) cuando estado pasa a suspendido. */
+  motivo_suspension: string | null;
+  plan: ProveedorPlan;
+  plan_inicio_at: string | null;
+  /** Contador reseteado mensualmente por job externo (no es count de la tabla). */
+  solicitudes_mes: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ProveedorServicio = {
+  id: string;
+  proveedor_id: string;
+  nombre: string;
+  descripcion: string | null;
+  categoria: ProveedorCategoria;
+  precio_desde_clp: number | null;
+  duracion_min: number | null;
+  activo: boolean;
+  orden: number;
+  created_at: string;
+};
+
+export type ProveedorMedio = {
+  id: string;
+  proveedor_id: string;
+  servicio_id: string | null;
+  tipo: "imagen" | "video";
+  /** Path relativo al bucket `proveedor-medios` (ej. `<proveedor_id>/<uuid>.webp`). */
+  storage_path: string;
+  /** URL pública (bucket es read-public). */
+  url_publica: string;
+  alt: string | null;
+  orden: number;
+  created_at: string;
+};
+
+export type ProveedorSolicitudCanal = "whatsapp" | "email" | "en_app";
+export type ProveedorSolicitudRangoPresupuesto = "lt-500k" | "500k-1m" | "1m-3m" | "gt-3m";
+
+export type ProveedorSolicitud = {
+  id: string;
+  proveedor_id: string;
+  evento_id: string | null;
+  remitente_user_id: string | null;
+  canal: ProveedorSolicitudCanal;
+  mensaje: string | null;
+  /** ISO YYYY-MM-DD de la fecha del evento (si se conoce). */
+  fecha_evento_contexto: string | null;
+  region_contexto: string | null;
+  presupuesto_clp_contexto: number | null;
+  rango_presupuesto: ProveedorSolicitudRangoPresupuesto | null;
+  /**
+   * `true` si al momento del insert el proveedor estaba free y ya tenía
+   * `solicitudes_mes >= cap`. El proveedor NO recibe email cuando está limitado.
+   */
+  limitado_por_plan: boolean;
+  /** Día UTC para `UNIQUE(proveedor_id, remitente_user_id, canal, dia_solicitud)`. */
+  dia_solicitud: string;
+  created_at: string;
+};
+
+export type ProveedorFavorito = {
+  id: string;
+  evento_id: string;
+  proveedor_id: string;
+  servicio_id: string | null;
+  agregado_por: string;
+  nota: string | null;
+  created_at: string;
+};
+
+/**
+ * Fila de la vista `v_marketplace_tarjetas` consumida por `/marketplace`.
+ * Solo contiene proveedores con `estado = 'aprobado'`.
+ */
+export type MarketplaceTarjeta = {
+  id: string;
+  slug: string;
+  nombre_negocio: string;
+  eslogan: string | null;
+  categoria_principal: ProveedorCategoria;
+  region: string;
+  ciudad: string | null;
+  plan: ProveedorPlan;
+  estado: ProveedorEstado;
+  created_at: string;
+  solicitudes_mes: number;
+  imagen_hero_url: string | null;
+  precio_desde_clp: number | null;
+  medios_count: number;
 };

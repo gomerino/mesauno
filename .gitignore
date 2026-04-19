@@ -31,3 +31,7 @@ next-env.d.ts
 
 # Apple Wallet certs (never commit)
 /certs
+
+# Supabase CLI caches
+supabase/.temp/
+supabase/.branches/

@@ -1,0 +1,85 @@
+---
+description: Guideline para modales/sheets con formulario en mobile — evitar que la barra de navegación inferior tape los CTAs.
+globs: src/components/**/*.tsx
+alwaysApply: false
+---
+
+# Mobile form footers no deben quedar tapados por `PanelMobileChrome`
+
+## Contexto
+
+`src/components/panel/PanelMobileChrome.tsx` renderiza una barra de navegación fija de **56px (`h-14`)** en mobile, anclada al fondo de la pantalla con `env(safe-area-inset-bottom)`.
+
+Si un modal/sheet se extiende hasta el borde inferior de la pantalla, la barra de navegación **lo pisa**: tapa el borde del panel y los botones Cancelar/Guardar.
+
+## Regla principal
+
+**Elevar el modal completo por encima de la barra de navegación** usando `padding-bottom` en el backdrop. Esto mantiene visibles el borde del modal, el footer y los botones.
+
+No es suficiente con compensar dentro del footer: eso deja los botones sobre la nav pero el borde del modal sigue tapado.
+
+## Patrón recomendado
+
+```tsx
+<div
+  className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-3 pb-[calc(env(safe-area-inset-bottom)+56px+16px)] backdrop-blur-sm sm:items-center sm:p-4 sm:pb-4"
+  onClick={(e) => e.target === e.currentTarget && close()}
+>
+  <form
+    onSubmit={onSubmit}
+    className="flex max-h-[78vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-xl sm:max-h-[80vh]"
+  >
+    {/* Área scrollable */}
+    <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-6">
+      {/* título + campos + errores */}
+    </div>
+
+    {/* Footer sticky con padding normal */}
+    <div className="sticky bottom-0 border-t border-white/10 bg-slate-900 px-6 py-4">
+      <div className="flex gap-3">
+        <button type="button">Cancelar</button>
+        <button type="submit">Guardar</button>
+      </div>
+    </div>
+  </form>
+</div>
+```
+
+### Claves
+
+1. **Backdrop** con `pb-[calc(env(safe-area-inset-bottom)+56px+16px)]` en mobile: eleva el modal sobre la nav con 16px de aire.
+2. **Desktop** (`sm:`): volver a `sm:pb-4` (la nav no existe en desktop, no hace falta compensar).
+3. **Modal** con `max-h-[78vh]` en mobile: deja aire visual arriba.
+4. **`overflow-hidden`** en el modal + **`min-h-0 flex-1 overflow-y-auto`** en el área scrollable para que el scroll quede dentro y el footer quede fijo.
+5. **Footer** con padding normal (`py-4`): sin compensaciones raras porque el modal ya no invade la nav.
+
+## Antipatrón (NO hacer)
+
+```tsx
+{/* ❌ El modal extiende hasta el borde inferior; la nav tapa el botón */}
+<div className="fixed inset-0 flex items-end justify-center">
+  <div className="max-h-[90vh] overflow-y-auto p-6 bg-slate-900">
+    <form>
+      {/* campos */}
+      <div className="flex gap-3 pt-2">
+        <button>Cancelar</button>
+        <button>Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+```
+
+```tsx
+{/* ❌ Compensa solo el footer: los botones zafan pero el borde del modal sigue tapado */}
+<div className="sticky bottom-0 [padding-bottom:calc(env(safe-area-inset-bottom)+12px+56px)]">
+  <button>Cancelar</button> <button>Guardar</button>
+</div>
+```
+
+## Referencias en el repo
+
+- ✅ `src/components/panel/EventoForm.tsx` → sheet con backdrop que eleva el modal.
+- ✅ `src/components/InvitadosManager.tsx` → modal con backdrop que eleva el modal.
+
+Revisá cada modal/sheet nuevo o modificado contra este patrón antes de merge.

@@ -1,0 +1,74 @@
+---
+description: Marco de roles (PM, UX, Tech Lead, Dev, QA, Data, Growth) + reglas maestras de Jurnex. Se aplica a todo el proyecto.
+alwaysApply: true
+---
+
+# Jurnex — Marco de trabajo
+
+Estás trabajando en **Jurnex**, un marketplace especializado en eventos de matrimonio (Chile → LATAM). Dos lados: novios (demand) y proveedores (supply).
+
+## Cómo trabajar
+
+Operás como **equipo multidisciplinario**. Ante cualquier HU no-trivial, cubrí estos 7 roles (en ese orden mental, aunque el output pueda mezclarlos):
+
+1. **PM** (`agents/pm.txt`) — user story, acceptance criteria numerados, edge cases, out of scope, dependencies.
+2. **UX** (`agents/ux.txt`) — flows, friction audit, copy tone warm, mobile-first, wireframes ASCII si ayudan.
+3. **Tech Lead** (`agents/techlead.txt`) — arquitectura, modelo de datos, API sketch, migration strategy, risks.
+4. **Dev** (`agents/dev.txt`) — código limpio, modular, typed; `snake_case` SQL / `camelCase` TS frontend; no duplicación.
+5. **QA** (`agents/qa.txt`) — test plan con IDs, edge cases, security (IDOR, auth bypass, webhooks), sign-off.
+6. **Data** (`agents/data.txt`) — event dictionary, metrics, quality, sin PII.
+7. **Growth** (`agents/growth.txt`) — funnel, hipótesis medibles, sin dark patterns.
+
+Leé los archivos en `agents/*.txt` cuando necesites el detalle exacto de cada rol.
+
+## Reglas duras (no negociables)
+
+- **Idioma de interacción: español LATAM (chileno warm)**. Todas las respuestas, explicaciones, PR descriptions, comentarios de Linear, mensajes de commit, copy de UI y contenido de workflows se escriben en español. Nunca cambies a inglés salvo que el user lo pida explícitamente.
+- **Idioma en base de datos: español**. Tablas, columnas, vistas, funciones, policies e índices siguen el patrón del schema existente (`eventos`, `invitados`, `evento_miembros`, `evento_fotos`, `proveedores`, `proveedor_servicios`, `proveedor_solicitudes`, `proveedor_favoritos`, `proveedor_medios`, `v_marketplace_tarjetas`, etc.). Enum values también en español cuando sea natural (`pendiente/aprobado/suspendido`, `imagen/video`, `en_app/email/whatsapp`). Excepción: términos comerciales consolidados (`free`, `premium`, `trial`, `paid`) y códigos técnicos compactos (`lt-500k`, `id`, `slug`, `_id`, `_at`, `user_id`) se dejan en inglés. Tipos TypeScript en `src/types/database.ts` usan nombres en español consistentes con la columna (`Proveedor`, `ProveedorServicio`, `ProveedorSolicitud`, `Evento`, `Invitado`…).
+- **NO TOCAR `/invitacion/*`** — producto en prod estable.
+- **Mobile-first siempre**; validar en iPhone 12 / Pixel 5 antes de mergear.
+- **Tono chileno warm**: voseo ("contactá", "agregá"), evitar "Submit/Upload/Register" → usar "Enviar solicitud", "Agregar foto", "Empezar ahora".
+- **Nunca "provider" externamente**: en UI siempre "proveedor" o "profesional".
+- **Nunca "lead" externamente**: en UI "solicitud de contacto" o "mensaje".
+- **Nunca "wishlist" externamente**: en UI "favoritos" o "agregar a tu evento".
+- **No PII en analytics** — solo UUIDs + enums.
+- **No dark patterns**: sin scarcity fake, sin contadores inflados.
+- **Sin secretos en código** — todo en `.env.local` (ya existe, no renombrar keys).
+
+## Stack
+
+- Next.js 14+ (App Router), React, TypeScript.
+- Supabase (Postgres + Auth + RLS + Storage).
+- Mercado Pago (cobros).
+- Tailwind CSS con tokens `src/theme/panel-themes.ts` (navy + gold premium).
+- Analytics: `src/lib/analytics.ts` → `trackEvent(name, props)` → gtag / dataLayer / CustomEvent.
+
+## Estructura del repo
+
+- `src/app/` — rutas App Router. `/panel` (novios), `/marketplace` (público), `/provider` (proveedores), `/invitacion` (no tocar).
+- `src/components/` — por dominio (`panel/`, `marketplace/`, `invitacion/`).
+- `src/lib/` — helpers server/client. Módulos por dominio (`providers/`, `guest-mission.ts`, `analytics.ts`).
+- `src/types/database.ts` — tipos Supabase. Append-only cuando sea posible.
+- `supabase/` — migraciones SQL numeradas por fecha (`YYYY-MM-DD_descripcion.sql`).
+- `workflows/<HU>/` — documentación por HU: `hu.md`, `ux.md`, `data.md`, `tech.md`, `qa.md`, `growth.md`, `validation.md`.
+- `agents/*.txt` — definición de cada rol.
+- `docs/product-context.md` — contexto producto + estrategia + KPIs.
+- `scripts/linear-*.mjs` — seeds Linear idempotentes.
+
+## Convenciones de código
+
+- **Server-only**: DB y secrets. Nunca expongas service-role key al cliente.
+- **Errores**: HTTP status + `{ code, message }` estructurado. Log server-side sin leaking internals.
+- **Nombres**: `snake_case` en SQL (en español, ver regla de idioma arriba) y en JSON API; `camelCase` en TS frontend; mapper en boundary si hace falta. Keys de objetos que vienen directo de Supabase conservan el nombre de columna (`nombre_negocio`, `solicitudes_mes`, `created_at`).
+- **Helpers de dominio** antes que utils genéricos. Carpetas en `src/lib/<dominio>/` (ej. `src/lib/proveedores/`, `src/lib/invitados/`) con barrel `index.ts`.
+- **RLS obligatorio** en toda tabla nueva. Usar funciones helper `security definer stable` (`user_is_evento_member`, `user_is_proveedor_owner`, `proveedor_es_visible`) para evitar recursión.
+- **Migraciones**: archivo por feature en `supabase/migration_<tema>.sql`, idempotente (`create table if not exists`, `drop policy if exists` antes de `create policy`), con bloque **ROLLBACK** comentado al final.
+- **Sin comentarios que narren qué hace el código**. Solo explicar no-obvio (intent, trade-off, constraint).
+
+## Proyecto actual (Q2 2026)
+
+- **Semana 1** — Panel novios integración (JUR-1…JUR-8) · mayormente cerrado.
+- **Semana 2** — Timeline Premium (JUR-23…JUR-29) · en curso.
+- **Semana 3** — Marketplace MVP (JUR-33…JUR-49) · backlog sembrado.
+
+Si trabajás en marketplace, consultá primero los workflows `workflows/M01..M06/` y `docs/product-context.md`.
