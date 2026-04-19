@@ -33,6 +33,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           >
             Eventos y usuarios
           </Link>
+          <Link
+            href="/admin/proveedores"
+            className="font-medium text-amber-400/90 hover:text-amber-300"
+          >
+            Proveedores
+          </Link>
           <Link href="/" className="text-slate-500 hover:text-slate-300">
             Inicio
           </Link>
