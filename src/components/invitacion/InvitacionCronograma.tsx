@@ -161,7 +161,7 @@ export function InvitacionCronograma({ hitos, fechaEvento, fotosPorHito }: Props
         </p>
         {hayFotosPorMomento ? (
           <p className="mt-1 text-[11px] leading-snug text-[#001d66]/70">
-            Galería: miniaturas junto a cada momento cuando la hora de la foto coincide con ese tramo del día.
+            Galería: fotos entre la hora de cada actividad y la de la siguiente (misma hora de inicio = mismo bloque).
           </p>
         ) : null}
         {statusBanner}

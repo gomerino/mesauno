@@ -1,7 +1,7 @@
 -- B02-05 v0: programa del día + fotos por ventanas (TZ America/Santiago).
--- Partición sin solapes: cada hito i toma [w_start, w_end) con límites en el punto medio entre t_{i-1}↔t_i y t_i↔t_{i+1}.
--- Primer hito: w_start = max(inicio_día, t_0 - 45m). Último: w_end = t_last + 3h.
--- Fotos: created_at >= w_start AND created_at < w_end (una foto solo en un hito).
+-- Ventana por hora de inicio: [t_inicio, t_siguiente_inicio_distinto) sin márgenes.
+-- Varios hitos con la misma hora comparten t_inicio → misma ventana y mismas fotos (repetición permitida).
+-- Último bloque horario: fin = t_último + 3h. Fotos: created_at >= w_start AND created_at < w_end.
 --
 -- IMPORTANTE: ejecutar este archivo completo de una sola vez (una sola sentencia CREATE FUNCTION).
 -- Si el editor parte por ";", usar "Run" sobre el bloque completo o pegar solo entre $function$ ... $function$.
@@ -31,9 +31,9 @@ as $function$
     from inv
     inner join public.eventos e on e.id = inv.evento_id
   ),
-  hitos_base as (
+  hitos_ts as (
     select
-      h.id,
+      h.id as hito_id,
       h.evento_id,
       h.hora,
       h.titulo,
@@ -42,40 +42,26 @@ as $function$
       h.ubicacion_url,
       h.icono,
       h.orden,
-      lag(h.hora) over (
-        partition by h.evento_id
-        order by h.orden asc, h.hora asc
-      ) as prev_hora,
-      lead(h.hora) over (
-        partition by h.evento_id
-        order by h.orden asc, h.hora asc
-      ) as next_hora,
-      evt.fecha as d
+      ((evt.fecha + h.hora) at time zone 'America/Santiago') as t_inicio
     from public.evento_programa_hitos h
     inner join evt on evt.evento_id = h.evento_id
   ),
-  hitos_ts as (
+  bloques as (
+    select distinct ht.evento_id, ht.t_inicio
+    from hitos_ts ht
+  ),
+  bloque_ventana as (
     select
-      hb.id as hito_id,
-      hb.evento_id,
-      hb.hora,
-      hb.titulo,
-      hb.descripcion_corta,
-      hb.lugar_nombre,
-      hb.ubicacion_url,
-      hb.icono,
-      hb.orden,
-      ((hb.d + hb.hora) at time zone 'America/Santiago') as t_centro,
-      (hb.d::timestamp at time zone 'America/Santiago') as day_start_tz,
-      case
-        when hb.prev_hora is null then null
-        else ((hb.d + hb.prev_hora) at time zone 'America/Santiago')
-      end as t_prev,
-      case
-        when hb.next_hora is null then null
-        else ((hb.d + hb.next_hora) at time zone 'America/Santiago')
-      end as t_next
-    from hitos_base hb
+      b.evento_id,
+      b.t_inicio as w_start,
+      coalesce(
+        lead(b.t_inicio) over (
+          partition by b.evento_id
+          order by b.t_inicio asc
+        ),
+        b.t_inicio + interval '3 hours'
+      ) as w_end_exclusive
+    from bloques b
   ),
   hitos_win as (
     select
@@ -88,19 +74,12 @@ as $function$
       ht.ubicacion_url,
       ht.icono,
       ht.orden,
-      case
-        when ht.t_prev is null then
-          greatest(ht.day_start_tz, ht.t_centro - interval '45 minutes')
-        else
-          ht.t_prev + (ht.t_centro - ht.t_prev) / 2
-      end as w_start,
-      case
-        when ht.t_next is null then
-          ht.t_centro + interval '3 hours'
-        else
-          ht.t_centro + (ht.t_next - ht.t_centro) / 2
-      end as w_end_exclusive
+      bv.w_start,
+      bv.w_end_exclusive
     from hitos_ts ht
+    inner join bloque_ventana bv
+      on bv.evento_id = ht.evento_id
+      and bv.w_start = ht.t_inicio
   ),
   hitos_with_fotos as (
     select
