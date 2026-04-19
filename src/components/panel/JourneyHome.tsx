@@ -1,8 +1,11 @@
 import { JourneyViajeClient } from "@/components/panel/JourneyViajeClient";
 import { JourneyPrimaryCta } from "@/components/panel/journey/JourneyPrimaryCta";
+import { PanelInviteShareCard } from "@/components/panel/PanelInviteShareCard";
 import { PanelSlimProgress } from "@/components/panel/PanelSlimProgress";
 import { PanelThemeSelector } from "@/components/panel/PanelThemeSelector";
 import { JourneyPhasesBar } from "@/components/panel/journey/JourneyPhasesBar";
+import { resolveGuestMissionState } from "@/lib/guest-mission";
+import { resolveInvitationToken } from "@/lib/invitation-url";
 import { getJourneyPhasesProgressLines } from "@/lib/journey-cards-progress";
 import { journeyHeadline, loadPanelProgressBundle } from "@/lib/panel-progress-load";
 import { resolveJourneyPhase } from "@/lib/journey-phases";
@@ -18,6 +21,7 @@ type JourneyHomeProps = {
   optimisticPlanActive?: boolean;
   /** Estado mock optimista desde query param (dev). */
   optimisticPaymentStatus?: "approved" | "rejected" | "pending" | null;
+  focusTarget?: string | null;
 };
 
 function isPlanActive(status: string | null | undefined): boolean {
@@ -29,6 +33,7 @@ export async function JourneyHome({
   showSuccessHero = false,
   optimisticPlanActive = false,
   optimisticPaymentStatus = null,
+  focusTarget = null,
 }: JourneyHomeProps) {
   if (forceFresh) {
     noStore();
@@ -49,6 +54,7 @@ export async function JourneyHome({
   const paymentStatus = optimisticPaymentStatus ?? bundle.mockPaymentStatus;
   const hasAccess = planStatus === "paid";
   const journeyPhase = resolveJourneyPhase(bundle.evento?.fecha_boda, bundle.evento?.fecha_evento);
+  const invitadosMission = resolveGuestMissionState(bundle.invitados);
   const planPaidForProgress = optimisticPlanActive || bundle.evento?.plan_status === "paid";
   const journeyProgress = getJourneyPhasesProgressLines(bundle, { planPaid: planPaidForProgress });
 
@@ -63,12 +69,24 @@ export async function JourneyHome({
     prefillNombre = [n1, n2].filter(Boolean).join(" & ");
   }
 
+  const sampleInvitado = bundle.invitados.find((i) => {
+    const raw = i.token_acceso?.trim();
+    return raw && raw.length > 0;
+  }) ?? bundle.invitados[0] ?? null;
+  const sampleToken = sampleInvitado
+    ? resolveInvitationToken({
+        token_acceso: sampleInvitado.token_acceso ?? null,
+        id: sampleInvitado.id,
+      })
+    : null;
+  const sampleNombre = sampleInvitado?.nombre_pasajero?.trim() || null;
+
   return (
     <div className="mx-auto w-full max-w-4xl">
       {bundle.evento ? (
         <>
           {/* Above the fold: un solo foco (CTA) + selector de estilo secundario */}
-          <div className="flex flex-col gap-3 md:gap-4">
+          <div className="flex min-h-[13.5rem] flex-col gap-3 md:min-h-[15rem] md:gap-4">
             {(!hasAccess || showSuccessHero) && (
               <JourneyPrimaryCta
                 invitados_count={bundle.invitados.length}
@@ -110,15 +128,26 @@ export async function JourneyHome({
                 />
               </div>
             ) : null}
+            {bundle.invitados.length > 0 ? (
+              <PanelInviteShareCard
+                sampleToken={sampleToken}
+                sampleNombre={sampleNombre}
+                invitadosCount={bundle.invitados.length}
+                invitacionesEnviadas={invitacionesEnviadas}
+              />
+            ) : null}
             <JourneyViajeClient
               evento={bundle.evento}
-              invitadosCount={bundle.invitados.length}
               phase={journeyPhase}
+              invitadosMission={invitadosMission}
+              focusTarget={focusTarget}
+              eventoComplete={bundle.steps.evento}
+              programaHitosCount={bundle.programaHitosCount}
             />
           </div>
         </>
       ) : (
-        <div className="flex flex-col gap-3 md:gap-4">
+        <div className="flex min-h-[13.5rem] flex-col gap-3 md:min-h-[15rem] md:gap-4">
           <JourneyPhasesBar
             phase={journeyPhase}
             progressPrimary={journeyProgress.primary}
@@ -129,8 +158,11 @@ export async function JourneyHome({
           </div>
           <JourneyViajeClient
             evento={bundle.evento}
-            invitadosCount={bundle.invitados.length}
             phase={journeyPhase}
+            invitadosMission={invitadosMission}
+            focusTarget={focusTarget}
+            eventoComplete={bundle.steps.evento}
+            programaHitosCount={bundle.programaHitosCount}
           />
         </div>
       )}

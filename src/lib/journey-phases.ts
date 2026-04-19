@@ -22,6 +22,32 @@ export function journeyPhaseObjective(phase: JourneyPhaseId): string {
   return PHASE_OBJECTIVE[phase];
 }
 
+/**
+ * Eyebrow corto por fase para el stepper premium (JUR-23).
+ * Se muestra encima del label en mayúsculas con tracking amplio.
+ */
+const PHASE_EYEBROW: Record<JourneyPhaseId, string> = {
+  "check-in": "Preparativos",
+  despegue: "Tu gran día",
+  "en-vuelo": "Experiencia ✨",
+};
+
+export function journeyPhaseEyebrow(phase: JourneyPhaseId): string {
+  return PHASE_EYEBROW[phase];
+}
+
+/** Índice lineal de la fase (0=check-in, 1=despegue, 2=en-vuelo). Útil para stepper. */
+export function journeyPhaseIndex(phase: JourneyPhaseId): number {
+  switch (phase) {
+    case "check-in":
+      return 0;
+    case "despegue":
+      return 1;
+    case "en-vuelo":
+      return 2;
+  }
+}
+
 type CalendarDay = { y: number; m: number; d: number };
 
 function parseCalendarDay(value: string | null | undefined): CalendarDay | null {

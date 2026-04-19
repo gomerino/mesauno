@@ -1,12 +1,14 @@
-import { CouplePageHeader } from "@/components/app/CouplePageHeader";
 import { EmptyStateCard } from "@/components/app/EmptyStateCard";
-import { PanelSubpageChrome } from "@/components/panel/PanelSubpageChrome";
+import { PanelPageContainer } from "@/components/panel/PanelPageContainer";
+import { PanelPageHeader } from "@/components/panel/PanelPageHeader";
+import { PanelSubpageProgress } from "@/components/panel/PanelSubpageProgress";
 import { createClient } from "@/lib/supabase/server";
 import { selectEventoForMember } from "@/lib/evento-membership";
-import { BoardingPassCard } from "@/components/BoardingPassCard";
 import { InvitadoPicker } from "@/components/panel/InvitadoPicker";
-import { boardingPassQrMapUrlMerged } from "@/lib/evento-boarding";
-import { resolveEventPlaylistEnv } from "@/lib/event-playlist-env";
+import { InvitacionShareActions } from "@/components/panel/InvitacionShareActions";
+import { InvitacionFullPreview } from "@/components/panel/InvitacionFullPreview";
+import { resolveInvitationToken } from "@/lib/invitation-url";
+import { resolveInvitacionThemeId } from "@/lib/invitacion-theme";
 import { fetchInvitadosPanelRowsWithAcompanantes } from "@/lib/panel-invitados";
 import type { Invitado, Evento } from "@/types/database";
 
@@ -37,46 +39,68 @@ export default async function PanelInvitadosVistaPage({
 
   if (list.length === 0) {
     return (
-      <PanelSubpageChrome>
-        <CouplePageHeader
+      <PanelPageContainer>
+        <PanelPageHeader
           eyebrow="Compartir"
           title="Vista previa"
-          subtitle="Así verá cada invitado su invitación. Añade al menos una persona en Invitados para previsualizarla."
+          subtitle="Así verá cada invitado su invitación. Agregá al menos una persona en Invitados para previsualizarla."
         />
-        <EmptyStateCard
-          title="Todavía no hay invitados"
-          description="Cuando des de alta a alguien, podrás ver aquí la invitación tal como la recibirá."
-          actionHref="/panel/invitados"
-          actionLabel="Ir a Invitados"
-        />
-      </PanelSubpageChrome>
+        <PanelSubpageProgress />
+        <div className="mt-6">
+          <EmptyStateCard
+            title="Todavía no hay invitados"
+            description="Cuando des de alta a alguien, vas a poder ver acá la invitación tal como la recibirá."
+            actionHref="/panel/invitados"
+            actionLabel="Ir a Invitados"
+          />
+        </div>
+      </PanelPageContainer>
     );
   }
 
   const defaultId = qId && list.some((i) => i.id === qId) ? qId : list[0]!.id;
   const invitado = list.find((i) => i.id === defaultId) ?? list[0]!;
 
-  const qrValue = boardingPassQrMapUrlMerged(invitado, eventoRow);
-  const playlists = resolveEventPlaylistEnv();
+  const tokenAcceso = resolveInvitationToken({
+    token_acceso: invitado.token_acceso ?? null,
+    id: invitado.id,
+  });
+  const themeId = resolveInvitacionThemeId({ evento: eventoRow, invitado }, null);
 
   return (
-    <PanelSubpageChrome>
-      <CouplePageHeader
+    <PanelPageContainer>
+      <PanelPageHeader
         eyebrow="Compartir"
         title="Vista previa"
-        subtitle="Elige un invitado para ver la invitación tal como la recibirá. Desde el panel puedes enviar correos o compartir el enlace."
+        subtitle="Así verá la invitación tu invitado. El estilo se configura desde los datos del evento."
       />
 
-      <div className="mt-8">
+      <PanelSubpageProgress />
+
+      <div className="mt-6">
         <InvitadoPicker
           invitados={list.map((i) => ({ id: i.id, nombre: i.nombre_pasajero }))}
           currentId={defaultId}
         />
       </div>
 
-      <div className="mt-10 flex justify-center">
-        <BoardingPassCard invitado={invitado} evento={eventoRow} qrValue={qrValue} playlists={playlists} />
+      <div className="mt-6 flex justify-center">
+        <InvitacionShareActions
+          tokenAcceso={tokenAcceso}
+          invitadoId={invitado.id}
+          invitadoNombre={invitado.nombre_pasajero}
+          source="vista_previa"
+        />
       </div>
-    </PanelSubpageChrome>
+
+      <div className="mt-8 flex justify-center">
+        <InvitacionFullPreview
+          tokenAcceso={tokenAcceso}
+          invitadoId={invitado.id}
+          invitadoNombre={invitado.nombre_pasajero}
+          previewThemeId={themeId}
+        />
+      </div>
+    </PanelPageContainer>
   );
 }

@@ -33,6 +33,34 @@ function isPanelPostPaymentPath(pathname: string): boolean {
   return pathname === "/panel/success" || pathname === "/panel/post-pago";
 }
 
+function isPanelEventoPath(pathname: string): boolean {
+  return pathname === "/panel/evento" || pathname.startsWith("/panel/evento/");
+}
+
+function isPanelInvitadosPath(pathname: string): boolean {
+  return pathname === "/panel/invitados" || pathname.startsWith("/panel/invitados/");
+}
+
+function isPanelProgramaPath(pathname: string): boolean {
+  return pathname === "/panel/programa" || pathname.startsWith("/panel/programa/");
+}
+
+function isPanelExperienciaPath(pathname: string): boolean {
+  return pathname === "/panel/experiencia" || pathname.startsWith("/panel/experiencia/");
+}
+
+function isPanelEquipoPath(pathname: string): boolean {
+  return pathname === "/panel/equipo" || pathname.startsWith("/panel/equipo/");
+}
+
+function isPanelFinanzasPath(pathname: string): boolean {
+  return pathname === "/panel/finanzas" || pathname.startsWith("/panel/finanzas/");
+}
+
+function isPanelInvitacionPath(pathname: string): boolean {
+  return pathname === "/panel/invitacion" || pathname.startsWith("/panel/invitacion/");
+}
+
 function NavLink({
   href,
   label,
@@ -78,6 +106,23 @@ export function PanelShell({
   const pathname = usePathname();
   const journeyHome = isJourneyHomePath(pathname);
   const postPaymentPage = isPanelPostPaymentPath(pathname);
+  const eventoPage = isPanelEventoPath(pathname);
+  const invitadosPage = isPanelInvitadosPath(pathname);
+  const programaPage = isPanelProgramaPath(pathname);
+  const experienciaPage = isPanelExperienciaPath(pathname);
+  const equipoPage = isPanelEquipoPath(pathname);
+  const finanzasPage = isPanelFinanzasPath(pathname);
+  const invitacionPage = isPanelInvitacionPath(pathname);
+  const showJourneyChrome =
+    !journeyHome &&
+    !postPaymentPage &&
+    !eventoPage &&
+    !invitadosPage &&
+    !programaPage &&
+    !experienciaPage &&
+    !equipoPage &&
+    !finanzasPage &&
+    !invitacionPage;
   const [theme, setTheme] = useState<JourneyThemeId>("relax");
 
   useEffect(() => {
@@ -135,8 +180,8 @@ export function PanelShell({
                 {unlockBanner}
               </div>
             ) : null}
-            {!pathname.startsWith("/panel/experiencia") && !journeyHome && !postPaymentPage ? <JourneyHeader /> : null}
-            {!journeyHome && !postPaymentPage ? (
+            {!pathname.startsWith("/panel/experiencia") && showJourneyChrome ? <JourneyHeader /> : null}
+            {showJourneyChrome ? (
               <div className="mt-4 md:mt-6">
                 <JourneyPhasesBar
                   phase={journeyPhase}
@@ -147,7 +192,7 @@ export function PanelShell({
             ) : null}
             <div
               className={`transition-all duration-300 ease-out ${
-                !journeyHome && !postPaymentPage ? "mt-6" : ""
+                showJourneyChrome ? "mt-6" : ""
               }`}
             >
               {children}

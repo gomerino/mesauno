@@ -13,12 +13,14 @@ export default function PanelHomePage({
 }) {
   const welcome = searchParams?.welcome;
   const mockPayment = searchParams?.mockPayment;
+  const focus = searchParams?.focus;
 
   const forceFreshFromWelcome =
     welcome === "1" || welcome === "true" || (Array.isArray(welcome) && welcome.includes("1"));
   const rawMockPayment =
     typeof mockPayment === "string" ? mockPayment : Array.isArray(mockPayment) ? mockPayment[0] : undefined;
   const mockPaymentStatus = isMockPaymentStatus(rawMockPayment) ? rawMockPayment : null;
+  const focusTarget = typeof focus === "string" ? focus : Array.isArray(focus) ? focus[0] : null;
   const forceFresh = forceFreshFromWelcome || Boolean(mockPaymentStatus);
   const optimisticPlanActive = process.env.NODE_ENV === "development" && mockPaymentStatus === "approved";
   const optimisticPaymentStatus = process.env.NODE_ENV === "development" ? mockPaymentStatus : null;
@@ -34,6 +36,7 @@ export default function PanelHomePage({
         showSuccessHero={forceFreshFromWelcome}
         optimisticPlanActive={optimisticPlanActive}
         optimisticPaymentStatus={optimisticPaymentStatus}
+        focusTarget={focusTarget}
       />
     </>
   );

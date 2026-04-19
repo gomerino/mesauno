@@ -1,6 +1,5 @@
 "use client";
 
-import { ExperienciaHeader } from "@/components/panel/experiencia/ExperienciaHeader";
 import { ExperienceCard } from "@/components/panel/experiencia/ExperienceCard";
 import Link from "next/link";
 
@@ -13,10 +12,8 @@ export function ExperienciaPageClient({ isPaid }: Props) {
 
   return (
     <div className="animate-fadeIn pb-4">
-      <ExperienciaHeader />
-
       <div
-        className={`mb-8 rounded-2xl border px-4 py-3 transition-all duration-300 sm:px-5 sm:py-4 ${
+        className={`mb-6 rounded-2xl border px-4 py-3 transition-all duration-300 sm:px-5 sm:py-4 ${
           locked
             ? "border-amber-500/20 bg-amber-500/[0.06] text-amber-50/95"
             : "border-emerald-500/25 bg-emerald-500/[0.07] text-emerald-50/95"
@@ -46,7 +43,7 @@ export function ExperienciaPageClient({ isPaid }: Props) {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-7 lg:gap-8">
         <ExperienceCard
           title="Boarding ✈️"
-          description="Mandá tus invitaciones y empezá el viaje con tus invitados"
+          description="Envía tus invitaciones y comienza el viaje con tus invitados"
           icon={<span aria-hidden>✈️</span>}
           status={locked ? "locked" : "active"}
         >

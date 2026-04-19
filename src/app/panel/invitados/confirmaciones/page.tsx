@@ -1,6 +1,7 @@
-import { CouplePageHeader } from "@/components/app/CouplePageHeader";
 import { EmptyStateCard } from "@/components/app/EmptyStateCard";
-import { PanelSubpageChrome } from "@/components/panel/PanelSubpageChrome";
+import { PanelPageContainer } from "@/components/panel/PanelPageContainer";
+import { PanelPageHeader } from "@/components/panel/PanelPageHeader";
+import { PanelSubpageProgress } from "@/components/panel/PanelSubpageProgress";
 import { createClient } from "@/lib/supabase/server";
 import { selectEventoForMember } from "@/lib/evento-membership";
 import { fetchInvitadosPanelRows } from "@/lib/panel-invitados";
@@ -23,7 +24,7 @@ function Table({
       <h2 className={`font-display text-xl font-bold ${accent}`}>
         {title} ({rows.length})
       </h2>
-      <div className="mt-3 overflow-x-auto rounded-xl border border-white/10 bg-white/5">
+      <div className="mt-3 overflow-x-auto rounded-2xl border border-white/10 bg-white/5">
         <table className="w-full min-w-[480px] text-left text-sm text-slate-200">
           <thead>
             <tr className="border-b border-white/10 text-xs uppercase text-slate-500">
@@ -70,23 +71,27 @@ export default async function InvitadosConfirmacionesPage() {
   const pendientes = list.filter((i) => !i.rsvp_estado || i.rsvp_estado === "pendiente");
 
   return (
-    <PanelSubpageChrome>
-      <CouplePageHeader
+    <PanelPageContainer>
+      <PanelPageHeader
         eyebrow="Respuestas"
         title="¿Quién viene?"
         subtitle="Confirmaciones, pendientes y quienes no podrán asistir, según lo que respondan por la invitación."
       />
 
+      <PanelSubpageProgress />
+
       {list.length === 0 ? (
-        <EmptyStateCard
-          title="Aún no hay invitados"
-          description="Carga tu lista en Invitados para empezar a recibir confirmaciones."
-          actionHref="/panel/invitados"
-          actionLabel="Ir a Invitados"
-        />
+        <div className="mt-6">
+          <EmptyStateCard
+            title="Aún no hay invitados"
+            description="Cargá tu lista en Invitados para empezar a recibir confirmaciones."
+            actionHref="/panel/invitados"
+            actionLabel="Ir a Invitados"
+          />
+        </div>
       ) : (
         <>
-          <div className="mt-8 flex flex-wrap gap-4">
+          <div className="mt-6 flex flex-wrap gap-4">
             <div className="rounded-xl border border-teal-500/30 bg-teal-500/10 px-4 py-3">
               <p className="text-xs uppercase text-teal-200/80">Confirmaron</p>
               <p className="font-display text-2xl font-bold text-teal-200">{confirmados.length}</p>
@@ -108,11 +113,11 @@ export default async function InvitadosConfirmacionesPage() {
           <p className="mt-10 text-center text-sm text-slate-500">
             ¿Falta alguien en la lista?{" "}
             <Link href="/panel/invitados" className="text-teal-300 underline hover:text-teal-200">
-              Añadir invitados
+              Agregar invitados
             </Link>
           </p>
         </>
       )}
-    </PanelSubpageChrome>
+    </PanelPageContainer>
   );
 }

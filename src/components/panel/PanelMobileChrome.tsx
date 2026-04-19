@@ -31,7 +31,7 @@ export function PanelMobileBottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.08] bg-[#070b14]/95 pb-[env(safe-area-inset-bottom)] pt-1 backdrop-blur-xl md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-[500] border-t border-white/[0.08] bg-[#070b14]/95 pb-[env(safe-area-inset-bottom)] pt-1 backdrop-blur-xl md:hidden"
       aria-label="Navegación del viaje"
     >
       <div className="mx-auto flex h-14 max-w-lg items-center justify-between gap-1 px-1">

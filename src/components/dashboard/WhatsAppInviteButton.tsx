@@ -1,24 +1,12 @@
 "use client";
 
+import { buildInvitationUrl } from "@/lib/invitation-url";
+import { trackEvent } from "@/lib/analytics";
 import { useCallback, useMemo, useState } from "react";
 
 /** Deja solo dígitos para `wa.me` (formato internacional sin +). */
 export function sanitizeWhatsAppPhone(raw: string): string {
   return raw.replace(/\D/g, "");
-}
-
-function invitationBaseUrl(): string {
-  const fromEnv = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (fromEnv) {
-    return fromEnv.replace(/\/$/, "");
-  }
-  return "https://mesauno.vercel.app";
-}
-
-function buildInvitationUrl(tokenAcceso: string): string {
-  const base = invitationBaseUrl();
-  const segment = encodeURIComponent(tokenAcceso);
-  return `${base}/invitacion/${segment}`;
 }
 
 function buildMessage(nombreInvitado: string, invitationUrl: string): string {
@@ -64,6 +52,11 @@ export function WhatsAppInviteButton({ nombreInvitado, telefono, tokenAcceso, cl
         return;
       }
       setSent(true);
+      trackEvent("invite_link_copied", {
+        source: "invitados_list",
+        method: "whatsapp",
+        has_invitado_id: true,
+      });
     },
     [phoneDigits]
   );

@@ -1,10 +1,13 @@
 "use client";
 
+import { BulkImportInvitados } from "@/components/BulkImportInvitados";
+import { CopyInviteLinkButton } from "@/components/dashboard/CopyInviteLinkButton";
 import { WhatsAppInviteButton } from "@/components/dashboard/WhatsAppInviteButton";
 import type { Invitado } from "@/types/database";
 import { nombresAcompanantes, sortInvitadoAcompanantes } from "@/lib/invitado-acompanantes";
 import { restriccionesFromDb, restriccionesToDb } from "@/lib/restricciones-alimenticias";
 import { supabaseErrorMessage } from "@/lib/supabase-error";
+import { trackEvent } from "@/lib/analytics";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -86,6 +89,7 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
   const supabase = useMemo(() => createClient(), []);
   const [rows, setRows] = useState<Invitado[]>(initialInvitados);
   const [modalOpen, setModalOpen] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
 
   useEffect(() => {
     if (modalOpen) return;
@@ -160,6 +164,19 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
       setFormError("El nombre es obligatorio");
       return;
     }
+    const normalizedEmail = form.email.trim().toLowerCase();
+    const normalizedName = form.nombre.trim().toLowerCase();
+    const duplicate = rows.find((r) => {
+      if (editingId && r.id === editingId) return false;
+      const sameEmail =
+        normalizedEmail.length > 0 && (r.email ?? "").trim().toLowerCase() === normalizedEmail;
+      const sameName = (r.nombre_pasajero ?? "").trim().toLowerCase() === normalizedName;
+      return sameEmail || sameName;
+    });
+    if (duplicate) {
+      setFormError("Este invitado ya existe. Revisa nombre o correo.");
+      return;
+    }
     setSaving(true);
     setFormError(null);
     const {
@@ -230,10 +247,21 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
     }
 
     const full = await fetchInvitadoFull(newId);
+    const isFirstGuest = rows.length === 0;
     setSaving(false);
     if (full) {
       setRows((r) => [full, ...r]);
     }
+    const fromMission =
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("from") === "mission";
+    trackEvent("guest_created", {
+      is_first_guest: isFirstGuest,
+      from_mission: fromMission,
+      has_email: Boolean(payload.email),
+      has_phone: Boolean(payload.telefono),
+      companions_count: form.acompanantes.filter((n) => n.trim().length > 0).length,
+    });
     closeModal();
     router.refresh();
   }
@@ -283,7 +311,14 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
+      <div className="flex flex-wrap justify-end gap-2">
+        <button
+          type="button"
+          onClick={() => setBulkOpen(true)}
+          className="rounded-full border border-white/15 bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-slate-200 hover:bg-white/10"
+        >
+          Importar lista
+        </button>
         <button
           type="button"
           onClick={openCreate}
@@ -340,6 +375,11 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
                           {sendFlash.msg}
                         </span>
                       )}
+                      <CopyInviteLinkButton
+                        tokenAcceso={String(row.token_acceso ?? row.id)}
+                        source="invitados_list"
+                        invitadoId={row.id}
+                      />
                       <WhatsAppInviteButton
                         nombreInvitado={row.nombre_pasajero ?? ""}
                         telefono={row.telefono ?? ""}
@@ -378,19 +418,21 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
 
       {modalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-3 pb-[calc(env(safe-area-inset-bottom)+56px+16px)] backdrop-blur-sm sm:items-center sm:p-4 sm:pb-4"
           onClick={(e) => e.target === e.currentTarget && closeModal()}
         >
-          <div
-            className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-xl"
+          <form
+            onSubmit={handleSave}
+            className="flex max-h-[78vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-xl animate-fadeIn sm:max-h-[80vh]"
             role="dialog"
             aria-modal="true"
             aria-labelledby="invitado-form-title"
           >
-            <h2 id="invitado-form-title" className="font-display text-xl font-bold text-white">
-              {editingId ? "Editar persona" : "Añadir invitado"}
-            </h2>
-            <form onSubmit={handleSave} className="mt-6 space-y-4">
+            <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-6">
+              <h2 id="invitado-form-title" className="font-display text-xl font-bold text-white">
+                {editingId ? "Editar persona" : "Añadir invitado"}
+              </h2>
+              <div className="mt-6 space-y-4 pb-4">
               <div>
                 <label className={label}>Nombre (titular de la invitación)</label>
                 <input
@@ -488,8 +530,10 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
                   {formError}
                 </p>
               )}
-
-              <div className="flex gap-3 pt-2">
+            </div>
+            </div>
+            <div className="sticky bottom-0 border-t border-white/10 bg-slate-900 px-6 py-4">
+              <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={closeModal}
@@ -505,10 +549,23 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
                   {saving ? "Guardando…" : "Guardar"}
                 </button>
               </div>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       )}
+
+      <BulkImportInvitados
+        open={bulkOpen}
+        onClose={() => setBulkOpen(false)}
+        eventoId={eventoId}
+        existing={rows.map((r) => ({
+          nombre_pasajero: r.nombre_pasajero,
+          email: r.email,
+        }))}
+        onImported={() => {
+          router.refresh();
+        }}
+      />
     </div>
   );
 }

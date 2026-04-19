@@ -105,25 +105,14 @@ function rangoPrecioBounds(
   }
 }
 
-/** Detalle completo para `/marketplace/[slug]`. Devuelve null si no existe o no está aprobado. */
-export async function obtenerProveedorPorSlug(
+async function cargarServiciosYMediosProveedor(
   supabase: SupabaseClient,
-  slug: string,
+  proveedor: Proveedor,
 ): Promise<{
   proveedor: Proveedor;
   servicios: ProveedorServicio[];
   medios: ProveedorMedio[];
-} | null> {
-  const { data: proveedor, error: errProveedor } = await supabase
-    .from("proveedores")
-    .select("*")
-    .eq("slug", slug)
-    .eq("estado", "aprobado")
-    .maybeSingle();
-
-  if (errProveedor) throw errProveedor;
-  if (!proveedor) return null;
-
+}> {
   const [{ data: servicios }, { data: medios }] = await Promise.all([
     supabase
       .from("proveedor_servicios")
@@ -139,10 +128,54 @@ export async function obtenerProveedorPorSlug(
   ]);
 
   return {
-    proveedor: proveedor as Proveedor,
+    proveedor,
     servicios: (servicios ?? []) as ProveedorServicio[],
     medios: (medios ?? []) as ProveedorMedio[],
   };
+}
+
+/**
+ * Detalle para `/marketplace/[slug]`.
+ * - Público anónimo: solo si `estado = aprobado`.
+ * - Si `viewerUserId` coincide con el dueño del perfil: cualquier estado (vista previa / panel).
+ */
+export async function obtenerProveedorPorSlug(
+  supabase: SupabaseClient,
+  slug: string,
+  viewerUserId?: string | null,
+): Promise<{
+  proveedor: Proveedor;
+  servicios: ProveedorServicio[];
+  medios: ProveedorMedio[];
+} | null> {
+  const s = slug.trim();
+  if (!s) return null;
+
+  if (viewerUserId) {
+    const { data: propio, error: errPropio } = await supabase
+      .from("proveedores")
+      .select("*")
+      .eq("slug", s)
+      .eq("user_id", viewerUserId)
+      .maybeSingle();
+
+    if (errPropio) throw errPropio;
+    if (propio) {
+      return cargarServiciosYMediosProveedor(supabase, propio as Proveedor);
+    }
+  }
+
+  const { data: proveedor, error: errProveedor } = await supabase
+    .from("proveedores")
+    .select("*")
+    .eq("slug", s)
+    .eq("estado", "aprobado")
+    .maybeSingle();
+
+  if (errProveedor) throw errProveedor;
+  if (!proveedor) return null;
+
+  return cargarServiciosYMediosProveedor(supabase, proveedor as Proveedor);
 }
 
 /**

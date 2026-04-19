@@ -1,5 +1,6 @@
-import { CouplePageHeader } from "@/components/app/CouplePageHeader";
-import { PanelSubpageChrome } from "@/components/panel/PanelSubpageChrome";
+import { PanelPageContainer } from "@/components/panel/PanelPageContainer";
+import { PanelPageHeader } from "@/components/panel/PanelPageHeader";
+import { PanelSubpageProgress } from "@/components/panel/PanelSubpageProgress";
 import { createClient } from "@/lib/supabase/server";
 import { selectEventoForMember } from "@/lib/evento-membership";
 import { AportesManager } from "@/components/panel/AportesManager";
@@ -17,23 +18,23 @@ function pagoBanner(pago: string | undefined) {
         role="status"
       >
         <strong className="font-semibold text-white">Pago recibido.</strong> Estamos confirmando tu suscripción; si no ves
-        el cambio en unos minutos, recarga esta página o el inicio.
+        el cambio en unos minutos, recargá esta página o el inicio.
       </div>
     );
   }
   if (pago === "pendiente") {
     return (
       <div className="mb-6 rounded-xl border border-amber-500/35 bg-amber-500/15 px-4 py-3 text-sm text-amber-50" role="status">
-        <strong className="font-semibold text-white">Pago en proceso.</strong> Vuelve más tarde; te avisaremos cuando
-        quede acreditado.
+        <strong className="font-semibold text-white">Pago en proceso.</strong> Volvé más tarde; te avisamos cuando quede
+        acreditado.
       </div>
     );
   }
   if (pago === "fallido") {
     return (
       <div className="mb-6 rounded-xl border border-red-500/35 bg-red-500/10 px-4 py-3 text-sm text-red-100" role="status">
-        <strong className="font-semibold text-white">Pago no completado.</strong> Puedes intentar de nuevo cuando
-        quieras con el botón de activar suscripción en el aviso de trial (si aplica).
+        <strong className="font-semibold text-white">Pago no completado.</strong> Puedes intentarlo nuevamente cuando quieras
+        con el botón de activar suscripción en el aviso de trial (si aplica).
       </div>
     );
   }
@@ -83,16 +84,18 @@ export default async function PanelFinanzasPage({ searchParams }: { searchParams
   }
 
   return (
-    <PanelSubpageChrome>
+    <PanelPageContainer>
       {pagoBanner(pago)}
 
-      <CouplePageHeader
+      <PanelPageHeader
         eyebrow="Finanzas"
         title="Regalos y pagos"
         subtitle="Datos para transferencias, registro de aportes y, si aplica, el estado de tu suscripción. Todo en un solo lugar."
       />
 
-      <div className="mt-10 space-y-10">
+      <PanelSubpageProgress />
+
+      <div className="mt-6 space-y-8 md:mt-8 md:space-y-10">
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
           <h2 className="font-display text-lg font-bold text-white">Datos para transferencia</h2>
           <p className="mt-2 text-sm text-slate-400">
@@ -145,6 +148,6 @@ export default async function PanelFinanzasPage({ searchParams }: { searchParams
           </div>
         )}
       </div>
-    </PanelSubpageChrome>
+    </PanelPageContainer>
   );
 }

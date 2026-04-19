@@ -75,7 +75,7 @@ export function RegistroProveedorFlow({
     if (draft) {
       setForm((f) => ({
         ...f,
-        email: draft.email ?? (userEmail ?? ""),
+        email: draft.email ?? "",
         nombreNegocio: draft.nombreNegocio ?? "",
         categoriaPrincipal: draft.categoriaPrincipal ?? "",
         region: draft.region ?? "",
@@ -87,8 +87,6 @@ export function RegistroProveedorFlow({
         sitioWeb: draft.sitioWeb ?? "",
       }));
       setStep(draft.step ?? 1);
-    } else if (userEmail) {
-      setForm((f) => ({ ...f, email: userEmail }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -316,7 +314,7 @@ export function RegistroProveedorFlow({
             form={form}
             setField={setField}
             errors={errors}
-            userEmailReadonly={Boolean(userEmail)}
+            sesionPreviaEmail={userEmail}
           />
         )}
         {step === 2 && (
@@ -429,8 +427,8 @@ function PasoCuenta({
   form,
   setField,
   errors,
-  userEmailReadonly,
-}: PasoProps & { userEmailReadonly: boolean }) {
+  sesionPreviaEmail,
+}: PasoProps & { sesionPreviaEmail: string | null }) {
   return (
     <div className="space-y-5">
       <div>
@@ -440,46 +438,45 @@ function PasoCuenta({
         </p>
       </div>
 
+      {sesionPreviaEmail && (
+        <div className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-100">
+          Tienes una sesión activa como{" "}
+          <strong className="font-semibold">{sesionPreviaEmail}</strong>. Estás
+          creando una cuenta nueva como proveedor: al finalizar, se iniciará
+          sesión con el correo que registres aquí.
+        </div>
+      )}
+
       <Field label="Correo electrónico" error={errors.email}>
         <input
           type="email"
           autoComplete="email"
-          disabled={userEmailReadonly}
           value={form.email}
           onChange={(e) => setField("email", e.target.value)}
           className="input-jurnex"
           placeholder="hola@tuestudio.cl"
         />
-        {userEmailReadonly && (
-          <p className="mt-1 text-xs text-slate-500">
-            Ya tienes sesión con este correo — seguimos con él.
-          </p>
-        )}
       </Field>
 
-      {!userEmailReadonly && (
-        <>
-          <Field label="Contraseña" error={errors.password}>
-            <input
-              type="password"
-              autoComplete="new-password"
-              value={form.password}
-              onChange={(e) => setField("password", e.target.value)}
-              className="input-jurnex"
-              placeholder="Mínimo 8 caracteres"
-            />
-          </Field>
-          <Field label="Confirma tu contraseña" error={errors.passwordConfirm}>
-            <input
-              type="password"
-              autoComplete="new-password"
-              value={form.passwordConfirm}
-              onChange={(e) => setField("passwordConfirm", e.target.value)}
-              className="input-jurnex"
-            />
-          </Field>
-        </>
-      )}
+      <Field label="Contraseña" error={errors.password}>
+        <input
+          type="password"
+          autoComplete="new-password"
+          value={form.password}
+          onChange={(e) => setField("password", e.target.value)}
+          className="input-jurnex"
+          placeholder="Mínimo 8 caracteres"
+        />
+      </Field>
+      <Field label="Confirma tu contraseña" error={errors.passwordConfirm}>
+        <input
+          type="password"
+          autoComplete="new-password"
+          value={form.passwordConfirm}
+          onChange={(e) => setField("passwordConfirm", e.target.value)}
+          className="input-jurnex"
+        />
+      </Field>
     </div>
   );
 }

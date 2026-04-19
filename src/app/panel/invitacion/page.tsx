@@ -1,5 +1,6 @@
-import { CouplePageHeader } from "@/components/app/CouplePageHeader";
-import { PanelSubpageChrome } from "@/components/panel/PanelSubpageChrome";
+import { PanelPageContainer } from "@/components/panel/PanelPageContainer";
+import { PanelPageHeader } from "@/components/panel/PanelPageHeader";
+import { PanelSubpageProgress } from "@/components/panel/PanelSubpageProgress";
 import { loadPanelProgressBundle } from "@/lib/panel-progress-load";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
@@ -41,11 +42,11 @@ export default async function PanelInvitacionHubPage() {
 
   const estadoTexto =
     estado === "no_evento"
-      ? "Primero creá la ficha del evento con nombres y fecha."
+      ? "Primero crea la ficha del evento con nombres y fecha."
       : estado === "sin_invitados"
-        ? "Añadí al menos una persona en tu lista para generar su enlace de invitación."
+        ? "Añade al menos una persona a tu lista para generar su enlace de invitación."
         : estado === "lista"
-          ? "Tu invitación está lista. Podés verla y compartirla cuando quieras."
+          ? "Tu invitación está lista. Puedes verla y compartirla cuando quieras."
           : "Ya hubo correos enviados o alguien abrió el enlace.";
 
   const primaryHref =
@@ -65,12 +66,14 @@ export default async function PanelInvitacionHubPage() {
           : "Vista previa";
 
   return (
-    <PanelSubpageChrome>
-      <CouplePageHeader
+    <PanelPageContainer>
+      <PanelPageHeader
         eyebrow="Invitación"
         title="Tu invitación"
-        subtitle="Estado y accesos. El diseño público sigue igual; aquí solo ves el resumen y los enlaces."
+        subtitle="Estado y accesos. El diseño público sigue igual; acá solo ves el resumen y los enlaces."
       />
+
+      <PanelSubpageProgress />
 
       <div className="mt-6 md:hidden">
         <Link
@@ -82,7 +85,7 @@ export default async function PanelInvitacionHubPage() {
       </div>
 
       <div
-        className="mt-6 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-4 md:mt-8"
+        className="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 md:mt-8"
         role="status"
       >
         <p className="text-[10px] font-semibold uppercase tracking-wide text-teal-400/90">Estado</p>
@@ -122,6 +125,6 @@ export default async function PanelInvitacionHubPage() {
           Compartir desde el panel
         </Link>
       </div>
-    </PanelSubpageChrome>
+    </PanelPageContainer>
   );
 }
