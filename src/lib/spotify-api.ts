@@ -14,6 +14,8 @@ type TokenResponse = {
   access_token: string;
   expires_in: number;
   refresh_token?: string;
+  /** Espacios separados; opcional en refresh. */
+  scope?: string;
 };
 
 async function postForm(url: string, body: string, headers: Record<string, string>): Promise<TokenResponse | null> {
@@ -28,6 +30,13 @@ async function postForm(url: string, body: string, headers: Record<string, strin
     return null;
   }
   return (await res.json()) as TokenResponse;
+}
+
+/** Si `scope` viene vacío o no viene, no se asume ausencia de permisos (Spotify a veces omite el campo). */
+export function spotifyGrantedScopesIncludePlaylistModify(scope: string | null | undefined): boolean {
+  if (scope == null || String(scope).trim() === "") return true;
+  const parts = String(scope).trim().split(/\s+/);
+  return parts.includes("playlist-modify-public") || parts.includes("playlist-modify-private");
 }
 
 export async function spotifyClientCredentialsAccessToken(): Promise<string | null> {
@@ -185,6 +194,12 @@ export function mensajeUsuarioSpotifyAddTrack(status: number, spotifyMessage: st
     return "Spotify pidió esperar un momento por demasiados intentos. Prueba de nuevo en unos segundos.";
   }
   if (status === 403) {
+    if (!m.trim() || /^forbidden\.?$/i.test(m)) {
+      return (
+        "Spotify no permitió modificar la playlist (403). Suele deberse a permisos viejos: en https://www.spotify.com/account/apps quita el acceso a esta app y vuelve a vincular Spotify desde el panel. " +
+        "Si la lista está en modo colaborativo, prueba una playlist nueva sin colaboración."
+      );
+    }
     if (/scope|insufficient|privilege|permission/i.test(m)) {
       return "Spotify no permitió modificar la playlist (faltan permisos). Pulsa «Volver a autorizar Spotify» en el panel del evento y acepta los permisos.";
     }

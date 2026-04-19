@@ -13,7 +13,9 @@ import {
   mensajeUsuarioSpotifyAddTrack,
   spotifyAddTracksToPlaylist,
   spotifyFetchPlaylistOwner,
+  spotifyGrantedScopesIncludePlaylistModify,
   spotifyRefreshAccessToken,
+  type SpotifyPlaylistMetaResult,
 } from "@/lib/spotify-api";
 import { parseSpotifyPlaylistId } from "@/lib/spotify-playlist-id";
 import { rateLimitPlaylistAdd } from "@/lib/spotify-rate-limit";
@@ -72,10 +74,25 @@ export async function addTrackToPlaylist(invitationAccessToken: string, track: T
     return { ok: false, error: "No se pudo autorizar con Spotify. Los novios deben volver a conectar." };
   }
 
+  if (
+    refreshed.scope != null &&
+    String(refreshed.scope).trim() !== "" &&
+    !spotifyGrantedScopesIncludePlaylistModify(refreshed.scope)
+  ) {
+    return {
+      ok: false,
+      error:
+        "Spotify no otorgó permiso para editar playlists con esta conexión. En https://www.spotify.com/account/apps quita el acceso a esta aplicación y, en el panel del evento, vuelve a vincular Spotify aceptando todos los permisos.",
+    };
+  }
+
   await spotifyUpdateRefreshTokenIfPresent(db, invitado.evento_id, refreshed.refresh_token);
 
+  let playlistMeta: SpotifyPlaylistMetaResult | null = null;
+  let ownerMatches = true;
+
   if (creds.spotify_user_id) {
-    const playlistMeta = await spotifyFetchPlaylistOwner(refreshed.access_token, playlistId);
+    playlistMeta = await spotifyFetchPlaylistOwner(refreshed.access_token, playlistId);
     if (!playlistMeta.ok) {
       return {
         ok: false,
@@ -83,7 +100,7 @@ export async function addTrackToPlaylist(invitationAccessToken: string, track: T
           "No pudimos validar la playlist del evento. Los novios deben revisar el enlace en el panel.",
       };
     }
-    const ownerMatches = playlistMeta.ownerId === creds.spotify_user_id;
+    ownerMatches = playlistMeta.ownerId === creds.spotify_user_id;
     if (!ownerMatches && !playlistMeta.collaborative) {
       return {
         ok: false,
@@ -91,14 +108,23 @@ export async function addTrackToPlaylist(invitationAccessToken: string, track: T
           "La playlist del evento no coincide con la cuenta de Spotify vinculada. Los novios deben revisar la configuración en el panel.",
       };
     }
+    if (playlistMeta.collaborative && !ownerMatches) {
+      return {
+        ok: false,
+        error:
+          "Esta playlist es colaborativa y la cuenta vinculada no es la dueña. Spotify no permite añadir canciones desde la app en ese caso. Usa una playlist cuya dueña sea la cuenta vinculada, o vincula la cuenta del dueño.",
+      };
+    }
   }
 
   const added = await spotifyAddTracksToPlaylist(refreshed.access_token, playlistId, [uri]);
   if (!added.ok) {
-    return {
-      ok: false,
-      error: mensajeUsuarioSpotifyAddTrack(added.status, added.spotifyMessage),
-    };
+    let error = mensajeUsuarioSpotifyAddTrack(added.status, added.spotifyMessage);
+    if (added.status === 403 && playlistMeta?.ok && playlistMeta.collaborative && ownerMatches) {
+      error +=
+        " Si la lista está en modo colaborativo, prueba desactivar la colaboración o crea una playlist nueva sin colaboración y actualízala en el panel.";
+    }
+    return { ok: false, error };
   }
 
   await playlistInsertAporte(db, {
