@@ -20,6 +20,31 @@ export async function spotifyGetCredentials(
   return data as EventoSpotifyRow | null;
 }
 
+/** Solo servidor (p. ej. service_role). No serializar `refresh_token` al cliente. */
+export type SpotifyPanelPublicState = {
+  connected: boolean;
+  playlistId: string | null;
+};
+
+export async function spotifyGetPanelPublicState(
+  db: SupabaseClient,
+  eventoId: string
+): Promise<SpotifyPanelPublicState> {
+  const { data, error } = await db
+    .from("evento_spotify")
+    .select("playlist_id, refresh_token")
+    .eq("evento_id", eventoId)
+    .maybeSingle();
+  if (error || !data) {
+    return { connected: false, playlistId: null };
+  }
+  const row = data as Pick<EventoSpotifyRow, "playlist_id" | "refresh_token">;
+  return {
+    connected: Boolean(row.refresh_token?.trim()),
+    playlistId: row.playlist_id?.trim() || null,
+  };
+}
+
 export async function spotifyUpsertRefreshToken(
   db: SupabaseClient,
   eventoId: string,
@@ -220,4 +245,154 @@ export async function playlistListRecentPublic(
       guest_first_name: first,
     };
   });
+}
+
+export type PlaylistTopPublic = {
+  track_uri: string;
+  personas: number;
+  track_name: string | null;
+  artist_names: string | null;
+  album_name: string | null;
+  image_url: string | null;
+};
+
+export async function playlistListTopPublic(
+  db: SupabaseClient,
+  eventoId: string,
+  limit: number
+): Promise<PlaylistTopPublic[]> {
+  const { data: aportesRaw, error: aErr } = await db
+    .from("playlist_aportes")
+    .select("track_uri, invitado_id, track_name, artist_names, album_name, image_url, created_at")
+    .eq("evento_id", eventoId);
+  if (aErr) {
+    console.error("[playlist ranking] aportes", aErr.message);
+    return [];
+  }
+  const { data: apoyosRaw, error: oErr } = await db.from("playlist_apoyos").select("track_uri, invitado_id").eq("evento_id", eventoId);
+  if (oErr) {
+    console.warn("[playlist ranking] apoyos", oErr.message);
+  }
+  type AporteR = {
+    track_uri: string;
+    invitado_id: string;
+    track_name: string | null;
+    artist_names: string | null;
+    album_name: string | null;
+    image_url: string | null;
+    created_at: string;
+  };
+  const aportes = (aportesRaw ?? []) as AporteR[];
+  const apoyos = (apoyosRaw ?? []) as Array<{ track_uri: string; invitado_id: string }>;
+
+  const byTrack = new Map<
+    string,
+    {
+      voters: Set<string>;
+      meta: {
+        track_name: string | null;
+        artist_names: string | null;
+        album_name: string | null;
+        image_url: string | null;
+        t: number;
+      } | null;
+    }
+  >();
+
+  for (const a of aportes) {
+    const uri = a.track_uri;
+    if (!byTrack.has(uri)) {
+      byTrack.set(uri, { voters: new Set(), meta: null });
+    }
+    const entry = byTrack.get(uri)!;
+    entry.voters.add(a.invitado_id);
+    const ts = new Date(a.created_at).getTime();
+    if (!entry.meta || ts >= entry.meta.t) {
+      entry.meta = {
+        track_name: a.track_name,
+        artist_names: a.artist_names,
+        album_name: a.album_name,
+        image_url: a.image_url,
+        t: ts,
+      };
+    }
+  }
+  for (const o of apoyos) {
+    if (!byTrack.has(o.track_uri)) {
+      byTrack.set(o.track_uri, { voters: new Set(), meta: null });
+    }
+    byTrack.get(o.track_uri)!.voters.add(o.invitado_id);
+  }
+
+  const rows: PlaylistTopPublic[] = [];
+  byTrack.forEach(({ voters, meta }, track_uri) => {
+    if (voters.size === 0) return;
+    rows.push({
+      track_uri,
+      personas: voters.size,
+      track_name: meta?.track_name ?? null,
+      artist_names: meta?.artist_names ?? null,
+      album_name: meta?.album_name ?? null,
+      image_url: meta?.image_url ?? null,
+    });
+  });
+  rows.sort((a, b) => b.personas - a.personas || (a.track_name ?? "").localeCompare(b.track_name ?? ""));
+  return rows.slice(0, limit);
+}
+
+export async function playlistInvitadoApoyoUris(
+  db: SupabaseClient,
+  eventoId: string,
+  invitadoId: string
+): Promise<Set<string>> {
+  const { data, error } = await db
+    .from("playlist_apoyos")
+    .select("track_uri")
+    .eq("evento_id", eventoId)
+    .eq("invitado_id", invitadoId);
+  if (error) {
+    console.error("[playlist_apoyos] list uris", error.message);
+    return new Set();
+  }
+  return new Set((data ?? []).map((r: { track_uri: string }) => r.track_uri));
+}
+
+export async function playlistHayAporteParaTrack(
+  db: SupabaseClient,
+  eventoId: string,
+  trackUri: string
+): Promise<boolean> {
+  const { data, error } = await db
+    .from("playlist_aportes")
+    .select("id")
+    .eq("evento_id", eventoId)
+    .eq("track_uri", trackUri)
+    .limit(1)
+    .maybeSingle();
+  if (error) {
+    console.error("[playlist_aportes] exists", error.message);
+    return false;
+  }
+  return Boolean(data);
+}
+
+export async function playlistInsertApoyo(
+  db: SupabaseClient,
+  eventoId: string,
+  invitadoId: string,
+  trackUri: string
+): Promise<{ ok: true; already?: boolean } | { ok: false; error: string }> {
+  const { error } = await db.from("playlist_apoyos").insert({
+    evento_id: eventoId,
+    invitado_id: invitadoId,
+    track_uri: trackUri,
+  });
+  if (error) {
+    if (error.code === "23505") {
+      return { ok: true, already: true };
+    }
+    console.error("[playlist_apoyos] insert", error.message);
+    return { ok: false, error: error.message };
+  }
+  return { ok: true };
 }

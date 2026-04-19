@@ -21,6 +21,8 @@ export function LegacyTheme({
   albumFotos,
   musicColabEnabled,
   recentTracks,
+  topTracks,
+  apoyoTrackUris,
 }: InvitacionThemePageProps) {
   const motivoViaje = merged.motivo_viaje;
   const fechaEventoPrograma = merged.fecha_evento;
@@ -69,7 +71,12 @@ export function LegacyTheme({
             compact
           />
           {musicColabEnabled ? (
-            <InvitacionMusicaColaborativa invitationAccessToken={token} initialRecent={recentTracks} />
+            <InvitacionMusicaColaborativa
+              invitationAccessToken={token}
+              initialRecent={recentTracks}
+              initialTop={topTracks}
+              apoyoTrackUris={apoyoTrackUris}
+            />
           ) : null}
         </div>
       </main>

@@ -57,10 +57,17 @@ export function ExperienciaPageClient({ isPaid }: Props) {
 
         <ExperienceCard
           title="Ambiente del viaje 🎵"
-          description="Tus invitados pueden sumar canciones a la playlist"
+          description="Tus invitados pueden sumar canciones a la playlist oficial de Spotify cuando la configures en tu evento."
           icon={<span aria-hidden>🎵</span>}
           status={locked ? "locked" : "active"}
-        />
+        >
+          <Link
+            href="/panel/evento#musica-spotify"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-gradient-to-r from-[#1DB954] to-[#169c46] px-5 text-sm font-semibold text-black shadow-lg transition hover:brightness-110 active:scale-[0.99]"
+          >
+            Configurar música en Spotify
+          </Link>
+        </ExperienceCard>
 
         <ExperienceCard
           title="Recuerdos del viaje 📸"

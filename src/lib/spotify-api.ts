@@ -102,13 +102,22 @@ export async function spotifySearchTracks(accessToken: string, query: string, li
   }));
 }
 
+export type SpotifyAddTracksResult = { ok: true } | { ok: false; status: number; spotifyMessage: string };
+
+/**
+ * Añade tracks a una playlist. Requiere token del usuario con scopes `playlist-modify-*`
+ * y que pueda editar esa lista (dueño o colaborador en lista colaborativa).
+ */
 export async function spotifyAddTracksToPlaylist(
   accessToken: string,
   playlistId: string,
   trackUris: string[]
-): Promise<boolean> {
-  if (trackUris.length === 0) return false;
-  const res = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+): Promise<SpotifyAddTracksResult> {
+  if (trackUris.length === 0) {
+    return { ok: false, status: 400, spotifyMessage: "empty uris" };
+  }
+  const id = playlistId.trim();
+  const res = await fetch(`https://api.spotify.com/v1/playlists/${encodeURIComponent(id)}/tracks`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -119,9 +128,71 @@ export async function spotifyAddTracksToPlaylist(
   const bodyText = await res.text();
   if (!res.ok) {
     logSpotifyApiError("api/playlists/tracks (POST)", res.status, bodyText);
-    return false;
+    const spotifyMessage = extractSpotifyWebApiErrorMessage(bodyText);
+    return { ok: false, status: res.status, spotifyMessage };
   }
-  return true;
+  return { ok: true };
+}
+
+/** Mensaje `error.message` de la Web API (formato varía entre endpoints). */
+export function extractSpotifyWebApiErrorMessage(bodyText: string): string {
+  const raw = bodyText.trim();
+  if (!raw) return "";
+  try {
+    const j = JSON.parse(raw) as Record<string, unknown>;
+    const err = j.error;
+    if (typeof err === "string") return err.slice(0, 500);
+    if (err && typeof err === "object") {
+      const o = err as Record<string, unknown>;
+      if (typeof o.message === "string") return o.message.slice(0, 500);
+      const nested = o.error;
+      if (nested && typeof nested === "object" && typeof (nested as { message?: string }).message === "string") {
+        return String((nested as { message: string }).message).slice(0, 500);
+      }
+    }
+  } catch {
+    /* no JSON */
+  }
+  return raw.slice(0, 500);
+}
+
+/** Mensaje para UI (español); sin filtrar PII — solo status y texto de Spotify. */
+export function mensajeUsuarioSpotifyAddTrack(status: number, spotifyMessage: string): string {
+  const m = spotifyMessage.toLowerCase();
+  if (status === 401) {
+    return "La sesión con Spotify expiró. Quien organiza el evento debe volver a vincular la cuenta en el panel.";
+  }
+  if (status === 404) {
+    return "Spotify no encontró la playlist. Revisa en el panel que el enlace o el ID de la lista sean correctos.";
+  }
+  if (status === 429) {
+    return "Spotify pidió esperar un momento por demasiados intentos. Prueba de nuevo en unos segundos.";
+  }
+  if (status === 403) {
+    if (/scope|insufficient|privilege|permission/i.test(m)) {
+      return "Spotify no permitió modificar la playlist (faltan permisos). Pulsa «Volver a autorizar Spotify» en el panel del evento y acepta los permisos.";
+    }
+    if (/registered|developer dashboard|not registered|not allowed/i.test(m)) {
+      return "Spotify bloqueó la acción: en modo desarrollo, tu cuenta debe figurar en «Users and access» de la app en developer.spotify.com (mismo correo que la cuenta de Spotify vinculada).";
+    }
+    if (/restriction|market|territory|not available in/i.test(m)) {
+      return "Spotify no permite añadir esta canción en tu región o a esta playlist. Prueba con otra pista.";
+    }
+    if (/collaborative|owner|only the owner|cannot modify/i.test(m)) {
+      return "Spotify no permite editar esta lista con la cuenta vinculada. Crea una playlist nueva con esa cuenta en Spotify y pégala en el panel, o usa la lista que creó la app al conectar.";
+    }
+    return (
+      "Spotify rechazó añadir la canción (403). Lo más habitual: la app está en modo desarrollo y falta tu usuario en «Users and access» en developer.spotify.com; " +
+      "o la playlist no es de la cuenta que vinculaste (crea una lista nueva con esa cuenta y actualízala en el panel). " +
+      "También ayuda pulsar de nuevo «Vincular Spotify» en el panel."
+    );
+  }
+  if (status === 400) {
+    if (/invalid/i.test(m)) {
+      return "Spotify rechazó los datos de la canción. Prueba con otra pista o actualiza la página.";
+    }
+  }
+  return "Spotify no pudo añadir la canción. Si persiste, quien organiza el evento puede revisar la playlist y volver a conectar Spotify en el panel.";
 }
 
 export async function spotifyFetchCurrentUserId(

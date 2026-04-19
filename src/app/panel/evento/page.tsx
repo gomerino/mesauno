@@ -3,14 +3,17 @@ import { JourneyPhasesBar } from "@/components/panel/journey/JourneyPhasesBar";
 import { MissionContextBanner } from "@/components/panel/MissionContextBanner";
 import { PanelThemeSelector } from "@/components/panel/PanelThemeSelector";
 import { EventoForm } from "@/components/panel/EventoForm";
+import { SpotifyPlaylistConnect } from "@/components/panel/SpotifyPlaylistConnect";
 import { selectEventoForMember } from "@/lib/evento-membership";
 import { resolveJourneyPhase } from "@/lib/journey-phases";
 import { getJourneyPhasesProgressLines } from "@/lib/journey-cards-progress";
 import { isEventBasicsComplete } from "@/lib/panel-setup-progress";
 import { loadPanelProgressBundle } from "@/lib/panel-progress-load";
-import { createClient } from "@/lib/supabase/server";
+import { spotifyGetPanelPublicState } from "@/lib/spotify-credentials";
+import { createClient, createStrictServiceClient } from "@/lib/supabase/server";
 import type { Evento } from "@/types/database";
 import Link from "next/link";
+import { Suspense } from "react";
 
 function pickWelcome(raw: Record<string, string | string[] | undefined> | undefined): boolean {
   if (!raw) return false;
@@ -53,12 +56,21 @@ export default async function PanelEventoPage({
   const hasAccess = planStatus === "paid";
   let canCheckout = false;
   let prefillNombre = "";
+  let isAdmin = false;
   if (eventoForProgress?.id) {
-    const { data: isAdmin } = await supabase.rpc("user_is_evento_admin", { p_evento_id: eventoForProgress.id });
-    canCheckout = planStatus !== "paid" && Boolean(isAdmin);
+    const { data: admin } = await supabase.rpc("user_is_evento_admin", { p_evento_id: eventoForProgress.id });
+    isAdmin = Boolean(admin);
+    canCheckout = planStatus !== "paid" && isAdmin;
     const n1 = eventoForProgress.nombre_novio_1?.trim() ?? "";
     const n2 = eventoForProgress.nombre_novio_2?.trim() ?? "";
     prefillNombre = [n1, n2].filter(Boolean).join(" & ");
+  }
+
+  const eventoId = eventoForProgress?.id ?? null;
+  const strictDb = await createStrictServiceClient();
+  let spotifyState = { connected: false as boolean, playlistId: null as string | null };
+  if (strictDb && eventoId && isAdmin && hasAccess) {
+    spotifyState = await spotifyGetPanelPublicState(strictDb, eventoId);
   }
 
   return (
@@ -131,6 +143,32 @@ export default async function PanelEventoPage({
       <div className="mt-4">
         <EventoForm initial={(evento ?? null) as Evento | null} />
       </div>
+
+      {hasAccess && isAdmin && eventoId ? (
+        <div id="musica-spotify" className="mt-8 scroll-mt-24">
+          {!strictDb ? (
+            <p className="rounded-2xl border border-amber-500/25 bg-amber-950/20 px-4 py-3 text-sm text-amber-100/90">
+              La música colaborativa requiere configuración del servidor (service role). Si ves esto en producción,
+              contacta soporte.
+            </p>
+          ) : (
+            <Suspense
+              fallback={
+                <div
+                  className="h-40 animate-pulse rounded-2xl border border-green-500/15 bg-green-950/20"
+                  aria-hidden
+                />
+              }
+            >
+              <SpotifyPlaylistConnect
+                eventoId={eventoId}
+                spotifyConnected={spotifyState.connected}
+                initialPlaylistId={spotifyState.playlistId}
+              />
+            </Suspense>
+          )}
+        </div>
+      ) : null}
 
       <nav className="mt-6 flex flex-wrap gap-x-4 gap-y-2 border-t border-white/[0.06] pt-4 text-xs" aria-label="Ir a otros módulos">
         <Link href="/panel/programa" className="text-teal-400/90 hover:text-teal-300">

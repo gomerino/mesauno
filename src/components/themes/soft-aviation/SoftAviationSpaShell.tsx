@@ -49,6 +49,8 @@ export function SoftAviationSpaShell({
   albumFotos,
   musicColabEnabled,
   recentTracks,
+  topTracks,
+  apoyoTrackUris,
 }: InvitacionThemePageProps) {
   const trackingToken = invitado.token_acceso ?? invitado.id;
   const tituloNovios =
@@ -274,75 +276,100 @@ export function SoftAviationSpaShell({
         ) : null}
 
         {activeTab === "playlist" ? (
-          <div
-            key="playlist"
-            className="animate-fadeIn flex min-h-full flex-col items-center justify-center px-3 py-8 text-center"
-          >
-            <p className="mb-4 max-w-sm text-xs text-[#1A2B48]/65">Agrega una canción para la fiesta 🎶</p>
-            <div className="flex w-full max-w-md flex-col items-center gap-5">
+          <div key="playlist" className="animate-fadeIn w-full px-1 py-4">
+            <p className="mb-5 text-center text-xs leading-relaxed text-[#1A2B48]/70">
+              Escucha la playlist del evento y suma canciones para la fiesta.
+            </p>
+            <div className="mx-auto flex w-full max-w-md flex-col gap-8">
               {hasPlaylist ? (
-                <>
-                  {appleUrl ? (
-                    <Link
-                      href={appleUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex w-full max-w-sm flex-col items-center gap-3 rounded-2xl border-2 border-[#D4AF37] bg-[#1A2B48] px-6 py-6 shadow-md transition hover:brightness-110"
-                    >
-                      <span
-                        className="flex h-12 w-12 items-center justify-center rounded-full bg-[#D4AF37]/20 text-white ring-2 ring-[#D4AF37]/50"
-                        aria-hidden
+                <section className="w-full" aria-labelledby="playlist-escuchar-heading">
+                  <h2
+                    id="playlist-escuchar-heading"
+                    className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-[#1A2B48]/45"
+                  >
+                    Escuchar
+                  </h2>
+                  <div className="flex flex-col items-stretch gap-4">
+                    {appleUrl ? (
+                      <Link
+                        href={appleUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex w-full flex-col items-center gap-3 rounded-2xl border-2 border-[#D4AF37] bg-[#1A2B48] px-6 py-6 text-center shadow-md transition hover:brightness-110"
                       >
-                        <svg viewBox="0 0 24 24" className="h-7 w-7" fill="currentColor">
-                          <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-                        </svg>
-                      </span>
-                      <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#D4AF37]">Apple Music</p>
-                        <p className="mt-1 font-inviteSerif text-lg font-semibold text-white">Abrir playlist</p>
-                        <p className="mt-1 text-xs text-white/70">Escucha la banda sonora del gran día</p>
-                      </div>
-                    </Link>
-                  ) : null}
+                        <span
+                          className="flex h-12 w-12 items-center justify-center rounded-full bg-[#D4AF37]/20 text-white ring-2 ring-[#D4AF37]/50"
+                          aria-hidden
+                        >
+                          <svg viewBox="0 0 24 24" className="h-7 w-7" fill="currentColor">
+                            <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+                          </svg>
+                        </span>
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#D4AF37]">Apple Music</p>
+                          <p className="mt-1 font-inviteSerif text-lg font-semibold text-white">Abrir playlist</p>
+                          <p className="mt-1 text-xs text-white/70">Escucha la banda sonora del gran día</p>
+                        </div>
+                      </Link>
+                    ) : null}
 
-                  {spotifyUrl ? (
-                    <Link
-                      href={spotifyUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex w-full max-w-sm items-center justify-center gap-2 rounded-full border-2 border-[#1A2B48]/15 bg-white px-5 py-3 text-sm font-semibold text-[#1A2B48] shadow-sm transition hover:border-[#D4AF37]/60 hover:bg-[#FFF9F0]"
-                    >
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1DB954] text-white">
-                        <Music2 className="h-4 w-4" aria-hidden />
-                      </span>
-                      Spotify
-                    </Link>
-                  ) : null}
+                    {spotifyUrl ? (
+                      <Link
+                        href={spotifyUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-[#1A2B48]/15 bg-white px-5 py-3 text-sm font-semibold text-[#1A2B48] shadow-sm transition hover:border-[#D4AF37]/60 hover:bg-[#FFF9F0]"
+                      >
+                        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1DB954] text-white">
+                          <Music2 className="h-4 w-4" aria-hidden />
+                        </span>
+                        Abrir playlist en Spotify
+                      </Link>
+                    ) : null}
 
-                  {playlists.other ? (
-                    <Link
-                      href={playlists.other}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-medium text-[#1A2B48] underline decoration-[#D4AF37] decoration-2 underline-offset-4 hover:text-[#D4AF37]"
-                    >
-                      Abrir enlace de música
-                    </Link>
-                  ) : null}
-                </>
-              ) : !musicColabEnabled ? (
-                <p className="max-w-xs text-sm text-[#1A2B48]/55">Pronto publicaremos el enlace a la playlist.</p>
+                    {playlists.other ? (
+                      <Link
+                        href={playlists.other}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-center text-sm font-medium text-[#1A2B48] underline decoration-[#D4AF37] decoration-2 underline-offset-4 hover:text-[#D4AF37]"
+                      >
+                        Abrir enlace de música
+                      </Link>
+                    ) : null}
+                  </div>
+                </section>
               ) : null}
 
               {musicColabEnabled ? (
-                <div className="w-full text-left">
+                <section
+                  className={`w-full ${hasPlaylist ? "border-t border-[#1A2B48]/10 pt-2" : ""}`}
+                  aria-labelledby="playlist-colab-heading"
+                >
+                  <h2
+                    id="playlist-colab-heading"
+                    className="mb-1 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-[#1A2B48]/45"
+                  >
+                    Proponer y apoyar
+                  </h2>
                   <InvitacionMusicaColaborativa
                     invitationAccessToken={token}
                     initialRecent={recentTracks}
-                    surface="dark"
+                    initialTop={topTracks}
+                    apoyoTrackUris={apoyoTrackUris}
+                    surface="light"
                   />
-                </div>
-              ) : null}
+                </section>
+              ) : hasPlaylist ? (
+                <p className="border-t border-[#1A2B48]/10 pt-6 text-center text-xs text-[#1A2B48]/55">
+                  Las sugerencias y votos en vivo se activan cuando quien organiza conecta Spotify en el panel del
+                  evento.
+                </p>
+              ) : (
+                <p className="text-center text-sm text-[#1A2B48]/55">
+                  Pronto publicaremos el enlace a la playlist y las canciones colaborativas.
+                </p>
+              )}
             </div>
           </div>
         ) : null}

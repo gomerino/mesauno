@@ -3,15 +3,19 @@
 import { createClient, createStrictServiceClient } from "@/lib/supabase/server";
 import { fetchInvitadoWithAcompanantes } from "@/lib/invitado-fetch";
 import {
+  playlistHayAporteParaTrack,
+  playlistInsertApoyo,
   playlistInsertAporte,
   spotifyGetCredentials,
   spotifyUpdateRefreshTokenIfPresent,
 } from "@/lib/spotify-credentials";
 import {
+  mensajeUsuarioSpotifyAddTrack,
   spotifyAddTracksToPlaylist,
   spotifyFetchPlaylistOwner,
   spotifyRefreshAccessToken,
 } from "@/lib/spotify-api";
+import { parseSpotifyPlaylistId } from "@/lib/spotify-playlist-id";
 import { rateLimitPlaylistAdd } from "@/lib/spotify-rate-limit";
 import { headers } from "next/headers";
 
@@ -53,8 +57,14 @@ export async function addTrackToPlaylist(invitationAccessToken: string, track: T
   }
 
   const creds = await spotifyGetCredentials(db, invitado.evento_id);
-  if (!creds?.refresh_token || !creds.playlist_id) {
+  if (!creds?.refresh_token || !creds.playlist_id?.trim()) {
     return { ok: false, error: "La playlist colaborativa no está activa para este evento." };
+  }
+
+  const playlistId =
+    parseSpotifyPlaylistId(creds.playlist_id) ?? creds.playlist_id.trim();
+  if (!playlistId) {
+    return { ok: false, error: "El ID de la playlist no es válido. Revisa el enlace en el panel del evento." };
   }
 
   const refreshed = await spotifyRefreshAccessToken(creds.refresh_token);
@@ -65,7 +75,7 @@ export async function addTrackToPlaylist(invitationAccessToken: string, track: T
   await spotifyUpdateRefreshTokenIfPresent(db, invitado.evento_id, refreshed.refresh_token);
 
   if (creds.spotify_user_id) {
-    const playlistMeta = await spotifyFetchPlaylistOwner(refreshed.access_token, creds.playlist_id);
+    const playlistMeta = await spotifyFetchPlaylistOwner(refreshed.access_token, playlistId);
     if (!playlistMeta.ok) {
       return {
         ok: false,
@@ -83,9 +93,12 @@ export async function addTrackToPlaylist(invitationAccessToken: string, track: T
     }
   }
 
-  const added = await spotifyAddTracksToPlaylist(refreshed.access_token, creds.playlist_id, [uri]);
-  if (!added) {
-    return { ok: false, error: "Spotify no pudo añadir la canción (¿playlist y permisos correctos?)." };
+  const added = await spotifyAddTracksToPlaylist(refreshed.access_token, playlistId, [uri]);
+  if (!added.ok) {
+    return {
+      ok: false,
+      error: mensajeUsuarioSpotifyAddTrack(added.status, added.spotifyMessage),
+    };
   }
 
   await playlistInsertAporte(db, {
@@ -121,4 +134,51 @@ export async function addTrackToSpotify(
     album: meta?.album ?? "",
     imageUrl: meta?.imageUrl ?? null,
   });
+}
+
+export type ApoyarResult = { ok: true; already?: boolean } | { ok: false; error: string };
+
+/**
+ * Apoyo sin tocar Spotify: suma preferencia a una canción que ya figuró como aporte.
+ */
+export async function apoyarTrackEnPlaylist(invitationAccessToken: string, trackUri: string): Promise<ApoyarResult> {
+  const tok = invitationAccessToken?.trim();
+  const uri = trackUri?.trim();
+  if (!tok || !uri || !TRACK_URI_RE.test(uri)) {
+    return { ok: false, error: "Solicitud inválida." };
+  }
+
+  const h = await headers();
+  const ip =
+    h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? h.get("x-real-ip") ?? h.get("cf-connecting-ip") ?? "unknown";
+  if (!rateLimitPlaylistAdd(ip)) {
+    return { ok: false, error: "Demasiados intentos. Espera un minuto." };
+  }
+
+  const db = await createStrictServiceClient();
+  if (!db) {
+    return { ok: false, error: "Servicio no disponible." };
+  }
+
+  const anon = await createClient();
+  const { data: invitado, error: invErr } = await fetchInvitadoWithAcompanantes(anon, tok);
+  if (invErr || !invitado?.id || !invitado.evento_id) {
+    return { ok: false, error: "Invitación no válida." };
+  }
+
+  const creds = await spotifyGetCredentials(db, invitado.evento_id);
+  if (!creds?.refresh_token || !creds.playlist_id) {
+    return { ok: false, error: "La playlist colaborativa no está activa para este evento." };
+  }
+
+  const existe = await playlistHayAporteParaTrack(db, invitado.evento_id, uri);
+  if (!existe) {
+    return { ok: false, error: "Primero tiene que estar propuesta en la playlist (búsqueda y Añadir)." };
+  }
+
+  const ins = await playlistInsertApoyo(db, invitado.evento_id, invitado.id, uri);
+  if (!ins.ok) {
+    return { ok: false, error: ins.error };
+  }
+  return { ok: true, already: ins.already };
 }

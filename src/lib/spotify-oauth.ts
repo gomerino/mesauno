@@ -1,6 +1,6 @@
 import { createClient, createStrictServiceClient } from "@/lib/supabase/server";
 import { spotifyExchangeCode, spotifyCreatePlaylist, spotifyResolveUserIdAfterAuthorization } from "@/lib/spotify-api";
-import { getSpotifyClientId, getSpotifyRedirectUri, SPOTIFY_MODIFY_SCOPES } from "@/lib/spotify-config";
+import { getSpotifyClientId, getSpotifyRedirectUriForRequest, SPOTIFY_MODIFY_SCOPES } from "@/lib/spotify-config";
 import { signSpotifyOAuthState, verifySpotifyOAuthState } from "@/lib/spotify-oauth-state";
 import { spotifyGetCredentials, spotifyUpdatePlaylistId, spotifyUpsertRefreshToken } from "@/lib/spotify-credentials";
 import { weddingPlaylistNameFromEvento } from "@/lib/spotify-wedding-playlist";
@@ -13,7 +13,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-
 
 export async function spotifyOAuthAuthorizeGET(request: Request): Promise<Response> {
   const clientId = getSpotifyClientId();
-  const redirectUri = getSpotifyRedirectUri();
+  const redirectUri = getSpotifyRedirectUriForRequest(request);
   if (!clientId || !redirectUri) {
     return NextResponse.json({ error: "Spotify no está configurado en el servidor." }, { status: 503 });
   }
@@ -69,9 +69,9 @@ export async function spotifyOAuthCallbackGET(request: Request): Promise<Respons
     return fail("Estado de sesión inválido o caducado. Vuelve a intentar.");
   }
 
-  const redirectUri = getSpotifyRedirectUri();
+  const redirectUri = getSpotifyRedirectUriForRequest(request);
   if (!redirectUri) {
-    return fail("SPOTIFY_REDIRECT_URI no configurada.");
+    return fail("No se pudo resolver la URI de retorno de Spotify (revisa SPOTIFY_REDIRECT_URI o la URL del sitio).");
   }
 
   const tokens = await spotifyExchangeCode(code, redirectUri);

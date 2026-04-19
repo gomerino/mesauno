@@ -28,14 +28,14 @@ export function SpotifyPlaylistConnect({ eventoId, spotifyConnected, initialPlay
     if (searchParams.get("spotify") === "connected") {
       flashHandled.current = true;
       toast.success("Cuenta de Spotify vinculada. Si no había playlist, creamos una oficial automáticamente.");
-      router.replace("/panel/evento");
+      router.replace("/panel/evento#musica-spotify");
       return;
     }
     const err = searchParams.get("spotify_error");
     if (err) {
       flashHandled.current = true;
       toast.error(decodeURIComponent(err));
-      router.replace("/panel/evento");
+      router.replace("/panel/evento#musica-spotify");
     }
   }, [searchParams, router]);
 

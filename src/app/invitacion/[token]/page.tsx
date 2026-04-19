@@ -10,7 +10,12 @@ import {
 import { resolveInvitacionThemeId } from "@/lib/invitacion-theme";
 import { resolveEventPlaylistEnv } from "@/lib/event-playlist-env";
 import { fetchInvitadoWithAcompanantes } from "@/lib/invitado-fetch";
-import { playlistListRecentPublic, spotifyGetCredentials } from "@/lib/spotify-credentials";
+import {
+  playlistInvitadoApoyoUris,
+  playlistListRecentPublic,
+  playlistListTopPublic,
+  spotifyGetCredentials,
+} from "@/lib/spotify-credentials";
 import type { EventoFoto, EventoProgramaHito, Invitado } from "@/types/database";
 import { notFound } from "next/navigation";
 
@@ -57,6 +62,8 @@ export default async function InvitacionPage({ params, searchParams }: Props) {
 
   let musicColabEnabled = false;
   let recentTracks: Awaited<ReturnType<typeof playlistListRecentPublic>> = [];
+  let topTracks: Awaited<ReturnType<typeof playlistListTopPublic>> = [];
+  let apoyoTrackUris: string[] = [];
   if (invitado.evento_id) {
     const db = await createStrictServiceClient();
     if (db) {
@@ -64,6 +71,9 @@ export default async function InvitacionPage({ params, searchParams }: Props) {
       musicColabEnabled = Boolean(creds?.refresh_token && creds.playlist_id);
       if (musicColabEnabled) {
         recentTracks = await playlistListRecentPublic(db, invitado.evento_id, 5);
+        topTracks = await playlistListTopPublic(db, invitado.evento_id, 8);
+        const uris = await playlistInvitadoApoyoUris(db, invitado.evento_id, invitado.id);
+        apoyoTrackUris = Array.from(uris);
       }
     }
   }
@@ -79,9 +89,11 @@ export default async function InvitacionPage({ params, searchParams }: Props) {
     albumFotos,
     musicColabEnabled,
     recentTracks,
+    topTracks,
+    apoyoTrackUris,
   };
 
-  const themeId = resolveInvitacionThemeId(invitado, themeQuery);
+  const themeId = resolveInvitacionThemeId({ evento, invitado }, themeQuery);
 
   if (themeId === "soft-aviation") {
     return <SoftAviationTheme {...themeProps} />;

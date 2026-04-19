@@ -8,12 +8,32 @@ export function getSpotifyClientSecret(): string | null {
   return v && !v.startsWith("tu_") ? v : null;
 }
 
+/**
+ * URI fija (opcional). Si la defines, debe coincidir **exactamente** con una fila en
+ * Spotify Developer → Redirect URIs (incluye esquema, host, puerto y ruta).
+ */
 export function getSpotifyRedirectUri(): string | null {
   const v = process.env.SPOTIFY_REDIRECT_URI?.trim();
   if (v) return v;
   const base = process.env.NEXT_PUBLIC_SITE_URL?.trim() || process.env.SITE_URL?.trim();
   if (base) return `${base.replace(/\/$/, "")}/api/auth/spotify/callback`;
   return null;
+}
+
+/**
+ * URI usada en authorize + token exchange. Prioridad: `SPOTIFY_REDIRECT_URI` si existe;
+ * si no, se deriva del request (`origin` + `/api/auth/spotify/callback`) para que coincida
+ * con `localhost` vs `127.0.0.1` y el puerto con los que el usuario abrió el panel.
+ */
+export function getSpotifyRedirectUriForRequest(request: Request): string | null {
+  const explicit = process.env.SPOTIFY_REDIRECT_URI?.trim();
+  if (explicit) return explicit;
+  try {
+    const u = new URL(request.url);
+    return `${u.origin}/api/auth/spotify/callback`;
+  } catch {
+    return null;
+  }
 }
 
 export function getSpotifyOAuthStateSecret(): string {

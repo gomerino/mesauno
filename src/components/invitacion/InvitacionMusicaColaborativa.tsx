@@ -1,14 +1,18 @@
 "use client";
 
-import { addTrackToPlaylist, type TrackMeta } from "@/app/invitacion/music-actions";
-import type { PlaylistAportePublic } from "@/lib/spotify-credentials";
+import { addTrackToPlaylist, apoyarTrackEnPlaylist, type TrackMeta } from "@/app/invitacion/music-actions";
+import { MasPedidasPlaylist } from "@/components/invitacion/MasPedidasPlaylist";
 import { UltimasCancionesPlaylist } from "@/components/invitacion/UltimasCancionesPlaylist";
+import type { PlaylistAportePublic, PlaylistTopPublic } from "@/lib/spotify-credentials";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 type Props = {
   invitationAccessToken: string;
   initialRecent: PlaylistAportePublic[];
+  initialTop: PlaylistTopPublic[];
+  /** URIs que este invitado ya apoyó (servidor). */
+  apoyoTrackUris: string[];
   /** `light`: tarjeta clara y texto marino (tema SoftAviation). Por defecto bloque oscuro estilo Spotify. */
   surface?: "dark" | "light";
 };
@@ -24,6 +28,8 @@ type ApiTrack = {
 export function InvitacionMusicaColaborativa({
   invitationAccessToken,
   initialRecent,
+  initialTop,
+  apoyoTrackUris,
   surface = "dark",
 }: Props) {
   const router = useRouter();
@@ -47,7 +53,14 @@ export function InvitacionMusicaColaborativa({
       const data = (await res.json()) as { tracks?: ApiTrack[]; error?: string };
       if (!res.ok) {
         setResults([]);
-        setMsg({ type: "err", text: data.error ?? "No se pudo buscar" });
+        const raw = data.error ?? "No se pudo buscar";
+        const friendly =
+          res.status === 503 && /no disponible/i.test(raw)
+            ? process.env.NODE_ENV === "development"
+              ? "Falta configurar SPOTIFY_CLIENT_ID y SPOTIFY_CLIENT_SECRET en .env.local (Spotify Developer), igual que para vincular la cuenta. Reiniciá el servidor tras guardar."
+              : "La búsqueda de canciones no está disponible en este momento."
+            : raw;
+        setMsg({ type: "err", text: friendly });
         return;
       }
       setResults(data.tracks ?? []);
@@ -79,6 +92,24 @@ export function InvitacionMusicaColaborativa({
     router.refresh();
   }
 
+  const onApoyar = useCallback(
+    async (trackUri: string) => {
+      setMsg(null);
+      const res = await apoyarTrackEnPlaylist(invitationAccessToken, trackUri);
+      if (!res.ok) {
+        setMsg({ type: "err", text: res.error });
+        return { ok: false as const, error: res.error };
+      }
+      setMsg({
+        type: "ok",
+        text: res.already ? "Ya habías apoyado esta canción." : "¡Gracias por tu apoyo!",
+      });
+      router.refresh();
+      return { ok: true as const, already: res.already };
+    },
+    [invitationAccessToken, router]
+  );
+
   return (
     <div
       className={
@@ -100,12 +131,28 @@ export function InvitacionMusicaColaborativa({
             Música colaborativa
           </h2>
           <p className={`text-xs ${light ? "text-[#1A2B48]/65" : "text-zinc-400"}`}>
-            Sugiere canciones para la fiesta — se añaden a la playlist oficial.
+            Sugiere canciones, apoya las favoritas y mira qué suma más gente — todo en la playlist oficial.
           </p>
         </div>
       </div>
 
+      {msg ? (
+        <p
+          className={`mt-3 text-sm ${msg.type === "ok" ? (light ? "text-emerald-700" : "text-[#1ed760]") : light ? "text-red-700" : "text-red-300"}`}
+          role="status"
+        >
+          {msg.text}
+        </p>
+      ) : null}
+
       <UltimasCancionesPlaylist items={initialRecent} variant={light ? "light" : "dark"} />
+
+      <MasPedidasPlaylist
+        items={initialTop}
+        apoyoTrackUris={apoyoTrackUris}
+        variant={light ? "light" : "dark"}
+        onApoyar={onApoyar}
+      />
 
       <div className="mt-3 flex gap-2">
         <input
@@ -128,15 +175,6 @@ export function InvitacionMusicaColaborativa({
           {loading ? "…" : "Buscar"}
         </button>
       </div>
-
-      {msg && (
-        <p
-          className={`mt-2 text-sm ${msg.type === "ok" ? (light ? "text-emerald-700" : "text-[#1ed760]") : light ? "text-red-700" : "text-red-300"}`}
-          role="status"
-        >
-          {msg.text}
-        </p>
-      )}
 
       {results.length > 0 && (
         <ul className="mt-3 max-h-60 space-y-2 overflow-y-auto pr-1">
