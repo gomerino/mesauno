@@ -1,6 +1,7 @@
 -- B02-05 v0: programa del día + fotos por ventanas de tiempo (misma fecha del evento, TZ fija).
--- Regla: ventana del hito i = [t_i - 45m, t_{i+1} - 1m]; último hito: [t_i - 45m, t_i + 3h].
--- Fotos: evento_fotos.created_at dentro de la ventana (timestamptz).
+-- Regla: ventana del hito i = [w_start, w_end) semiabierto: w_start = max(inicio_día, t_i-45m),
+--        w_end = t_{i+1} si hay siguiente hito; último hito: w_end = t_i + 3h. Así no se duplican fotos entre hitos.
+-- Fotos: evento_fotos.created_at >= w_start AND created_at < w_end.
 --
 -- IMPORTANTE: ejecutar este archivo completo de una sola vez (una sola sentencia CREATE FUNCTION).
 -- Si el editor parte por ";", usar "Run" sobre el bloque completo o pegar solo entre $function$ ... $function$.
@@ -68,10 +69,10 @@ as $function$
       ) as w_start,
       case
         when hb.next_hora is not null then
-          ((hb.d + hb.next_hora) at time zone 'America/Santiago') - interval '1 minute'
+          ((hb.d + hb.next_hora) at time zone 'America/Santiago')
         else
           ((hb.d + hb.hora) at time zone 'America/Santiago') + interval '3 hours'
-      end as w_end
+      end as w_end_exclusive
     from hitos_base hb
   ),
   hitos_with_fotos as (
@@ -85,7 +86,7 @@ as $function$
       hw.ubicacion_url,
       hw.icono,
       hw.w_start as ventana_inicio,
-      hw.w_end as ventana_fin,
+      hw.w_end_exclusive as ventana_fin,
       coalesce(
         (
           select jsonb_agg(
@@ -99,7 +100,7 @@ as $function$
           from public.evento_fotos f
           where f.evento_id = hw.evento_id
             and f.created_at >= hw.w_start
-            and f.created_at <= hw.w_end
+            and f.created_at < hw.w_end_exclusive
         ),
         '[]'::jsonb
       ) as fotos
