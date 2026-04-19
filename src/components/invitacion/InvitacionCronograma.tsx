@@ -1,5 +1,7 @@
 "use client";
 
+import { eventoFotoPublicUrl } from "@/lib/evento-foto-url";
+import type { ProgramaHitoFotoPublic } from "@/lib/programa-con-fotos-publica";
 import { ProgramaIconoLucide } from "@/lib/programa-icons";
 import type { EventoProgramaHito } from "@/types/database";
 import { Check, MapPin } from "lucide-react";
@@ -85,9 +87,11 @@ type Props = {
   hitos: EventoProgramaHito[];
   /** Fecha del evento (YYYY-MM-DD o ISO); define el día en que aplica “Ahora”. */
   fechaEvento: string | null;
+  /** Miniaturas por `hito.id` (misma ventana que el RPC programa+fotos). */
+  fotosPorHito?: Record<string, ProgramaHitoFotoPublic[]>;
 };
 
-export function InvitacionCronograma({ hitos, fechaEvento }: Props) {
+export function InvitacionCronograma({ hitos, fechaEvento, fotosPorHito }: Props) {
   const [now, setNow] = useState(() => new Date());
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
 
@@ -271,6 +275,33 @@ export function InvitacionCronograma({ hitos, fechaEvento }: Props) {
                   >
                     Ver mapa
                   </a>
+                ) : null}
+                {fotosPorHito?.[h.id]?.length ? (
+                  <ul
+                    className="mt-3 flex max-w-full gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#001d66]/20"
+                    aria-label="Fotos cerca de este momento"
+                  >
+                    {fotosPorHito[h.id]!.map((f) => (
+                      <li key={f.id} className="shrink-0">
+                        <a
+                          href={eventoFotoPublicUrl(f.storage_path)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#001d66]/40 focus-visible:ring-offset-2 rounded-lg"
+                        >
+                          <img
+                            src={eventoFotoPublicUrl(f.storage_path)}
+                            alt=""
+                            width={72}
+                            height={72}
+                            loading="lazy"
+                            decoding="async"
+                            className="h-[4.5rem] w-[4.5rem] rounded-lg border border-[#001d66]/10 object-cover sm:h-[5rem] sm:w-[5rem]"
+                          />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
                 ) : null}
               </div>
             </li>

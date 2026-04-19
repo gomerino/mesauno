@@ -46,6 +46,7 @@ export function SoftAviationSpaShell({
   qrValue,
   playlists,
   programaHitos,
+  programaFotosPorHito,
   albumFotos,
   musicColabEnabled,
   recentTracks,
@@ -379,7 +380,11 @@ export function SoftAviationSpaShell({
             <p className="mb-2 text-center text-xs text-[#1A2B48]/65">Revisa cómo llegar y horarios</p>
             {hasItinerario ? (
               <div className="rounded-2xl border border-[#1A2B48]/10 bg-white p-3 shadow-sm sm:p-4 [&_.font-display]:font-inviteSerif">
-                <InvitacionCronograma hitos={programaHitos} fechaEvento={merged.fecha_evento} />
+                <InvitacionCronograma
+                  hitos={programaHitos}
+                  fechaEvento={merged.fecha_evento}
+                  fotosPorHito={programaFotosPorHito}
+                />
               </div>
             ) : (
               <div className="rounded-2xl border border-dashed border-[#1A2B48]/15 bg-white/80 p-8 text-center text-sm text-[#1A2B48]/60">

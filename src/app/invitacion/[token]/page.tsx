@@ -11,6 +11,12 @@ import { resolveInvitacionThemeId } from "@/lib/invitacion-theme";
 import { resolveEventPlaylistEnv } from "@/lib/event-playlist-env";
 import { fetchInvitadoWithAcompanantes } from "@/lib/invitado-fetch";
 import {
+  hubHitosToProgramaHitos,
+  parseProgramaConFotosVentanasPublica,
+  programaFotosPorHitoFromHub,
+  type ProgramaHitoFotoPublic,
+} from "@/lib/programa-con-fotos-publica";
+import {
   playlistInvitadoApoyoUris,
   playlistListRecentPublic,
   playlistListTopPublic,
@@ -43,11 +49,23 @@ export default async function InvitacionPage({ params, searchParams }: Props) {
   const playlists = resolveEventPlaylistEnv();
 
   let programaHitos: EventoProgramaHito[] = [];
-  const { data: programaRaw, error: programaErr } = await supabase.rpc("programa_evento_lista_publica", {
+  let programaFotosPorHito: Record<string, ProgramaHitoFotoPublic[]> = {};
+
+  const { data: hubRaw, error: hubErr } = await supabase.rpc("programa_con_fotos_ventanas_publica", {
     p_token: token,
   });
-  if (!programaErr && Array.isArray(programaRaw)) {
-    programaHitos = programaRaw as EventoProgramaHito[];
+  const hub = !hubErr ? parseProgramaConFotosVentanasPublica(hubRaw) : null;
+
+  if (hub && hub.hitos.length > 0) {
+    programaHitos = hubHitosToProgramaHitos(hub);
+    programaFotosPorHito = programaFotosPorHitoFromHub(hub);
+  } else {
+    const { data: programaRaw, error: programaErr } = await supabase.rpc("programa_evento_lista_publica", {
+      p_token: token,
+    });
+    if (!programaErr && Array.isArray(programaRaw)) {
+      programaHitos = programaRaw as EventoProgramaHito[];
+    }
   }
 
   let albumFotos: EventoFoto[] = [];
@@ -86,6 +104,7 @@ export default async function InvitacionPage({ params, searchParams }: Props) {
     qrValue,
     playlists,
     programaHitos,
+    programaFotosPorHito,
     albumFotos,
     musicColabEnabled,
     recentTracks,

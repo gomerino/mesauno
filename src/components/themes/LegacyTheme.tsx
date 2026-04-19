@@ -18,6 +18,7 @@ export function LegacyTheme({
   qrValue,
   playlists,
   programaHitos,
+  programaFotosPorHito,
   albumFotos,
   musicColabEnabled,
   recentTracks,
@@ -54,7 +55,11 @@ export function LegacyTheme({
           }
         >
           <MotivoViajeInvitacion texto={motivoViaje} />
-          <InvitacionCronograma hitos={programaHitos} fechaEvento={fechaEventoPrograma} />
+          <InvitacionCronograma
+            hitos={programaHitos}
+            fechaEvento={fechaEventoPrograma}
+            fotosPorHito={programaFotosPorHito}
+          />
           {invitado.evento_id ? (
             <div className="mt-3">
               <InvitacionAlbumSection
