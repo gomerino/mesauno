@@ -34,3 +34,37 @@ export {
   type AgregarFavoritoInput,
   type AgregarFavoritoResult,
 } from "./favoritos";
+
+export {
+  registrarProveedor,
+  RegistroProveedorError,
+  type RegistroProveedorInput,
+  type RegistroProveedorErrorCode,
+  type RegistroProveedorResult,
+} from "./registro";
+
+export {
+  actualizarProveedorPropio,
+  ActualizarProveedorError,
+  type ActualizarProveedorInput,
+} from "./actualizar";
+
+export {
+  subirMedioProveedor,
+  eliminarMedioProveedor,
+  reordenarMediosProveedor,
+  SubirMedioError,
+  type SubirMedioInput,
+  type SubirMedioResult,
+} from "./medios";
+
+export {
+  listarProveedoresAdmin,
+  aprobarProveedor,
+  suspenderProveedor,
+  parseMotivoSuspension,
+  esMotivoSuspension,
+  MOTIVOS_SUSPENSION,
+  type MotivoSuspension,
+  type AdminProveedorListaItem,
+} from "./admin";
