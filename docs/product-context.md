@@ -25,6 +25,9 @@ Organiza tu matrimonio completo en un solo lugar:
 - Flujo de pago plan novios (Mercado Pago, plan Esencial $19.990 / plan Experiencia $34.990).
 - Marketplace básico (`/marketplace`) con listado plano — listo para evolucionar a v1.
 
+### Por construir (demand / evento)
+- **Sitio público del evento** (URL compartible bajo el dominio del producto; dominio propio/subdominio en fases posteriores). Workflow: `workflows/S01-sitio-publico-evento/`.
+
 ### Por construir (marketplace)
 - Modelo de datos real (providers, services, media, bookings).
 - Panel proveedor self-serve.
