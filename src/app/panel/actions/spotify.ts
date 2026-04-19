@@ -62,20 +62,20 @@ export async function saveSpotifyPlaylistIdAction(
       return {
         ok: false,
         error:
-          "No encontramos esa playlist. Copiá el enlace desde Spotify (Compartir → Copiar enlace al playlist) o revisá el ID.",
+          "No encontramos esa playlist. Copia el enlace desde Spotify (Compartir → Copiar enlace al playlist) o revisa el ID.",
       };
     }
     if (playlistMeta.status === 403) {
       return {
         ok: false,
         error:
-          "Spotify no permitió leer la playlist con tu cuenta (403). Si es privada de otra persona, no podés usarla; si es tuya, probá volver a vincular Spotify.",
+          "Spotify no permitió leer la playlist con tu cuenta (403). Si es privada de otra persona, no puedes usarla; si es tuya, prueba volver a vincular Spotify.",
       };
     }
     return {
       ok: false,
       error:
-        "No pudimos leer esa playlist. Revisá el enlace (también sirve con /intl-es/ en la URL); si la lista es muy antigua o borrada, creá una nueva.",
+        "No pudimos leer esa playlist. Revisa el enlace (también sirve con /intl-es/ en la URL); si la lista es muy antigua o fue borrada, crea una nueva.",
     };
   }
 

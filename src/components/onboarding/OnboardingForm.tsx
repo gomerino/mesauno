@@ -80,7 +80,7 @@ export function OnboardingForm() {
 
       if (!signData.session) {
         setError(
-          "Tenés que confirmar el correo antes de seguir. Revisá tu bandeja (y el spam) y volvé a entrar."
+          "Tienes que confirmar el correo antes de seguir. Revisa tu bandeja (y el spam) y vuelve a entrar."
         );
         return;
       }
@@ -200,7 +200,7 @@ export function OnboardingForm() {
         {busy ? "Creando tu viaje…" : "Crear mi viaje ✈️"}
       </button>
       <p className="text-center text-[11px] leading-relaxed text-slate-500">
-        Si cerrás sesión, podés volver a entrar con “Olvidé mi contraseña” usando este correo.
+        Si cierras sesión, puedes volver a entrar con “Olvidé mi contraseña” usando este correo.
       </p>
     </form>
   );

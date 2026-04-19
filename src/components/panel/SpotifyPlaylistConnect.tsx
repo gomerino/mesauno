@@ -73,7 +73,7 @@ export function SpotifyPlaylistConnect({ eventoId, spotifyConnected, initialPlay
         <h2 className="font-display text-lg font-semibold text-green-400">Música colaborativa (Spotify)</h2>
         <p className="mt-1 text-sm text-slate-400">
           Los invitados podrán buscar canciones y sumarlas a la playlist oficial. Al vincular tu cuenta creamos una
-          playlist &quot;Boda: …&quot; automáticamente; podés reemplazarla pegando otro enlace si preferís una lista ya
+          playlist &quot;Boda: …&quot; automáticamente; puedes reemplazarla pegando otro enlace si prefieres una lista
           existente.
         </p>
       </div>

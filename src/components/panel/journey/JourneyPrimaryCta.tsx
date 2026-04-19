@@ -59,16 +59,16 @@ export function JourneyPrimaryCta({
       ctaLabel = "Invitar pasajeros";
       href = "/panel/invitacion";
       text = hasInvitaciones
-        ? "Compartí el acceso y seguí sumando quienes vuelan contigo."
-        : "Tu plan está activo: invitá y completá los detalles cuando quieras.";
+        ? "Comparte el acceso y sigue sumando a quienes vuelan contigo."
+        : "Tu plan está activo: invita y completa los detalles cuando quieras.";
     } else if (phase === "despegue") {
       ctaLabel = "Ver programa";
       href = "/panel/programa";
-      text = "Coordiná últimos detalles y tené el día a mano, sin apuro.";
+      text = "Coordina los últimos detalles y ten el día a mano, sin apuros.";
     } else {
       ctaLabel = "Ver experiencia";
       href = "/panel/experiencia";
-      text = "Mostrá lo que armaste y compartí el momento con quienes vuelan contigo.";
+      text = "Muestra lo que armaste y comparte el momento con quienes vuelan contigo.";
     }
   } else if (paymentStatus === "pending") {
     title = "Pago en revisión";
@@ -84,9 +84,9 @@ export function JourneyPrimaryCta({
     title = "Desbloquea la experiencia ✨";
     text =
       phase === "despegue"
-        ? "Activá el viaje y coordiná el programa con tus pasajeros."
+        ? "Activa el viaje y coordina el programa con tus pasajeros."
         : phase === "en-vuelo"
-          ? "Activá para que tus invitados disfruten la experiencia completa."
+          ? "Actívala para que tus invitados disfruten la experiencia completa."
           : "Todo lo que tus invitados van a vivir";
     ctaLabel = "Activar experiencia ✈️";
     if (canCheckout && eventoId) {
@@ -96,17 +96,17 @@ export function JourneyPrimaryCta({
     }
   } else if (phase === "check-in") {
     title = "Tu viaje comienza pronto ✈️";
-    text = "Completá la información clave e invitá cuando te sientas listo.";
+    text = "Completa la información clave e invita cuando te sientas listo.";
     ctaLabel = "Completar datos";
     href = "/panel/evento";
   } else if (phase === "despegue") {
     title = "Todo listo para el gran día";
-    text = "Revisá el programa y coordiná con tus pasajeros sin perder el ritmo.";
+    text = "Revisa el programa y coordina con tus pasajeros sin perder el ritmo.";
     ctaLabel = "Ver programa";
     href = "/panel/programa";
   } else {
     title = "Disfruta la experiencia";
-    text = "Explorá lo que preparaste y compartilo con quien vuela contigo.";
+    text = "Explora lo que preparaste y compártelo con quienes vuelan contigo.";
     ctaLabel = "Ver experiencia";
     href = "/panel/experiencia";
   }

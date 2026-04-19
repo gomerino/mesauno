@@ -68,7 +68,7 @@ export function OnboardingFullClient() {
         Mandar invitaciones ✈️
       </button>
       <p className="mt-6 text-center text-xs text-slate-500">
-        ¿Ya tenés cuenta?{" "}
+        ¿Ya tienes cuenta?{" "}
         <Link href="/login?next=/panel" className="text-[#D4AF37] hover:underline">
           Ir al panel
         </Link>

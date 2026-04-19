@@ -255,7 +255,7 @@ export function TravelGroupForm() {
       <div>
         <h2 className="font-display text-lg font-semibold text-white">Grupo de viaje</h2>
         <p className="mt-1 text-sm text-slate-500">
-          Un pasajero principal y quienes vuelan con él. Podés ajustar todo antes de enviar invitaciones.
+          Un pasajero principal y quienes vuelan con él. Puedes ajustar todo antes de enviar invitaciones.
         </p>
       </div>
 

@@ -222,7 +222,7 @@ export async function spotifyResolveUserIdAfterAuthorization(
   }
 
   console.warn(
-    "[spotify] spotify_user_id sigue nulo: revisá /me en logs (403 = usuario no en dashboard de la app en modo development), credenciales y scopes."
+    "[spotify] spotify_user_id sigue nulo: revisa /me en logs (403 = usuario no en dashboard de la app en modo development), credenciales y scopes."
   );
   return { spotifyUserId: null, refreshToken: refresh };
 }

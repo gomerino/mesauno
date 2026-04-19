@@ -78,7 +78,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       id,
       persisted: false,
-      message: "No se pudo guardar en servidor; continuá en modo local.",
+      message: "No se pudo guardar en el servidor; continúa en modo local.",
     });
   }
 

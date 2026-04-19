@@ -12,7 +12,7 @@ export default function OnboardingPreviewPage() {
     <div>
       <h1 className="text-center font-display text-2xl font-bold text-white sm:text-3xl">Aquí empieza tu viaje</h1>
       <p className="mx-auto mt-2 max-w-md text-center text-sm text-slate-400">
-        Así se ve tu pase con lo que ya nos contaste. Podés seguir afinando en un paso.
+        Así se ve tu pase con lo que nos has contado. Puedes seguir afinándolo en un paso.
       </p>
       <div className="mt-10">
         <Suspense
