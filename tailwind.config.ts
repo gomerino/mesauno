@@ -59,6 +59,26 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(10px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        /** JUR-28 · microceremonia post-pago (candado → ✦) */
+        unlockLockExit: {
+          "0%": { opacity: "1", transform: "translateY(0)" },
+          "100%": { opacity: "0", transform: "translateY(14px)" },
+        },
+        unlockGlowOnce: {
+          "0%": { opacity: "0", transform: "scale(0.4)" },
+          "45%": { opacity: "0.5", transform: "scale(1.1)" },
+          "100%": { opacity: "0", transform: "scale(2)" },
+        },
+        unlockSparkleIn: {
+          "0%": { opacity: "0", transform: "scale(0) rotate(0deg)" },
+          "55%": { opacity: "1", transform: "scale(1.12) rotate(140deg)" },
+          "100%": { opacity: "1", transform: "scale(1) rotate(180deg)" },
+        },
+        unlockParticle: {
+          "0%": { opacity: "0", transform: "scale(0)" },
+          "35%": { opacity: "1", transform: "scale(1)" },
+          "100%": { opacity: "0", transform: "scale(0.45)" },
+        },
       },
       animation: {
         stampDrop: "stampDrop 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards",
@@ -72,6 +92,10 @@ const config: Config = {
         journeyGlowPulse: "journeyGlowPulse 2.5s ease-in-out infinite",
         planCtaSync: "planCtaSync 0.18s ease-out both",
         postPayReveal: "postPayReveal 0.5s ease-out both",
+        unlockLockExit: "unlockLockExit 0.45s ease-in forwards",
+        unlockGlowOnce: "unlockGlowOnce 1.15s ease-out forwards",
+        unlockSparkleIn: "unlockSparkleIn 1s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both",
+        unlockParticle: "unlockParticle 1.1s ease-out forwards",
       },
       colors: {
         dreams: {

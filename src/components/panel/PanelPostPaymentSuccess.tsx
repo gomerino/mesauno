@@ -1,5 +1,6 @@
 "use client";
 
+import { PostPaymentUnlockCelebration } from "@/components/panel/PostPaymentUnlockCelebration";
 import Link from "next/link";
 
 export type PanelPostPaymentSuccessProps = {
@@ -34,6 +35,7 @@ export function PanelPostPaymentSuccess({
 
   return (
     <div className="mx-auto max-w-lg space-y-8 pb-8 md:max-w-2xl md:pb-12">
+      <PostPaymentUnlockCelebration paymentId={paymentId} />
       <header className="motion-safe:animate-postPayReveal motion-safe:[animation-delay:40ms] motion-reduce:animate-none motion-reduce:opacity-100">
         <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]/90">Listo</p>
         <h1 className="mt-2 font-display text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl">
