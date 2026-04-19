@@ -1,19 +1,26 @@
 /** @type {import('next').NextConfig} */
 function buildImageRemotePatterns() {
+  const patterns = [
+    {
+      protocol: "https",
+      hostname: "images.unsplash.com",
+      pathname: "/**",
+    },
+  ];
   const raw = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!raw) return [];
-  try {
-    const u = new URL(raw);
-    return [
-      {
+  if (raw) {
+    try {
+      const u = new URL(raw);
+      patterns.push({
         protocol: u.protocol.replace(":", ""),
         hostname: u.hostname,
         pathname: "/storage/v1/object/public/**",
-      },
-    ];
-  } catch {
-    return [];
+      });
+    } catch {
+      // ignorar URL inválida
+    }
   }
+  return patterns;
 }
 
 const nextConfig = {

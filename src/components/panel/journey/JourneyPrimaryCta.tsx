@@ -39,10 +39,6 @@ export function JourneyPrimaryCta({
   const isActive = isPlanActive(plan_status);
   const paymentStatus = payment_status ?? null;
 
-  if (process.env.NODE_ENV === "development") {
-    console.log({ plan_status, paymentStatus });
-  }
-
   const hasInvitaciones = invitaciones_enviadas > 0;
 
   let title = "Siguiente paso ✈️";
