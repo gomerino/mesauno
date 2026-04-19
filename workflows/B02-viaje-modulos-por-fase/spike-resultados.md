@@ -89,7 +89,7 @@ Fecha de cierre técnico: 2026-04-19. Fuente: revisión del repo actual.
 ### Recomendación para B02-05
 
 1. **TZ v0:** constante `America/Santiago` en RPC (migración `migration_programa_con_fotos_publica.sql`); **fase 2:** columna TZ en `eventos` si hace falta multi-región.
-2. **v0 implementado:** RPC **`programa_con_fotos_ventanas_publica(p_token)`** → JSON con ventanas **semiabiertas** `[w_start, w_end)` (`fotos.created_at >= w_start AND < w_end`) para no duplicar la misma foto en dos hitos seguidos; último hito `w_end = t_i + 3h`.
+2. **v0 implementado:** RPC **`programa_con_fotos_ventanas_publica(p_token)`** → ventanas **sin solape**: límites en el **punto medio** entre hitos consecutivos; primer hito arranca en `max(día, t_0−45m)`; último termina en `t_last+3h`; filtro `created_at >= w_start AND < w_end`.
 3. **Migración opcional:** `capturada_at timestamptz` + EXIF en cliente al subir.
 4. **UI “en vuelo”:** consumir esta RPC en invitación (sustituir o complementar `programa_evento_lista_publica` + `fotos_evento_lista_publica`).
 
