@@ -6,7 +6,7 @@ import { obtenerProveedorPropio } from "@/lib/proveedores";
 export const metadata: Metadata = {
   title: "Para proveedores · Jurnex",
   description:
-    "Los novios de Jurnex están armando sus bodas. Queremos que te conozcan. Sumate al marketplace de matrimonios premium de Chile.",
+    "Las parejas de Jurnex están organizando sus bodas. Queremos que te conozcan. Súmate al marketplace de matrimonios premium.",
 };
 
 /**
@@ -23,7 +23,7 @@ export default async function LandingProveedoresPage() {
   const ctaHref = proveedor ? "/proveedor" : "/para-proveedores/registro";
   const ctaLabel = proveedor
     ? "Ir a mi panel de proveedor"
-    : "Empezar ahora · Es gratis";
+    : "Comenzar ahora · Es gratis";
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900 text-white">
@@ -36,15 +36,15 @@ export default async function LandingProveedoresPage() {
               <span className="h-1.5 w-1.5 rounded-full bg-amber-300" /> Marketplace premium · Chile
             </p>
             <h1 className="font-display text-4xl font-bold leading-tight md:text-6xl">
-              Los novios de Jurnex están armando sus bodas.{" "}
+              Las parejas de Jurnex están organizando sus bodas.{" "}
               <span className="bg-gradient-to-r from-amber-200 via-amber-300 to-amber-200 bg-clip-text text-transparent">
                 Queremos que te conozcan.
               </span>
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-slate-300 md:text-xl">
-              Sumá tu servicio al marketplace, recibí contactos cualificados de
-              novios que ya están buscando proveedores y convertí leads en
-              experiencias inolvidables.
+              Suma tu servicio al marketplace, recibe contactos cualificados de
+              parejas que ya están buscando proveedores y convierte solicitudes
+              en experiencias inolvidables.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Link
@@ -125,14 +125,14 @@ function HeroCard() {
         <p className="text-sm text-slate-300">contactos cualificados al mes por proveedor activo</p>
 
         <div className="mt-8 grid grid-cols-2 gap-4">
-          <Stat kpi="120+" label="novios activos" />
+          <Stat kpi="120+" label="parejas activas" />
           <Stat kpi="8" label="categorías" />
           <Stat kpi="48h" label="SLA de aprobación" />
           <Stat kpi="$0" label="inscripción" />
         </div>
 
         <p className="mt-6 text-xs text-slate-400">
-          Cifras conservadoras basadas en nuestro cohorte beta. No prometemos
+          Cifras conservadoras basadas en nuestra cohorte beta. No prometemos
           más de lo que podemos entregar.
         </p>
       </div>
@@ -152,19 +152,19 @@ function Stat({ kpi, label }: { kpi: string; label: string }) {
 function ProofPoints() {
   const points = [
     {
-      titulo: "Novios que ya están listos",
+      titulo: "Parejas que ya están listas",
       texto:
-        "Accedés a parejas que pasaron por onboarding y tienen evento concreto. No curiosos.",
+        "Accedes a parejas que completaron el onboarding y tienen un evento concreto en marcha. No curiosos.",
     },
     {
       titulo: "Marketplace curado",
       texto:
-        "Revisamos cada perfil antes de activarlo. Calidad primero — mejor convertís.",
+        "Revisamos cada perfil antes de activarlo. Calidad primero, así conviertes mejor.",
     },
     {
       titulo: "Sin intermediarios",
       texto:
-        "Los leads llegan directo a tu WhatsApp o correo. Jurnex no cobra comisión al cierre.",
+        "Las solicitudes llegan directo a tu WhatsApp o correo. Jurnex no cobra comisión al cierre.",
     },
   ];
   return (
@@ -191,25 +191,25 @@ function BeneficiosSection() {
       icon: "✈️",
       titulo: "Perfil premium en minutos",
       texto:
-        "Registrá tu negocio en 3 pasos: cuenta, detalles y tus mejores fotos. Después, nosotros revisamos.",
+        "Registra tu negocio en 3 pasos: cuenta, detalles y tus mejores fotos. Luego nosotros revisamos.",
     },
     {
       icon: "💬",
       titulo: "Contacto directo",
       texto:
-        "Los novios te escriben por WhatsApp o correo desde tu ficha. Siempre con contexto (fecha, región, presupuesto).",
+        "Las parejas te escriben por WhatsApp o correo desde tu ficha. Siempre con contexto (fecha, región, presupuesto).",
     },
     {
       icon: "✨",
-      titulo: "Featured si subís de plan",
+      titulo: "Destacado si subes de plan",
       texto:
-        "Premium: aparecés primero, sin cap mensual de leads, analytics de tu perfil.",
+        "Premium: apareces primero, sin tope mensual de contactos y con analítica de tu perfil.",
     },
     {
       icon: "📸",
-      titulo: "Tu portfolio brilla",
+      titulo: "Tu portafolio brilla",
       texto:
-        "Galería de hasta 6 fotos en plan free (sin límite en premium) optimizadas para mobile-first.",
+        "Galería de hasta 6 fotos en plan free (sin límite en premium), optimizadas para móvil.",
     },
   ];
   return (
@@ -243,10 +243,10 @@ function PlanesSection({ ctaHref }: { ctaHref: string }) {
       <div className="mx-auto max-w-5xl">
         <div className="mb-10 text-center">
           <h2 className="font-display text-3xl font-bold md:text-4xl">
-            Elegí tu plan
+            Elige tu plan
           </h2>
           <p className="mt-3 text-slate-300">
-            Empezá gratis. Pasate a premium cuando los leads sobren.
+            Comienza gratis. Pásate a Premium cuando los contactos sobren.
           </p>
         </div>
 
@@ -264,7 +264,7 @@ function PlanesSection({ ctaHref }: { ctaHref: string }) {
               "Listado por región y categoría",
             ]}
             ctaHref={ctaHref}
-            ctaLabel="Empezar gratis"
+            ctaLabel="Comenzar gratis"
           />
           <PlanCard
             nombre="Premium"
@@ -272,20 +272,20 @@ function PlanesSection({ ctaHref }: { ctaHref: string }) {
             frecuencia="CLP / mes"
             destacado
             beneficios={[
-              "Todo lo del Free",
+              "Todo lo del plan Free",
               "Fotos sin límite",
-              "Leads sin límite mensual",
-              "Ficha destacada (aparecés primero)",
-              "Analytics: vistas, clicks, conversión",
-              "Badge Premium en tu perfil",
+              "Solicitudes sin límite mensual",
+              "Ficha destacada (apareces primero)",
+              "Analítica: vistas, clics y conversión",
+              "Distintivo Premium en tu perfil",
             ]}
             ctaHref={ctaHref}
-            ctaLabel="Empezar y subir después"
+            ctaLabel="Comenzar y mejorar después"
           />
         </div>
 
         <p className="mt-6 text-center text-xs text-slate-400">
-          Podés arrancar en Free y pasar a Premium desde tu panel cuando quieras.
+          Puedes empezar en Free y pasar a Premium desde tu panel cuando quieras.
           Sin permanencia, sin letra chica.
         </p>
       </div>
@@ -358,19 +358,19 @@ function FAQSection() {
     },
     {
       q: "¿Cobran comisión por reserva?",
-      a: "No. Jurnex cobra solo la suscripción Premium si subís de plan. Las reservas y pagos con el novio los gestionás vos, fuera de la plataforma.",
+      a: "No. Jurnex cobra solo la suscripción Premium si decides subir de plan. Las reservas y pagos con la pareja los gestionas tú, fuera de la plataforma.",
     },
     {
       q: "¿Puedo cambiar de plan o pausar?",
-      a: "Sí. Desde tu panel podés subir, bajar o pausar tu visibilidad. Sin permanencia.",
+      a: "Sí. Desde tu panel puedes subir, bajar o pausar tu visibilidad cuando quieras. Sin permanencia.",
     },
     {
-      q: "¿Qué tipo de fotos suben?",
-      a: "Recomendamos 3–6 fotos de trabajos reales, con buena luz. Evitá watermarks grandes y fotos muy editadas que no representen lo real.",
+      q: "¿Qué tipo de fotos suben los proveedores?",
+      a: "Recomendamos 3 a 6 fotos de trabajos reales, con buena luz. Evita marcas de agua grandes y fotos muy editadas que no representen el resultado real.",
     },
     {
-      q: "¿Necesito tener web?",
-      a: "No. Podés poner Instagram o solo WhatsApp. Muchos proveedores empiezan así.",
+      q: "¿Necesito tener sitio web?",
+      a: "No. Puedes ofrecer solo Instagram o WhatsApp. Muchos proveedores comienzan así.",
     },
   ];
   return (
@@ -406,8 +406,8 @@ function CtaFinal({ ctaHref, ctaLabel }: { ctaHref: string; ctaLabel: string }) 
           ¿Listo para despegar?
         </p>
         <p className="mx-auto mt-4 max-w-xl text-slate-300">
-          Te tomás 5 minutos, nosotros revisamos en 48 horas y los novios
-          empiezan a conocerte. Sin riesgo, sin permanencia.
+          Te toma 5 minutos, nosotros revisamos en 48 horas y las parejas
+          comienzan a conocerte. Sin riesgo y sin permanencia.
         </p>
         <Link
           href={ctaHref}

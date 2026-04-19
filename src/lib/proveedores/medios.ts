@@ -67,7 +67,7 @@ export async function subirMedioProveedor(
   if (!MIMES_PERMITIDOS.has(contentType)) {
     throw new SubirMedioError(
       "mime-invalido",
-      "Formato no permitido. Usá JPG, PNG o WebP.",
+      "Formato no permitido. Usa JPG, PNG o WebP.",
     );
   }
 
@@ -75,7 +75,7 @@ export async function subirMedioProveedor(
   if (size > MAX_BYTES) {
     throw new SubirMedioError(
       "tamano-excedido",
-      "La foto supera 10MB. Comprimila antes de subirla.",
+      "La foto supera los 10 MB. Comprímela antes de subirla.",
     );
   }
 
@@ -85,12 +85,12 @@ export async function subirMedioProveedor(
       .select("id", { count: "exact", head: true })
       .eq("proveedor_id", proveedorId);
     if (cErr) {
-      throw new SubirMedioError("error-db", "No pudimos chequear tu plan.", cErr.message);
+      throw new SubirMedioError("error-db", "No pudimos verificar tu plan.", cErr.message);
     }
     if ((count ?? 0) >= CAP_MEDIOS_FREE) {
       throw new SubirMedioError(
         "cap-plan-free",
-        `Alcanzaste el máximo de ${CAP_MEDIOS_FREE} fotos del plan free. Upgradeá para subir más.`,
+        `Alcanzaste el máximo de ${CAP_MEDIOS_FREE} fotos del plan Free. Cambia a Premium para subir más.`,
       );
     }
   }

@@ -102,7 +102,7 @@ export async function actualizarProveedorPropio(
   if (!data) {
     throw new ActualizarProveedorError(
       "no-autorizado",
-      "No encontramos tu perfil o no tenés permiso para editarlo.",
+      "No encontramos tu perfil o no tienes permiso para editarlo.",
     );
   }
   return data as Proveedor;

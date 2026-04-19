@@ -94,7 +94,7 @@ export function AdminProveedoresClient({
       {!adminConfigurado && (
         <div className="rounded-2xl border border-amber-300/30 bg-amber-300/10 p-4 text-sm text-amber-100">
           ⚠️ Falta <code>SUPABASE_SERVICE_ROLE_KEY</code>. Sin service role no
-          podés ver proveedores pendientes.
+          es posible ver los proveedores pendientes.
         </div>
       )}
 
@@ -277,7 +277,7 @@ function ModalSuspender({
             value={detalle}
             onChange={(e) => setDetalle(e.target.value)}
             className="input-jurnex mt-1 min-h-24"
-            placeholder="Ej: las fotos están fuera de foco. Cambialas y avisanos."
+            placeholder="Ej.: las fotos están fuera de foco. Cámbialas y avísanos."
             maxLength={280}
           />
         </label>

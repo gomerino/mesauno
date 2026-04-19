@@ -31,15 +31,15 @@ Trabajás como **equipo multidisciplinario** cubriendo 7 roles definidos en `age
 - `agents/data.txt` — Data / Analytics
 - `agents/growth.txt` — Growth
 
-Ante una HU no-trivial, cubrí los 7 ángulos. Para HUs nuevas, creá una carpeta `workflows/<ID>-<slug>/` con los 7 archivos del patrón (ver `.cursor/rules/jurnex-workflow.mdc`).
+Ante una HU no-trivial, cubre los 7 ángulos. Para HUs nuevas, crea una carpeta `workflows/<ID>-<slug>/` con los 7 archivos del patrón (ver `.cursor/rules/jurnex-workflow.mdc`).
 
 ## Reglas duras
 
-1. **Idioma de interacción: español LATAM (chileno warm)**. Chats, PRs, commits, Linear, copy UI — todo en español salvo que el user pida explícitamente lo contrario.
+1. **Idioma de interacción: español LATAM neutro (tuteo)**. Chats, PRs, commits, Linear, copy UI — todo en español con tuteo neutro (tú/tienes/puedes/quieres). **Prohibido el voseo argentino** (vos/tenés/podés/querés/sumate/registrate/contanos/subí/dejá/mirá), prohibidos los modismos chilenos fuertes (bacán/pololo/cachái). El copy debe sonar igual de natural en Chile, México, Colombia y Perú.
 2. **Idioma en base de datos: español**. Tablas y columnas siguen el patrón del schema (`eventos`, `invitados`, `evento_fotos`, `proveedores`, `proveedor_servicios`, `proveedor_solicitudes`, `proveedor_favoritos`, `proveedor_medios`, `v_marketplace_tarjetas`…). Enum values en español cuando es natural (`pendiente/aprobado/suspendido`, `imagen/video`, `en_app/email/whatsapp`); términos comerciales (`free`, `premium`, `trial`, `paid`) y códigos técnicos (`user_id`, `slug`, `lt-500k`) quedan en inglés. Tipos TS en `src/types/database.ts` usan los mismos nombres que la columna (`nombre_negocio`, `solicitudes_mes`, `created_at`).
 3. **No tocar `/invitacion/*`** — producto en producción estable.
 4. **Mobile-first siempre**.
-5. **Tono chileno warm**: voseo, evitar "Submit/Register/Upload" → "Enviar solicitud", "Crear cuenta", "Subir foto".
+5. **Tono warm + profesional, LATAM neutro**: tuteo (tú/puedes), evitar "Submit/Register/Upload" → "Enviar solicitud", "Crear cuenta", "Subir foto". Sin voseo, sin modismos regionales fuertes.
 6. Externamente **"proveedor"** (no "provider"), **"solicitud"** (no "lead"), **"favoritos / agregar a tu evento"** (no "wishlist").
 7. RLS obligatorio en toda tabla nueva. Usar funciones helper `security definer stable` (`user_is_evento_member`, `user_is_proveedor_owner`, `proveedor_es_visible`) para evitar recursión.
 8. Migraciones como `supabase/migration_<tema>.sql`, idempotentes, con bloque ROLLBACK comentado al final.

@@ -7,7 +7,7 @@ import { RegistroProveedorFlow } from "@/components/proveedores/RegistroProveedo
 export const metadata: Metadata = {
   title: "Registrarme como proveedor · Jurnex",
   description:
-    "Sumate al marketplace de matrimonios. Registro self-serve en 3 pasos.",
+    "Únete al marketplace de matrimonios. Registro autoservicio en 3 pasos.",
 };
 
 export default async function RegistroProveedorPage() {

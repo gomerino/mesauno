@@ -112,7 +112,7 @@ export async function registrarProveedor(
     );
   }
   if (nombreNegocio.length === 0) {
-    throw new RegistroProveedorError("nombre-vacio", "Contanos el nombre de tu negocio.");
+    throw new RegistroProveedorError("nombre-vacio", "Cuéntanos el nombre de tu negocio.");
   }
   if (!esCategoriaProveedor(categoria)) {
     throw new RegistroProveedorError(
@@ -121,7 +121,7 @@ export async function registrarProveedor(
     );
   }
   if (region.length === 0) {
-    throw new RegistroProveedorError("region-vacia", "Seleccioná una región.");
+    throw new RegistroProveedorError("region-vacia", "Selecciona una región.");
   }
 
   let userId: string;
@@ -146,7 +146,7 @@ export async function registrarProveedor(
     if (!yaExiste) {
       throw new RegistroProveedorError(
         "error-auth",
-        "No pudimos crear tu cuenta. Intentá de nuevo.",
+        "No pudimos crear tu cuenta. Intenta nuevamente.",
         createErr.message,
       );
     }
@@ -172,7 +172,7 @@ export async function registrarProveedor(
     if (yaProv) {
       throw new RegistroProveedorError(
         "email-en-uso-otro-proveedor",
-        "Ya existe un perfil de proveedor con este correo. Iniciá sesión para editarlo.",
+        "Ya existe un perfil de proveedor con este correo. Inicia sesión para editarlo.",
       );
     }
   } else {

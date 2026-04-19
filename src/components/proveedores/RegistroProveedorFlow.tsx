@@ -154,16 +154,16 @@ export function RegistroProveedorFlow({
   const validarPaso2 = (): boolean => {
     const errs: Record<string, string> = {};
     if (form.nombreNegocio.trim().length < 2) {
-      errs.nombreNegocio = "Contanos el nombre del negocio.";
+      errs.nombreNegocio = "Cuéntanos el nombre del negocio.";
     }
     if (!form.categoriaPrincipal) {
-      errs.categoriaPrincipal = "Seleccioná una categoría.";
+      errs.categoriaPrincipal = "Selecciona una categoría.";
     }
     if (!form.region) {
-      errs.region = "Seleccioná tu región.";
+      errs.region = "Selecciona tu región.";
     }
     if (form.eslogan.length > 120) {
-      errs.eslogan = "El eslogan debe ser corto (máx 120).";
+      errs.eslogan = "El eslogan debe ser corto (máx. 120).";
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -174,17 +174,17 @@ export function RegistroProveedorFlow({
     const wa = form.whatsapp.trim();
     if (wa && !/^\+[1-9]\d{7,14}$/.test(wa)) {
       errs.whatsapp =
-        "Debe empezar con + y país (ej: +56912345678).";
+        "Debe empezar con + y el código de país (ej.: +56912345678).";
     }
     if (!wa && !form.instagram.trim() && !form.sitioWeb.trim()) {
       errs.whatsapp =
-        "Dejá al menos un canal de contacto (WhatsApp, Instagram o web).";
+        "Deja al menos un canal de contacto (WhatsApp, Instagram o sitio web).";
     }
     if (fotos.length === 0) {
-      errs.fotos = "Subí al menos 1 foto de tus trabajos.";
+      errs.fotos = "Sube al menos 1 foto de tus trabajos.";
     }
     if (fotos.length > 6) {
-      errs.fotos = "En plan free podés subir hasta 6 fotos.";
+      errs.fotos = "En plan Free puedes subir hasta 6 fotos.";
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -434,9 +434,9 @@ function PasoCuenta({
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="font-display text-2xl font-bold">Creá tu cuenta</h2>
+        <h2 className="font-display text-2xl font-bold">Crea tu cuenta</h2>
         <p className="mt-1 text-sm text-slate-400">
-          Con este correo vas a gestionar tu perfil y recibir notificaciones.
+          Con este correo gestionarás tu perfil y recibirás notificaciones.
         </p>
       </div>
 
@@ -452,7 +452,7 @@ function PasoCuenta({
         />
         {userEmailReadonly && (
           <p className="mt-1 text-xs text-slate-500">
-            Ya tenés sesión con este correo — seguimos con él.
+            Ya tienes sesión con este correo — seguimos con él.
           </p>
         )}
       </Field>
@@ -469,7 +469,7 @@ function PasoCuenta({
               placeholder="Mínimo 8 caracteres"
             />
           </Field>
-          <Field label="Confirmá tu contraseña" error={errors.passwordConfirm}>
+          <Field label="Confirma tu contraseña" error={errors.passwordConfirm}>
             <input
               type="password"
               autoComplete="new-password"
@@ -490,7 +490,7 @@ function PasoNegocio({ form, setField, errors }: PasoProps) {
       <div>
         <h2 className="font-display text-2xl font-bold">Sobre tu negocio</h2>
         <p className="mt-1 text-sm text-slate-400">
-          Lo que ven los novios al descubrir tu perfil.
+          Lo que ven las parejas al descubrir tu perfil.
         </p>
       </div>
 
@@ -512,7 +512,7 @@ function PasoNegocio({ form, setField, errors }: PasoProps) {
             onChange={(e) => setField("categoriaPrincipal", e.target.value)}
             className="input-jurnex"
           >
-            <option value="">Elegí una</option>
+            <option value="">Elige una</option>
             {PROVEEDOR_CATEGORIAS.map((c) => (
               <option key={c.value} value={c.value}>
                 {c.label}
@@ -526,7 +526,7 @@ function PasoNegocio({ form, setField, errors }: PasoProps) {
             onChange={(e) => setField("region", e.target.value)}
             className="input-jurnex"
           >
-            <option value="">Elegí tu región</option>
+            <option value="">Elige tu región</option>
             {PROVEEDOR_REGIONES.map((r) => (
               <option key={r.value} value={r.value}>
                 {r.label}
@@ -568,7 +568,7 @@ function PasoNegocio({ form, setField, errors }: PasoProps) {
           value={form.biografia}
           onChange={(e) => setField("biografia", e.target.value)}
           className="input-jurnex min-h-32 resize-y"
-          placeholder="Contanos qué te hace único. ¿Cuántos matrimonios hiciste? ¿Qué estilo te define?"
+          placeholder="Cuéntanos qué te hace único. ¿Cuántos matrimonios has realizado? ¿Qué estilo te define?"
           maxLength={2000}
         />
       </Field>
@@ -600,7 +600,7 @@ function PasoContactoVisual({
       <div>
         <h2 className="font-display text-2xl font-bold">Cómo te conocen</h2>
         <p className="mt-1 text-sm text-slate-400">
-          Contactos para que los novios te escriban + tus mejores fotos.
+          Contactos para que las parejas te escriban + tus mejores fotos.
         </p>
       </div>
 
@@ -648,7 +648,7 @@ function PasoContactoVisual({
       <div>
         <p className="text-sm font-medium text-slate-200">Tus mejores fotos</p>
         <p className="mt-1 text-xs text-slate-400">
-          1 a 6 fotos en plan free. La primera es la foto de portada. JPG, PNG o WebP · máx 10MB c/u.
+          1 a 6 fotos en plan Free. La primera es la foto de portada. JPG, PNG o WebP · máx. 10 MB c/u.
         </p>
 
         {errors.fotos && (
@@ -782,9 +782,8 @@ function PantallaConfirmacion({ nombreNegocio }: { nombreNegocio: string }) {
         {nombreNegocio}, tu perfil está en revisión.
       </h1>
       <p className="mt-4 max-w-md text-slate-300">
-        Te vamos a escribir al correo en un máximo de 48 horas con la
-        aprobación. Mientras tanto podés seguir editando tu perfil desde el
-        panel.
+        Te escribiremos al correo en un máximo de 48 horas con la aprobación.
+        Mientras tanto puedes seguir editando tu perfil desde el panel.
       </p>
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Link

@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   const proveedor = await obtenerProveedorPropio(supabase, user.id);
   if (!proveedor) {
     return NextResponse.json(
-      { error: "No tenés un perfil de proveedor todavía." },
+      { error: "Todavía no tienes un perfil de proveedor." },
       { status: 404 },
     );
   }

@@ -66,10 +66,10 @@ export function buildBienvenidaPendienteHtml(params: Firma): string {
     `
       <p style="margin: 0 0 10px; font-size: 20px; font-weight: 600;">¡Bienvenido, ${escapar(nombreNegocio)}!</p>
       <p style="margin: 0 0 16px; color: #444; line-height: 1.55;">
-        Recibimos tu solicitud para sumarte al marketplace. Nuestro equipo la está revisando y te avisaremos por este correo en un <strong>máximo de 48 horas</strong>.
+        Recibimos tu solicitud para unirte al marketplace. Nuestro equipo la está revisando y te avisaremos por este correo en un <strong>máximo de 48 horas</strong>.
       </p>
       <p style="margin: 0 0 20px; color: #444; line-height: 1.55;">
-        Mientras tanto, podés ver cómo quedó tu perfil y completar información extra si querés.
+        Mientras tanto, puedes ver cómo quedó tu perfil y completar información extra si lo deseas.
       </p>
       <p style="margin: 0 0 8px;">${cta(panelUrl, "Ver mi perfil")}</p>
       <p style="margin: 18px 0 0; font-size: 12px; color: #888; word-break: break-all;">Si el botón no funciona, copia este enlace: ${escapar(panelUrl)}</p>
@@ -85,16 +85,16 @@ export function buildAprobadoHtml(params: Firma & { perfilPublicoUrl: string }):
     `
       <p style="margin: 0 0 10px; font-size: 20px; font-weight: 600;">${escapar(nombreNegocio)}, tu perfil ya es visible ✈️</p>
       <p style="margin: 0 0 16px; color: #444; line-height: 1.55;">
-        Los novios que están armando su boda ya pueden descubrirte en el marketplace. Queremos ayudarte a convertir esos contactos en experiencias inolvidables.
+        Las parejas que están organizando su boda ya pueden descubrirte en el marketplace. Queremos ayudarte a convertir esos contactos en experiencias inolvidables.
       </p>
       <p style="margin: 0 0 8px;">${cta(perfilPublicoUrl, "Ver mi perfil público")}</p>
       <p style="margin: 18px 0 10px; color: #444; line-height: 1.55;">
-        Para maximizar leads, te recomendamos:
+        Para maximizar tus contactos, te recomendamos:
       </p>
       <ul style="margin: 0 0 20px 20px; color: #444; line-height: 1.55;">
         <li>Subir al menos 3 fotos de trabajos recientes.</li>
-        <li>Completar tu bio con tu propuesta diferencial.</li>
-        <li>Configurar precio desde para cada servicio.</li>
+        <li>Completar tu biografía con tu propuesta diferencial.</li>
+        <li>Configurar el precio desde para cada servicio.</li>
       </ul>
       <p style="margin: 0 0 8px;"><a href="${escapar(panelUrl)}" style="color: ${NAVY}; font-weight: 600;">Ir a mi panel →</a></p>
     `,
@@ -127,10 +127,10 @@ export function buildSuspendidoHtml(
           : ""
       }
       <p style="margin: 0 0 20px; color: #444; line-height: 1.55;">
-        Podés editar tu perfil desde el panel y responder a este correo para que lo revisemos de nuevo.
+        Puedes editar tu perfil desde el panel y responder a este correo para que lo revisemos nuevamente.
       </p>
       <p style="margin: 0 0 8px;">${cta(panelUrl, "Editar mi perfil")}</p>
-      <p style="margin: 18px 0 0; font-size: 12px; color: #888;">¿Dudas? Respondenos a este correo o escribinos a <a href="mailto:hola@jurnex.cl" style="color: ${NAVY};">hola@jurnex.cl</a>.</p>
+      <p style="margin: 18px 0 0; font-size: 12px; color: #888;">¿Tienes dudas? Responde a este correo o escríbenos a <a href="mailto:hola@jurnex.cl" style="color: ${NAVY};">hola@jurnex.cl</a>.</p>
     `,
   );
 }

@@ -19,15 +19,16 @@ Operás como **equipo multidisciplinario**. Ante cualquier HU no-trivial, cubrí
 6. **Data** (`agents/data.txt`) — event dictionary, metrics, quality, sin PII.
 7. **Growth** (`agents/growth.txt`) — funnel, hipótesis medibles, sin dark patterns.
 
-Leé los archivos en `agents/*.txt` cuando necesites el detalle exacto de cada rol.
+Lee los archivos en `agents/*.txt` cuando necesites el detalle exacto de cada rol.
 
 ## Reglas duras (no negociables)
 
-- **Idioma de interacción: español LATAM (chileno warm)**. Todas las respuestas, explicaciones, PR descriptions, comentarios de Linear, mensajes de commit, copy de UI y contenido de workflows se escriben en español. Nunca cambies a inglés salvo que el user lo pida explícitamente.
+- **Idioma de interacción: español LATAM neutro**. Todas las respuestas, explicaciones, PR descriptions, comentarios de Linear, mensajes de commit, copy de UI y contenido de workflows se escriben en español **con tuteo neutro** (tú/tienes/puedes/quieres). Nunca cambies a inglés salvo que el user lo pida explícitamente.
+- **PROHIBIDO el voseo argentino** en copy de producto, emails, UI, documentación visible, comentarios de PR, Linear, etc. No uses `vos`, `tenés`, `podés`, `querés`, `sumate`, `registrate`, `contanos`, `subí`, `dejá`, `mirá`, `andá`, `escuchá`, `pasá`. Usá las formas neutras: `tú`, `tienes`, `puedes`, `quieres`, `súmate`, `regístrate`, `cuéntanos`, `sube`, `deja`, `mira`, `ve`, `escucha`, `pásate`. Tampoco modismos chilenos fuertes (`bacán`, `pololo`, `cachái`).
 - **Idioma en base de datos: español**. Tablas, columnas, vistas, funciones, policies e índices siguen el patrón del schema existente (`eventos`, `invitados`, `evento_miembros`, `evento_fotos`, `proveedores`, `proveedor_servicios`, `proveedor_solicitudes`, `proveedor_favoritos`, `proveedor_medios`, `v_marketplace_tarjetas`, etc.). Enum values también en español cuando sea natural (`pendiente/aprobado/suspendido`, `imagen/video`, `en_app/email/whatsapp`). Excepción: términos comerciales consolidados (`free`, `premium`, `trial`, `paid`) y códigos técnicos compactos (`lt-500k`, `id`, `slug`, `_id`, `_at`, `user_id`) se dejan en inglés. Tipos TypeScript en `src/types/database.ts` usan nombres en español consistentes con la columna (`Proveedor`, `ProveedorServicio`, `ProveedorSolicitud`, `Evento`, `Invitado`…).
 - **NO TOCAR `/invitacion/*`** — producto en prod estable.
 - **Mobile-first siempre**; validar en iPhone 12 / Pixel 5 antes de mergear.
-- **Tono chileno warm**: voseo ("contactá", "agregá"), evitar "Submit/Upload/Register" → usar "Enviar solicitud", "Agregar foto", "Empezar ahora".
+- **Tono warm + profesional, español LATAM neutro (tuteo)**: "contáctanos", "agrega", "súmate", "comienza ahora". Evitar "Submit/Upload/Register" → usar "Enviar solicitud", "Agregar foto", "Comenzar ahora". Cero voseo argentino, cero modismos regionales fuertes. Funciona igual de bien para usuarios en Chile, México, Colombia, Perú o Argentina.
 - **Nunca "provider" externamente**: en UI siempre "proveedor" o "profesional".
 - **Nunca "lead" externamente**: en UI "solicitud de contacto" o "mensaje".
 - **Nunca "wishlist" externamente**: en UI "favoritos" o "agregar a tu evento".

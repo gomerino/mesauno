@@ -25,16 +25,16 @@ export default async function PanelProveedorPage() {
     return (
       <div className="mx-auto max-w-xl py-16 text-center">
         <h1 className="font-display text-2xl font-bold">
-          Todavía no tenés un perfil de proveedor
+          Todavía no tienes un perfil de proveedor
         </h1>
         <p className="mt-4 text-slate-400">
-          Registrate en menos de 5 minutos para aparecer en el marketplace.
+          Regístrate en menos de 5 minutos para aparecer en el marketplace.
         </p>
         <Link
           href="/para-proveedores/registro"
           className="mt-6 inline-flex items-center justify-center rounded-full bg-amber-300 px-6 py-3 text-sm font-semibold text-slate-950 hover:bg-amber-200"
         >
-          Empezar registro
+          Comenzar registro
         </Link>
       </div>
     );
@@ -131,7 +131,7 @@ export default async function PanelProveedorPage() {
         </div>
         {medios.length === 0 ? (
           <div className="mt-4 rounded-2xl border border-dashed border-white/10 bg-white/5 p-8 text-center text-sm text-slate-400">
-            Todavía no subiste fotos. Subí desde el panel completo (disponible en M03).
+            Todavía no has subido fotos. Podrás hacerlo desde el panel completo (disponible en M03).
           </div>
         ) : (
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
@@ -160,10 +160,10 @@ export default async function PanelProveedorPage() {
       <section className="rounded-3xl border border-amber-300/20 bg-amber-300/5 p-6 text-sm text-slate-200 md:p-8">
         <p className="font-semibold text-amber-200">Próximamente (M03)</p>
         <p className="mt-2">
-          El panel editable completo (fotos drag-drop, servicios con precios,
-          reordenar portfolio, ver leads recibidos) está en desarrollo. Si
-          necesitás ajustar algo ya, contestá al correo de bienvenida y lo
-          hacemos manualmente.
+          El panel editable completo (fotos con drag & drop, servicios con
+          precios, reordenar portafolio, ver solicitudes recibidas) está en
+          desarrollo. Si necesitas ajustar algo ahora, responde al correo de
+          bienvenida y lo hacemos manualmente.
         </p>
       </section>
     </div>
@@ -211,7 +211,7 @@ function BannerEstado({
           <span>🎉</span> Tu perfil está visible
         </p>
         <p className="mt-1 text-sm text-emerald-100/80">
-          Los novios ya pueden descubrirte en el marketplace.{" "}
+          Las parejas ya pueden descubrirte en el marketplace.{" "}
           <Link
             href={`/marketplace/${slug}`}
             className="underline hover:text-white"
@@ -231,18 +231,18 @@ function BannerEstado({
   return (
     <div className="rounded-2xl border border-rose-500/40 bg-rose-500/10 p-5">
       <p className="flex items-center gap-2 font-display text-lg font-semibold text-rose-100">
-        <span>🔒</span> Necesitamos más info para activarte
+        <span>🔒</span> Necesitamos más información para activarte
       </p>
       <p className="mt-1 text-sm text-rose-100/80">
         {motivoLabel ?? "Tu perfil está en pausa."}
         {detalle ? ` · ${detalle}` : ""}
       </p>
       <p className="mt-2 text-xs text-rose-200/70">
-        Escribinos a{" "}
+        Escríbenos a{" "}
         <a href="mailto:hola@jurnex.cl" className="underline">
           hola@jurnex.cl
         </a>{" "}
-        con los ajustes y lo revisamos de nuevo.
+        con los ajustes y lo revisamos nuevamente.
       </p>
     </div>
   );
