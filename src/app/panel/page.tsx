@@ -13,6 +13,7 @@ export default function PanelHomePage({
 }) {
   const welcome = searchParams?.welcome;
   const mockPayment = searchParams?.mockPayment;
+  const celebrate = searchParams?.celebrate;
   const focus = searchParams?.focus;
 
   const forceFreshFromWelcome =
@@ -25,10 +26,18 @@ export default function PanelHomePage({
   const optimisticPlanActive = process.env.NODE_ENV === "development" && mockPaymentStatus === "approved";
   const optimisticPaymentStatus = process.env.NODE_ENV === "development" ? mockPaymentStatus : null;
 
+  const celebrateRaw =
+    typeof celebrate === "string" ? celebrate : Array.isArray(celebrate) ? celebrate[0] : undefined;
+  const celebrateToSuccess =
+    process.env.NODE_ENV === "development" &&
+    mockPaymentStatus === "approved" &&
+    (celebrateRaw === "1" || celebrateRaw === "true");
+
   return (
     <>
       <PanelMockPaymentActivator
         status={process.env.NODE_ENV === "development" ? mockPaymentStatus : null}
+        redirectAfterApprovedTo={celebrateToSuccess ? "/panel/success" : null}
       />
       <PanelWelcomeCleanup enabled={forceFreshFromWelcome} />
       <JourneyHome
