@@ -32,6 +32,19 @@ function asString(v: unknown): string | null {
   return typeof v === "string" ? v : null;
 }
 
+function asIsoTimestamp(v: unknown): string | null {
+  const s = asString(v)?.trim();
+  if (s) return s;
+  if (typeof v === "number" && Number.isFinite(v)) {
+    try {
+      return new Date(v).toISOString();
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 function normalizeHora(raw: unknown): string {
   const s = asString(raw)?.trim() ?? "";
   if (!s) return "00:00:00";
@@ -53,7 +66,7 @@ function parseFotos(raw: unknown): ProgramaHitoFotoPublic[] {
     const o = item as Record<string, unknown>;
     const id = asString(o.id)?.trim();
     const storage_path = asString(o.storage_path)?.trim();
-    const created_at = asString(o.created_at)?.trim();
+    const created_at = asIsoTimestamp(o.created_at);
     if (id && storage_path && created_at) out.push({ id, storage_path, created_at });
   }
   return out;
@@ -87,8 +100,16 @@ function parseHitos(raw: unknown): ProgramaConFotosHitoParsed[] {
 
 /** Interpreta el JSON devuelto por `programa_con_fotos_ventanas_publica`. */
 export function parseProgramaConFotosVentanasPublica(raw: unknown): ProgramaConFotosHub | null {
-  if (!raw || typeof raw !== "object") return null;
-  const o = raw as Record<string, unknown>;
+  let v: unknown = raw;
+  if (typeof raw === "string") {
+    try {
+      v = JSON.parse(raw) as unknown;
+    } catch {
+      return null;
+    }
+  }
+  if (!v || typeof v !== "object") return null;
+  const o = v as Record<string, unknown>;
   if (o.ok !== true) return null;
   const evento_id = asString(o.evento_id)?.trim();
   if (!evento_id) return null;

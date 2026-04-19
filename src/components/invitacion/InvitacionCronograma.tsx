@@ -103,6 +103,10 @@ export function InvitacionCronograma({ hitos, fechaEvento, fotosPorHito }: Props
   const eventDay = useMemo(() => sameLocalCalendarDay(fechaEvento, now), [fechaEvento, now]);
   const liveIdx = useMemo(() => (eventDay ? liveHitoIndex(hitos, now) : -1), [eventDay, hitos, now]);
   const nextIdx = useMemo(() => (eventDay ? nextHitoIndex(hitos, now) : -1), [eventDay, hitos, now]);
+  const hayFotosPorMomento = useMemo(
+    () => Object.values(fotosPorHito ?? {}).some((arr) => Array.isArray(arr) && arr.length > 0),
+    [fotosPorHito],
+  );
 
   /** Centrar en vista el hito “Ahora” o, si no aplica, el “Próximo”. */
   useEffect(() => {
@@ -155,6 +159,11 @@ export function InvitacionCronograma({ hitos, fechaEvento, fotosPorHito }: Props
         <p className="mt-1 text-[11px] leading-snug text-[#001d66]/55">
           Todos los momentos del día, en orden cronológico
         </p>
+        {hayFotosPorMomento ? (
+          <p className="mt-1 text-[11px] leading-snug text-[#001d66]/70">
+            Galería: miniaturas junto a cada momento cuando la hora de la foto coincide con ese tramo del día.
+          </p>
+        ) : null}
         {statusBanner}
       </div>
 

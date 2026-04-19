@@ -73,15 +73,21 @@ export function SoftAviationSpaShell({
     evento
   );
 
-  /** Pase + Carta siempre; Regalos/Música/Plan si confirmó; Fotos si es día del evento (independiente). */
+  const hasItinerario = programaHitos.length > 0;
+
+  /**
+   * Pase + Carta siempre; Plan si hay hitos (lectura pública, sin depender del RSVP);
+   * Regalos/Música si confirmó; Fotos si es día del evento.
+   */
   const navItems = useMemo(() => {
     const core = NAV.filter((n) => n.id === "ticket" || n.id === "motivo");
+    const planTab = hasItinerario ? NAV.filter((n) => n.id === "itinerario") : [];
     const postConfirm = isConfirmed
-      ? NAV.filter((n) => n.id === "regalos" || n.id === "playlist" || n.id === "itinerario")
+      ? NAV.filter((n) => n.id === "regalos" || n.id === "playlist")
       : [];
     const fotosTab = isEventDay ? NAV.filter((n) => n.id === "fotos") : [];
-    return [...core, ...postConfirm, ...fotosTab];
-  }, [isConfirmed, isEventDay]);
+    return [...core, ...planTab, ...postConfirm, ...fotosTab];
+  }, [isConfirmed, isEventDay, hasItinerario]);
 
   const navColumnCount = navItems.length + (isEventDay ? 1 : 0);
 
@@ -96,7 +102,6 @@ export function SoftAviationSpaShell({
 
   const motivoText = merged.motivo_viaje?.trim() ?? "";
   const eventoId = invitado.evento_id ?? null;
-  const hasItinerario = programaHitos.length > 0;
   const fechaLegible = formatFechaEventoLarga(merged.fecha_evento);
 
   const checkInPayload = (invitado.qr_code_token ?? invitado.id).trim();
