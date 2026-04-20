@@ -1,5 +1,6 @@
 "use client";
 
+import { INVITACION_FOTO_SUBIDA_EVENT } from "@/lib/invitacion-foto-upload-client";
 import type { EventoFoto } from "@/types/database";
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
@@ -43,6 +44,22 @@ export function InvitacionAlbumSection({
   useEffect(() => {
     if (!controlled) setInternal(initialFotos);
   }, [initialFotos, controlled]);
+
+  useEffect(() => {
+    const onSubida = (ev: Event) => {
+      const ce = ev as CustomEvent<{ foto?: EventoFoto }>;
+      const foto = ce.detail?.foto;
+      if (!foto) return;
+      setFotos((prev) => {
+        if (prev.some((p) => p.id === foto.id)) return prev;
+        return [foto, ...prev].sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+      });
+    };
+    window.addEventListener(INVITACION_FOTO_SUBIDA_EVENT, onSubida as EventListener);
+    return () => window.removeEventListener(INVITACION_FOTO_SUBIDA_EVENT, onSubida as EventListener);
+  }, [setFotos]);
 
   return (
     <section

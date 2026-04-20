@@ -3,18 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --background: #0f172a;
-  --foreground: #f8fafc;
+  --background: #060b14;
+  --foreground: #eaf2ff;
 }
 
 body {
-  color: var(--foreground);
-  background: linear-gradient(180deg, #042f2e 0%, #0f172a 45%, #1e1b4b 100%);
-  min-height: 100vh;
+  @apply min-h-screen bg-jurnex-bg text-jurnex-text-primary antialiased;
 }
 
 @layer components {
   .input-jurnex {
-    @apply w-full rounded-xl border border-white/10 bg-slate-950/50 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-amber-300/60 focus:outline-none focus:ring-2 focus:ring-amber-300/20;
+    @apply w-full rounded-jurnex-sm border border-jurnex-border bg-jurnex-surface px-4 py-3 text-sm text-jurnex-text-primary placeholder:text-jurnex-text-muted focus:border-jurnex-primary focus:outline-none focus:ring-2 focus:ring-jurnex-primary/25;
   }
 }

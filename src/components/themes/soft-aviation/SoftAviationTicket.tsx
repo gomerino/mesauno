@@ -86,6 +86,8 @@ type Props = {
   programaHitos: EventoProgramaHito[];
   /** Etiqueta de dress code (p. ej. onboarding). Por defecto "Elegante". */
   dressCodeLabel?: string;
+  /** Si true, se omite la línea de cierre “te esperamos a bordo” (gran día). */
+  isEventDay?: boolean;
 };
 
 /**
@@ -98,6 +100,7 @@ export function SoftAviationTicket({
   mapUrl,
   programaHitos,
   dressCodeLabel = "Elegante",
+  isEventDay = false,
 }: Props) {
   const address = resolveDestinoParaMapa(merged.destino);
   const wazeUrl = `https://waze.com/ul?q=${encodeURIComponent(address)}&navigate=yes`;
@@ -225,10 +228,13 @@ export function SoftAviationTicket({
           </div>
         </div>
 
-        {/* Cierre emocional — una línea */}
-        <div className="border-t border-dashed border-invite-navy/22 px-3 py-3 text-center sm:px-4">
-          <p className="text-[9px] font-medium leading-relaxed text-invite-navy/70 sm:text-[10px]">Todo listo, te esperamos a bordo</p>
-        </div>
+        {!isEventDay ? (
+          <div className="border-t border-dashed border-invite-navy/22 px-3 py-3 text-center sm:px-4">
+            <p className="text-[9px] font-medium leading-relaxed text-invite-navy/70 sm:text-[10px]">
+              Todo listo, te esperamos a bordo
+            </p>
+          </div>
+        ) : null}
       </div>
     </section>
   );

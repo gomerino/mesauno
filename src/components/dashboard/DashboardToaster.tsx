@@ -3,5 +3,12 @@
 import { Toaster } from "sonner";
 
 export function DashboardToaster() {
-  return <Toaster richColors position="top-center" />;
+  return (
+    <Toaster
+      richColors
+      closeButton
+      position="top-center"
+      toastOptions={{ duration: 4000 }}
+    />
+  );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import type { EventoFoto } from "@/types/database";
-import imageCompression from "browser-image-compression";
+import { subirFotoInvitacionDesdeCliente } from "@/lib/invitacion-foto-upload-client";
 import { Camera } from "lucide-react";
 import { useCallback, useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
@@ -12,32 +12,6 @@ type Props = {
   /** Suma al `bottom` del FAB (p. ej. barra fija de check-in encima). Ej: `5.25rem`. */
   fabBottomExtra?: string;
 };
-
-function uploadFormDataWithProgress(
-  formData: FormData,
-  onProgress: (pct: number) => void
-): Promise<{ ok: boolean; status: number; body: unknown }> {
-  return new Promise((resolve) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/invitacion/fotos");
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable) {
-        onProgress(Math.min(100, Math.round((100 * e.loaded) / e.total)));
-      }
-    };
-    xhr.onload = () => {
-      let body: unknown = null;
-      try {
-        body = JSON.parse(xhr.responseText) as unknown;
-      } catch {
-        body = null;
-      }
-      resolve({ ok: xhr.status >= 200 && xhr.status < 300, status: xhr.status, body });
-    };
-    xhr.onerror = () => resolve({ ok: false, status: 0, body: null });
-    xhr.send(formData);
-  });
-}
 
 export function PhotoUpload({ invitacionToken, onUploaded, fabBottomExtra }: Props) {
   const inputId = useId();
@@ -63,37 +37,17 @@ export function PhotoUpload({ invitacionToken, onUploaded, fabBottomExtra }: Pro
       setCompressPct(8);
 
       try {
-        setCompressPct(12);
-        const compressed = await imageCompression(file, {
-          maxSizeMB: 1.2,
-          maxWidthOrHeight: 1920,
-          useWebWorker: true,
-          initialQuality: 0.82,
-          fileType: "image/jpeg",
+        const res = await subirFotoInvitacionDesdeCliente(file, invitacionToken, {
+          onCompressPct: (p) => setCompressPct(p),
+          onUploadPct: (p) => setUploadPct(p),
         });
-        setCompressPct(100);
-
-        const formData = new FormData();
-        formData.append("token", invitacionToken);
-        formData.append("file", compressed, "foto.jpg");
-
-        const res = await uploadFormDataWithProgress(formData, (p) => setUploadPct(p));
 
         if (!res.ok) {
-          const msg =
-            typeof res.body === "object" && res.body !== null && "error" in res.body
-              ? String((res.body as { error?: string }).error)
-              : "No se pudo subir la foto";
-          setErr(msg || `Error ${res.status}`);
+          setErr(res.error || "No se pudo subir la foto");
           return;
         }
 
-        const body = res.body as { ok?: boolean; foto?: EventoFoto };
-        if (body?.ok && body.foto) {
-          onUploaded(body.foto);
-        } else {
-          setErr("Respuesta inesperada del servidor");
-        }
+        onUploaded(res.foto);
       } catch (ce) {
         setErr(ce instanceof Error ? ce.message : "Error al procesar la imagen");
       } finally {
@@ -141,7 +95,6 @@ export function PhotoUpload({ invitacionToken, onUploaded, fabBottomExtra }: Pro
         </div>
       ) : null}
 
-      {/* <label htmlFor> abre el selector de archivos/cámara de forma nativa (iOS/Android); evita click() programático bloqueado */}
       <label
         htmlFor={inputId}
         className={`pointer-events-auto flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-[#001d66] text-white shadow-[0_6px_24px_rgba(0,29,102,0.45)] ring-4 ring-white/90 transition hover:bg-[#002a8c] hover:shadow-xl ${

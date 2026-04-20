@@ -16,6 +16,10 @@ type Props = {
   className?: string;
   /** Texto del botón en estado idle. Default: "Copiar link". */
   label?: string;
+  /** Solo icono (p. ej. barra compacta en móvil); usa `title` y `aria-label` como ayuda. */
+  iconOnly?: boolean;
+  onCopySuccess?: () => void;
+  onCopyError?: () => void;
 };
 
 function LinkGlyph({ className }: { className?: string }) {
@@ -60,6 +64,9 @@ export function CopyInviteLinkButton({
   size = "sm",
   className,
   label = "Copiar link",
+  iconOnly = false,
+  onCopySuccess,
+  onCopyError,
 }: Props) {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState(false);
@@ -96,6 +103,7 @@ export function CopyInviteLinkButton({
         document.body.removeChild(ta);
       }
       setCopied(true);
+      onCopySuccess?.();
       trackEvent("invite_link_copied", {
         source,
         method: "copy",
@@ -104,15 +112,21 @@ export function CopyInviteLinkButton({
       timerRef.current = setTimeout(() => setCopied(false), 2200);
     } catch {
       setError(true);
+      onCopyError?.();
       timerRef.current = setTimeout(() => setError(false), 2500);
     }
-  }, [invitationUrl, source, invitadoId]);
+  }, [invitationUrl, source, invitadoId, onCopySuccess, onCopyError]);
 
-  const sizeCls =
-    size === "md"
+  const sizeCls = iconOnly
+    ? "min-h-[44px] min-w-[44px] justify-center gap-0 p-0 text-xs"
+    : size === "md"
       ? "px-4 py-2 text-sm"
       : "px-3 py-1.5 text-xs";
-  const iconCls = size === "md" ? "h-4 w-4" : "h-3.5 w-3.5";
+  const iconCls =
+    iconOnly ? "h-5 w-5" : size === "md" ? "h-4 w-4" : "h-3.5 w-3.5";
+
+  const ariaForIcon =
+    copied ? "Copiado al portapapeles" : error ? "Error al copiar, reintenta" : "Copiar enlace de invitación";
 
   const stateCls = copied
     ? "border-emerald-600/50 bg-emerald-900/40 text-emerald-200 hover:bg-emerald-900/55"
@@ -125,9 +139,11 @@ export function CopyInviteLinkButton({
       type="button"
       onClick={handleClick}
       aria-live="polite"
+      aria-label={iconOnly ? ariaForIcon : undefined}
       title={copied ? "Link copiado al portapapeles" : "Copiar link de invitación"}
       className={[
         "inline-flex items-center gap-1.5 rounded-full border font-semibold shadow-sm transition",
+        iconOnly ? "rounded-xl" : "",
         sizeCls,
         stateCls,
         className ?? "",
@@ -138,7 +154,7 @@ export function CopyInviteLinkButton({
       ) : (
         <LinkGlyph className={`${iconCls} shrink-0`} />
       )}
-      {copied ? "Copiado" : error ? "Reintenta" : label}
+      {iconOnly ? null : copied ? "Copiado" : error ? "Reintenta" : label}
     </button>
   );
 }

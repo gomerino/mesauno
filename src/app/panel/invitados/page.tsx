@@ -1,15 +1,14 @@
 import { GrowthNudge } from "@/components/app/GrowthNudge";
-import { GuestsMissionContextClient } from "@/components/panel/GuestsMissionContextClient";
+import { InvitadosManager } from "@/components/InvitadosManager";
 import { JourneyPrimaryCta } from "@/components/panel/journey/JourneyPrimaryCta";
 import { JourneyPhasesBar } from "@/components/panel/journey/JourneyPhasesBar";
-import { PanelThemeSelector } from "@/components/panel/PanelThemeSelector";
+import { InvitadosSidebar } from "@/components/panel/invitados/InvitadosSidebar";
+import { PanelPageHeader } from "@/components/panel/PanelPageHeader";
 import { createClient } from "@/lib/supabase/server";
-import { InvitadosManager } from "@/components/InvitadosManager";
 import { fetchInvitadosPanelRowsWithAcompanantes } from "@/lib/panel-invitados";
 import { resolveJourneyPhase } from "@/lib/journey-phases";
 import { getJourneyPhasesProgressLines } from "@/lib/journey-cards-progress";
 import { loadPanelProgressBundle } from "@/lib/panel-progress-load";
-import { resolveGuestMissionState } from "@/lib/guest-mission";
 import type { Invitado } from "@/types/database";
 import Link from "next/link";
 
@@ -43,7 +42,6 @@ export default async function PanelInvitadosPage({
   const fromMission =
     fromMissionRaw === "mission" ||
     (Array.isArray(fromMissionRaw) && fromMissionRaw.includes("mission"));
-  const invitadosMission = resolveGuestMissionState(invitados);
   const journeyPhase = resolveJourneyPhase(evento?.fecha_boda, evento?.fecha_evento);
   const journeyProgress = getJourneyPhasesProgressLines({
     ...bundle,
@@ -52,6 +50,16 @@ export default async function PanelInvitadosPage({
   const planStatus = evento?.plan_status ?? null;
   const hasAccess = planStatus === "paid";
   const invitacionesEnviadas = invitados.filter((r) => r.email_enviado === true).length;
+  const abrieronTrasCorreo = invitados.filter(
+    (r) => r.email_enviado === true && r.invitacion_vista === true
+  ).length;
+  const tasaAperturaPct =
+    invitacionesEnviadas > 0
+      ? Math.min(
+          100,
+          Math.round((abrieronTrasCorreo / invitacionesEnviadas) * 1000) / 10
+        )
+      : 0;
   let canCheckout = false;
   let prefillNombre = "";
   if (evento?.id) {
@@ -63,91 +71,91 @@ export default async function PanelInvitadosPage({
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl">
-      <div className="flex min-h-[13.5rem] flex-col gap-3 md:min-h-[15rem] md:gap-4">
-        {!hasAccess ? (
-          <JourneyPrimaryCta
-            invitados_count={invitados.length}
-            plan_status={planStatus}
-            payment_status={bundle.mockPaymentStatus}
-            invitaciones_enviadas={invitacionesEnviadas}
-            canCheckout={canCheckout}
-            eventoId={evento?.id ?? null}
-            userEmail={user?.email ?? ""}
-            prefillNombre={prefillNombre || "Mi evento"}
+    <div className="min-h-full bg-[#0B0F1A] pb-24">
+      <div className="relative z-[1] mx-auto w-full max-w-[1200px] px-6">
+        <section className="flex flex-col gap-4">
+          <JourneyPhasesBar
             phase={journeyPhase}
+            progressPrimary={journeyProgress.primary}
+            progressHint={journeyProgress.hint}
           />
-        ) : (
-          <p className="text-xs font-medium tracking-wide text-[#D4AF37]/85">✨ Experiencia activa</p>
+          <PanelPageHeader
+            eyebrow="Invitados"
+            title="Tu tripulación"
+            subtitle={
+              <>
+                Gestiona tu lista y comparte invitaciones. Los datos del destino están en{" "}
+                <Link href="/panel/evento" className="text-teal-400/90 underline hover:text-teal-300">
+                  Evento
+                </Link>
+                .
+              </>
+            }
+          />
+          <div className="border-b border-white/10" aria-hidden />
+        </section>
+
+        {!hasAccess ? (
+          <div className="mt-6">
+            <JourneyPrimaryCta
+              invitados_count={invitados.length}
+              plan_status={planStatus}
+              payment_status={bundle.mockPaymentStatus}
+              invitaciones_enviadas={invitacionesEnviadas}
+              canCheckout={canCheckout}
+              eventoId={evento?.id ?? null}
+              userEmail={user?.email ?? ""}
+              prefillNombre={prefillNombre || "Mi evento"}
+              phase={journeyPhase}
+            />
+          </div>
+        ) : null}
+
+        {!evento && (
+          <div className="mt-4">
+            <GrowthNudge
+              message="Aún no creaste la ficha del evento. Cuando la completes, los invitados quedarán asociados automáticamente."
+              href="/panel/evento"
+              ctaLabel="Crear ficha del evento"
+            />
+          </div>
         )}
-        <JourneyPhasesBar
-          phase={journeyPhase}
-          className={hasAccess ? "mt-1.5 md:mt-2" : ""}
-          progressPrimary={journeyProgress.primary}
-          progressHint={journeyProgress.hint}
-        />
-        <div className="mt-3 md:mt-3">
-          <PanelThemeSelector />
-        </div>
-      </div>
 
-      <header className="mt-3 border-b border-white/[0.06] pb-4">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-teal-400/80">Invitados</p>
-        <h1 className="font-display text-2xl font-bold tracking-tight text-white md:text-3xl">Tu tripulación</h1>
-        <p className="mt-1 text-sm text-slate-400">
-          Gestiona tu lista y comparte invitaciones. Los datos del destino están en{" "}
-          <Link href="/panel/evento" className="text-teal-300 underline hover:text-teal-200">
-            Evento
-          </Link>
-          .
-        </p>
-      </header>
-
-      <GuestsMissionContextClient
-        fromMission={fromMission}
-        missionState={invitadosMission}
-        hasInvitados={hasInvitados}
-      />
-
-      {evento && !hasInvitados && (
-        <div className="mt-4 md:hidden">
-          <a
-            href="#agregar-invitados"
-            className="flex min-h-[48px] w-full items-center justify-center rounded-full bg-teal-500 px-4 text-sm font-semibold text-white shadow-lg shadow-teal-950/30 hover:bg-teal-400"
+        {evento && !hasInvitados && (
+          <div
+            className="mt-4 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/70"
+            role="status"
           >
-            Agregar invitados
-          </a>
+            <strong className="font-medium text-white/90">Te falta un paso:</strong> añade al menos una
+            persona abajo para generar su invitación y compartirla.
+          </div>
+        )}
+
+        {invitadosError && (
+          <p className="mt-4 rounded-xl border border-red-500/30 bg-red-950/20 px-4 py-3 text-sm text-red-200/90">
+            No pudimos cargar la lista. Intenta recargar la página. Si el problema sigue, contacta soporte.
+          </p>
+        )}
+
+        <div className="mt-6 flex flex-col gap-6 lg:grid lg:grid-cols-12 lg:items-start lg:gap-6">
+          <div id="agregar-invitados" className="scroll-mt-28 lg:col-span-8">
+            <InvitadosManager eventoId={evento?.id ?? null} initialInvitados={invitados} />
+          </div>
+
+          {evento ? (
+            <div className="lg:col-span-4">
+              <InvitadosSidebar
+                eventoId={evento.id}
+                hasInvitados={hasInvitados}
+                fromMission={fromMission}
+                totalInvitados={invitados.length}
+                emailsEnviados={invitacionesEnviadas}
+                abrieronTrasCorreo={abrieronTrasCorreo}
+                tasaAperturaPct={tasaAperturaPct}
+              />
+            </div>
+          ) : null}
         </div>
-      )}
-
-      {!evento && (
-        <div className="mt-6">
-          <GrowthNudge
-            message="Aún no creaste la ficha del evento. Cuando la completes, los invitados quedarán asociados automáticamente."
-            href="/panel/evento"
-            ctaLabel="Crear ficha del evento"
-          />
-        </div>
-      )}
-
-      {evento && !hasInvitados && (
-        <div
-          className="mt-6 rounded-xl border border-teal-500/30 bg-teal-500/[0.12] px-4 py-3 text-sm text-teal-50"
-          role="status"
-        >
-          <strong className="font-medium text-white">Te falta un paso:</strong> añade al menos una persona abajo para
-          generar su invitación y compartirla.
-        </div>
-      )}
-
-      {invitadosError && (
-        <p className="mt-6 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
-          No pudimos cargar la lista. Intentá recargar la página. Si el problema sigue, contactá soporte.
-        </p>
-      )}
-
-      <div id="agregar-invitados" className="mt-6 scroll-mt-28">
-        <InvitadosManager eventoId={evento?.id ?? null} initialInvitados={invitados} />
       </div>
     </div>
   );

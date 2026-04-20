@@ -3,7 +3,6 @@ import { JourneyPrimaryCta } from "@/components/panel/journey/JourneyPrimaryCta"
 import { JourneyPhasesBar } from "@/components/panel/journey/JourneyPhasesBar";
 import { PanelPageContainer } from "@/components/panel/PanelPageContainer";
 import { PanelPageHeader } from "@/components/panel/PanelPageHeader";
-import { PanelThemeSelector } from "@/components/panel/PanelThemeSelector";
 import { selectEventoForMember } from "@/lib/evento-membership";
 import { resolveJourneyPhase } from "@/lib/journey-phases";
 import { getJourneyPhasesProgressLines } from "@/lib/journey-cards-progress";
@@ -73,9 +72,6 @@ export default async function ExperienciaPage() {
           progressPrimary={journeyProgress.primary}
           progressHint={journeyProgress.hint}
         />
-        <div className="mt-3 md:mt-3">
-          <PanelThemeSelector />
-        </div>
       </div>
 
       <PanelPageHeader

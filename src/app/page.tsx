@@ -19,10 +19,10 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-[#020617] pb-[5.5rem] md:pb-0">
+    <div className="min-h-screen bg-jurnex-bg pb-[5.5rem] md:pb-0">
       <SiteHeader />
       <Hero />
-      <div className="border-b border-white/5 bg-[#0f172a]/50">
+      <div className="border-b border-jurnex-border bg-jurnex-surface/50">
         <LandingSocialProof />
       </div>
       <Features />
@@ -30,7 +30,7 @@ export default function HomePage() {
       <LandingMidCta />
       <HowItWorks />
       <CTA />
-      <footer className="border-t border-white/10 bg-[#020617] px-4 py-10 text-center text-xs text-slate-500">
+      <footer className="border-t border-jurnex-border bg-jurnex-bg px-4 py-10 text-center text-xs text-jurnex-text-muted">
         <div className="mx-auto flex max-w-xl flex-wrap items-center justify-center gap-x-4 gap-y-2">
           <Link href="/marketplace" className="hover:text-slate-300">
             Marketplace

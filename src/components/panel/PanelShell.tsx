@@ -77,7 +77,7 @@ function NavLink({
     <Link
       href={href}
       className={`rounded-xl px-3 py-2 text-sm transition-all duration-200 ${
-        active ? `border ${activeCls}` : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
+        active ? `border ${activeCls}` : "text-jurnex-text-secondary hover:bg-jurnex-surface-hover hover:text-jurnex-text-primary"
       }`}
     >
       {label}
@@ -141,15 +141,20 @@ export function PanelShell({
 
   return (
     <PanelJourneyThemeContext.Provider value={theme}>
-      <div data-theme={theme} className="flex min-h-screen flex-col bg-[#050810] md:flex-row">
+      <div data-theme={theme} className="flex min-h-screen flex-col bg-jurnex-bg md:flex-row">
         <div className={`pointer-events-none fixed inset-0 transition-colors duration-300 ${glow}`} aria-hidden />
 
-        <aside className="relative z-[1] hidden w-56 shrink-0 border-r border-white/[0.06] bg-[#070b14]/90 backdrop-blur-xl md:block lg:w-60">
+        <aside className="relative z-[1] hidden w-56 shrink-0 border-r border-jurnex-border bg-jurnex-surface/90 backdrop-blur-xl md:block lg:w-60">
           <div className="flex h-full flex-col gap-1 p-4 lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto lg:py-6">
-            <Link href="/panel" className="mb-2 font-display text-lg font-bold tracking-tight text-white">
+            <Link
+              href="/panel"
+              className="mb-2 font-display text-lg font-bold tracking-tight text-jurnex-text-primary"
+            >
               Dreams
             </Link>
-            <p className="mb-4 truncate border-b border-white/[0.06] pb-3 text-[11px] text-slate-500">{userEmail}</p>
+            <p className="mb-4 truncate border-b border-jurnex-border pb-3 text-[11px] text-jurnex-text-muted">
+              {userEmail}
+            </p>
 
             <nav className="flex flex-col gap-0.5" aria-label="Navegación principal">
               {panelSidebarVisibleItems().map(({ href, label, ...rest }) => (
@@ -165,7 +170,7 @@ export function PanelShell({
 
             <Link
               href="/"
-              className={`mt-8 text-[11px] text-slate-600 transition ${publicHover}`}
+              className={`mt-8 text-[11px] text-jurnex-text-muted transition ${publicHover}`}
             >
               ← Sitio público
             </Link>

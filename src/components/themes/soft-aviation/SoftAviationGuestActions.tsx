@@ -19,6 +19,8 @@ type Props = {
   /** `embedded`: botón en flujo (debajo del hub de pestañas). `fixed`: barra fija al viewport (legacy). */
   footerMode?: "fixed" | "embedded";
   onRsvpEstadoChange?: (estado: string | null) => void;
+  /** Si true y la asistencia ya está confirmada, no se muestra el resumen ni “Editar asistencia” (gran día). */
+  isEventDay?: boolean;
 };
 
 export function SoftAviationGuestActions({
@@ -30,6 +32,7 @@ export function SoftAviationGuestActions({
   spotifyPlaylistUrl,
   footerMode = "fixed",
   onRsvpEstadoChange,
+  isEventDay = false,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [flowMode, setFlowMode] = useState<"create" | "edit">("create");
@@ -42,6 +45,7 @@ export function SoftAviationGuestActions({
 
   const ui: RsvpUiState = rsvpUiStateFromDb(rsvpEstado);
   const destinoSummary = guestSeatSummaryLine(invitado, evento);
+  const hideConfirmedChrome = ui === "confirmed" && isEventDay;
 
   const notifyParent = useCallback(
     (estado: string | null) => {
@@ -79,7 +83,7 @@ export function SoftAviationGuestActions({
         </button>
       )}
 
-      {ui === "confirmed" && (
+      {ui === "confirmed" && !hideConfirmedChrome && (
         <div className="space-y-3 animate-rsvpReveal motion-reduce:animate-none">
           <div className="text-center">
             <p className="text-[13px] font-semibold leading-snug text-[#1A2B48]">Todo listo, te esperamos a bordo</p>
@@ -105,6 +109,20 @@ export function SoftAviationGuestActions({
       )}
     </div>
   );
+
+  if (hideConfirmedChrome) {
+    return open ? (
+      <SoftAviationCheckInFlow
+        invitadoId={invitadoId}
+        initialEstado={rsvpEstado ?? initialEstado}
+        initialRestricciones={restriccionesFromDb(restriccionesRaw)}
+        spotifyPlaylistUrl={spotifyPlaylistUrl}
+        flowMode={flowMode}
+        onClose={() => setOpen(false)}
+        onRsvpSaved={handleRsvpSaved}
+      />
+    ) : null;
+  }
 
   return (
     <>

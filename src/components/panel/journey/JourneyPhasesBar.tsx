@@ -28,6 +28,8 @@ type Props = {
    * leerlo directamente y eliminar este prop.
    */
   isPlanActive?: boolean;
+  /** Marco dorado + glow (p. ej. continuidad con bloque de misión en Invitados). */
+  accentPremium?: boolean;
 };
 
 type PhaseState = "past" | "current" | "future" | "locked";
@@ -98,6 +100,7 @@ export function JourneyPhasesBar({
   progressPrimary,
   progressHint,
   isPlanActive = true,
+  accentPremium = false,
 }: Props) {
   const pathname = usePathname();
   const progressCombined = [progressPrimary, progressHint].filter(Boolean).join(" · ");
@@ -125,7 +128,13 @@ export function JourneyPhasesBar({
   return (
     <div className={`flex flex-col ${className}`}>
       {/* Fondo premium: glass + radial gradient dorado muy sutil arriba. */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[radial-gradient(ellipse_60%_60%_at_50%_-20%,rgba(212,175,55,0.08),transparent_70%)] bg-white/[0.03] px-3 pb-3 pt-4 md:px-5 md:pb-4 md:pt-5">
+      <div
+        className={`relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[radial-gradient(ellipse_60%_60%_at_50%_-20%,rgba(212,175,55,0.08),transparent_70%)] bg-white/[0.03] px-3 pb-3 pt-4 md:px-5 md:pb-4 md:pt-5 ${
+          accentPremium
+            ? "shadow-[0_0_36px_-10px_rgba(212,175,55,0.28)] ring-1 ring-[#D4AF37]/30"
+            : ""
+        }`}
+      >
         <ol
           className="relative grid grid-cols-3 items-start"
           aria-label="Etapas del viaje"

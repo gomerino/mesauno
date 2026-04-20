@@ -5,9 +5,7 @@ import { useEffect, useRef } from "react";
 
 type Props = { accessToken: string };
 
-/**
- * Actualización silenciosa vía RPC (sin bloquear el Server Component principal).
- */
+/** Registra la apertura de la invitación en segundo plano, sin bloquear la carga de la página. */
 export function InvitacionViewTracker({ accessToken }: Props) {
   const fired = useRef(false);
 

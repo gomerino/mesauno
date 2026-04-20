@@ -1,10 +1,12 @@
 import type { Config } from "tailwindcss";
+import { tokens } from "./styles/tokens";
 
 const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./styles/**/*.ts",
   ],
   theme: {
     extend: {
@@ -98,6 +100,21 @@ const config: Config = {
         unlockParticle: "unlockParticle 1.1s ease-out forwards",
       },
       colors: {
+        jurnex: {
+          bg: tokens.colors.bg,
+          surface: tokens.colors.surface,
+          "surface-hover": tokens.colors.surfaceHover,
+          border: tokens.colors.border,
+          primary: tokens.colors.primary,
+          "primary-soft": tokens.colors.primarySoft,
+          secondary: tokens.colors.secondary,
+          "text-primary": tokens.colors.textPrimary,
+          "text-secondary": tokens.colors.textSecondary,
+          "text-muted": tokens.colors.textMuted,
+          success: tokens.colors.success,
+          error: tokens.colors.error,
+          warning: tokens.colors.warning,
+        },
         dreams: {
           teal: "#0d9488",
           coral: "#f97316",
@@ -111,6 +128,22 @@ const config: Config = {
           gold: "#D4AF37",
           navy: "#1A2B48",
         },
+      },
+      borderRadius: {
+        jurnex: "16px",
+        "jurnex-sm": tokens.radius.sm,
+        "jurnex-md": tokens.radius.md,
+        "jurnex-lg": tokens.radius.lg,
+      },
+      boxShadow: {
+        "jurnex-glow":
+          "0 0 24px -8px rgba(47, 230, 195, 0.18), inset 0 1px 0 0 rgba(255,255,255,0.06)",
+        "jurnex-glow-hover":
+          "0 0 32px -6px rgba(47, 230, 195, 0.28), inset 0 1px 0 0 rgba(255,255,255,0.08)",
+        "jurnex-card": "0 8px 40px -12px rgba(0, 0, 0, 0.55)",
+      },
+      transitionDuration: {
+        jurnex: "150ms",
       },
       fontFamily: {
         display: ["var(--font-outfit)", "system-ui", "sans-serif"],

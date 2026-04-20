@@ -87,7 +87,7 @@ type Props = {
   hitos: EventoProgramaHito[];
   /** Fecha del evento (YYYY-MM-DD o ISO); define el día en que aplica “Ahora”. */
   fechaEvento: string | null;
-  /** Miniaturas por `hito.id` (misma ventana que el RPC programa+fotos). */
+  /** Miniaturas por momento del programa (`hito.id`). */
   fotosPorHito?: Record<string, ProgramaHitoFotoPublic[]>;
 };
 
@@ -103,10 +103,6 @@ export function InvitacionCronograma({ hitos, fechaEvento, fotosPorHito }: Props
   const eventDay = useMemo(() => sameLocalCalendarDay(fechaEvento, now), [fechaEvento, now]);
   const liveIdx = useMemo(() => (eventDay ? liveHitoIndex(hitos, now) : -1), [eventDay, hitos, now]);
   const nextIdx = useMemo(() => (eventDay ? nextHitoIndex(hitos, now) : -1), [eventDay, hitos, now]);
-  const hayFotosPorMomento = useMemo(
-    () => Object.values(fotosPorHito ?? {}).some((arr) => Array.isArray(arr) && arr.length > 0),
-    [fotosPorHito],
-  );
 
   /** Centrar en vista el hito “Ahora” o, si no aplica, el “Próximo”. */
   useEffect(() => {
@@ -157,13 +153,8 @@ export function InvitacionCronograma({ hitos, fechaEvento, fotosPorHito }: Props
       <div className="border-b border-[#001d66]/10 pb-3">
         <h2 className="font-display text-sm font-bold tracking-wide text-[#001d66]">Itinerario</h2>
         <p className="mt-1 text-[11px] leading-snug text-[#001d66]/55">
-          Todos los momentos del día, en orden cronológico
+          El plan del día, momento a momento
         </p>
-        {hayFotosPorMomento ? (
-          <p className="mt-1 text-[11px] leading-snug text-[#001d66]/70">
-            Galería: fotos entre la hora de cada actividad y la de la siguiente (misma hora de inicio = mismo bloque).
-          </p>
-        ) : null}
         {statusBanner}
       </div>
 
@@ -252,8 +243,12 @@ export function InvitacionCronograma({ hitos, fechaEvento, fotosPorHito }: Props
                     </span>
                   ) : null}
                   {isPast && !isLive ? (
-                    <span className="rounded-full bg-gray-200/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-gray-600">
-                      Listo
+                    <span
+                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-emerald-400/30 bg-emerald-500/20 text-[10px] font-semibold leading-none text-emerald-700"
+                      aria-label="Momento completado"
+                      title="Momento completado"
+                    >
+                      ✓
                     </span>
                   ) : null}
                 </div>
@@ -288,7 +283,7 @@ export function InvitacionCronograma({ hitos, fechaEvento, fotosPorHito }: Props
                 {fotosPorHito?.[h.id]?.length ? (
                   <ul
                     className="mt-3 flex max-w-full gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#001d66]/20"
-                    aria-label="Fotos cerca de este momento"
+                    aria-label="Recuerdos de este momento"
                   >
                     {fotosPorHito[h.id]!.map((f) => (
                       <li key={f.id} className="shrink-0">

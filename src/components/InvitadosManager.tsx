@@ -1,16 +1,23 @@
 "use client";
 
 import { BulkImportInvitados } from "@/components/BulkImportInvitados";
-import { CopyInviteLinkButton } from "@/components/dashboard/CopyInviteLinkButton";
-import { WhatsAppInviteButton } from "@/components/dashboard/WhatsAppInviteButton";
+import { Button, Card, Chip, Input, Textarea } from "@/components/jurnex-ui";
+import { InvitadosMesaAccordion } from "@/components/panel/invitados/InvitadosMesaAccordion";
+import {
+  INVITADOS_DESKTOP_GRID,
+  InvitadoMesaDesktopBlock,
+  InvitadoMesaMobileCard,
+} from "@/components/panel/invitados/InvitadosMesaRows";
 import type { Invitado } from "@/types/database";
-import { nombresAcompanantes, sortInvitadoAcompanantes } from "@/lib/invitado-acompanantes";
+import { sortInvitadoAcompanantes } from "@/lib/invitado-acompanantes";
 import { restriccionesFromDb, restriccionesToDb } from "@/lib/restricciones-alimenticias";
 import { supabaseErrorMessage } from "@/lib/supabase-error";
 import { trackEvent } from "@/lib/analytics";
 import { createClient } from "@/lib/supabase/client";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { toast } from "sonner";
 
 type FormState = {
   nombre: string;
@@ -75,34 +82,117 @@ function payloadFromForm(
   return base;
 }
 
-const label = "block text-xs font-medium text-slate-400";
-const input =
-  "mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-white outline-none ring-teal-500 focus:ring-2";
+const label = "block text-xs font-medium text-jurnex-text-secondary";
 
 type Props = {
   eventoId: string | null;
   initialInvitados: Invitado[];
 };
 
+type RsvpBucket = "confirmado" | "pendiente" | "declinado";
+
+const RSVP_SECTION_ORDER: RsvpBucket[] = ["confirmado", "pendiente", "declinado"];
+
+function normalizeRsvp(estado: string | null | undefined): RsvpBucket {
+  if (estado === "confirmado" || estado === "declinado" || estado === "pendiente") {
+    return estado;
+  }
+  return "pendiente";
+}
+
+/** Agrupa por texto de asiento (mesa); vacío → sin mesa. Dentro, por RSVP. */
+function groupInvitadosByMesaYRsvp(rows: Invitado[]) {
+  const byMesa = new Map<string, Invitado[]>();
+  for (const r of rows) {
+    const k = r.asiento?.trim() ?? "";
+    if (!byMesa.has(k)) byMesa.set(k, []);
+    byMesa.get(k)!.push(r);
+  }
+  const keys = Array.from(byMesa.keys()).sort((a, b) => {
+    if (a === "" && b !== "") return 1;
+    if (b === "" && a !== "") return -1;
+    return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
+  });
+  return keys.map((mesaKey) => {
+    const list = byMesa.get(mesaKey)!;
+    const byRsvp: Record<RsvpBucket, Invitado[]> = {
+      confirmado: [],
+      pendiente: [],
+      declinado: [],
+    };
+    for (const r of list) {
+      byRsvp[normalizeRsvp(r.rsvp_estado)].push(r);
+    }
+    for (const bucket of RSVP_SECTION_ORDER) {
+      byRsvp[bucket].sort((a, b) =>
+        (a.nombre_pasajero ?? "").localeCompare(b.nombre_pasajero ?? "", "es", { sensitivity: "base" })
+      );
+    }
+    return {
+      key: mesaKey || "sin-mesa",
+      label: mesaKey ? `Mesa ${mesaKey}` : "Sin mesa asignada",
+      byRsvp,
+    };
+  });
+}
+
+function computeDefaultOpenMesaKey(
+  mesas: { key: string; byRsvp: Record<RsvpBucket, Invitado[]> }[]
+): string | null {
+  if (mesas.length === 0) return null;
+  return mesas[0].key;
+}
+
+function mesaInvitadoStats(mesa: { byRsvp: Record<RsvpBucket, Invitado[]> }) {
+  const confirmados = mesa.byRsvp.confirmado.length;
+  const pendientes = mesa.byRsvp.pendiente.length;
+  const total =
+    confirmados + pendientes + mesa.byRsvp.declinado.length;
+  const progressPct = total > 0 ? Math.round((confirmados / total) * 100) : 0;
+  return { total, confirmados, pendientes, progressPct };
+}
+
+function mesaDomIdSafe(mesaKey: string) {
+  return mesaKey.replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
 export function InvitadosManager({ eventoId, initialInvitados }: Props) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
+  const [isNavPending, startTransition] = useTransition();
   const [rows, setRows] = useState<Invitado[]>(initialInvitados);
   const [modalOpen, setModalOpen] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
+  const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [highlightNewId, setHighlightNewId] = useState<string | null>(null);
 
   useEffect(() => {
     if (modalOpen) return;
     setRows(initialInvitados);
   }, [initialInvitados, modalOpen]);
+
+  useEffect(() => {
+    if (expandedRowId && !rows.some((r) => r.id === expandedRowId)) {
+      setExpandedRowId(null);
+    }
+  }, [rows, expandedRowId]);
+
+  useEffect(() => {
+    if (!highlightNewId) return;
+    const t = window.setTimeout(() => setHighlightNewId(null), 2400);
+    return () => window.clearTimeout(t);
+  }, [highlightNewId]);
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [sendingId, setSendingId] = useState<string | null>(null);
-  const [sendFlash, setSendFlash] = useState<{ id: string; ok: boolean; msg: string } | null>(
-    null
+  const [openMesaKey, setOpenMesaKey] = useState<string | null>(() =>
+    computeDefaultOpenMesaKey(groupInvitadosByMesaYRsvp(initialInvitados))
   );
+  const mesaHeaderRefs = useRef(new Map<string, HTMLButtonElement>());
 
   function openCreate() {
     setEditingId(null);
@@ -111,17 +201,23 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
     setModalOpen(true);
   }
 
-  function openEdit(row: Invitado) {
+  const openEdit = useCallback((row: Invitado) => {
     setEditingId(row.id);
     setForm(rowToForm(row));
     setFormError(null);
     setModalOpen(true);
-  }
+  }, []);
 
   function closeModal() {
     setModalOpen(false);
     setEditingId(null);
     setFormError(null);
+  }
+
+  function refreshList() {
+    startTransition(() => {
+      router.refresh();
+    });
   }
 
   async function syncAcompanantes(invitadoId: string, lines: string[]) {
@@ -186,6 +282,7 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
     if (authErr || !user) {
       setSaving(false);
       setFormError("Inicia sesión para guardar.");
+      toast.error("Inicia sesión para guardar.", { duration: 4000 });
       return;
     }
     const payload = payloadFromForm(form, eventoId, user.id, editingId);
@@ -194,13 +291,17 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
       const { error } = await supabase.from("invitados").update(payload).eq("id", editingId);
       if (error) {
         setSaving(false);
-        setFormError(supabaseErrorMessage(error));
+        const msg = supabaseErrorMessage(error);
+        setFormError(msg);
+        toast.error(msg, { duration: 4000 });
         return;
       }
       const syncErr = await syncAcompanantes(editingId, form.acompanantes);
       if (syncErr) {
         setSaving(false);
-        setFormError(supabaseErrorMessage(syncErr));
+        const msg = supabaseErrorMessage(syncErr);
+        setFormError(msg);
+        toast.error(msg, { duration: 4000 });
         return;
       }
       const full = await fetchInvitadoFull(editingId);
@@ -209,7 +310,8 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
         setRows((r) => r.map((x) => (x.id === editingId ? full : x)));
       }
       closeModal();
-      router.refresh();
+      toast.success("Invitado actualizado", { duration: 4000 });
+      refreshList();
       return;
     }
 
@@ -234,7 +336,9 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
 
     if (insErr || newId == null || typeof newId !== "string") {
       setSaving(false);
-      setFormError(insErr ? supabaseErrorMessage(insErr) : "No se pudo crear el invitado");
+      const msg = insErr ? supabaseErrorMessage(insErr) : "No se pudo crear el invitado";
+      setFormError(msg);
+      toast.error(msg, { duration: 4000 });
       return;
     }
 
@@ -242,7 +346,9 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
     if (syncErr) {
       await supabase.from("invitados").delete().eq("id", newId);
       setSaving(false);
-      setFormError(supabaseErrorMessage(syncErr));
+      const msg = supabaseErrorMessage(syncErr);
+      setFormError(msg);
+      toast.error(msg, { duration: 4000 });
       return;
     }
 
@@ -251,6 +357,7 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
     setSaving(false);
     if (full) {
       setRows((r) => [full, ...r]);
+      setHighlightNewId(full.id);
     }
     const fromMission =
       typeof window !== "undefined" &&
@@ -263,45 +370,76 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
       companions_count: form.acompanantes.filter((n) => n.trim().length > 0).length,
     });
     closeModal();
-    router.refresh();
+    toast.success("Persona añadida a la lista", { duration: 4000 });
+    refreshList();
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm("¿Eliminar este invitado?")) return;
-    const { error } = await supabase.from("invitados").delete().eq("id", id);
-    if (error) {
-      alert(error.message);
-      return;
-    }
-    setRows((r) => r.filter((x) => x.id !== id));
-  }
-
-  async function handleSendEmail(id: string) {
-    const row = rows.find((x) => x.id === id);
-    if (!row?.email?.trim()) {
-      setSendFlash({ id, ok: false, msg: "Añade un correo al invitado antes de enviar." });
-      return;
-    }
-    setSendingId(id);
-    setSendFlash(null);
-    try {
-      const res = await fetch("/api/invitaciones/enviar", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ invitadoId: id }),
-      });
-      const json = (await res.json()) as { ok?: boolean; error?: string };
-      if (!res.ok) {
-        setSendFlash({ id, ok: false, msg: json.error ?? "No se pudo enviar" });
-      } else {
-        setSendFlash({ id, ok: true, msg: "Listo: invitación enviada." });
+  const handleDelete = useCallback(
+    async (id: string) => {
+      if (!confirm("¿Eliminar este invitado?")) return;
+      setDeletingId(id);
+      try {
+        const { error } = await supabase.from("invitados").delete().eq("id", id);
+        if (error) {
+          toast.error("No se pudo eliminar. Intenta nuevamente.", { duration: 4000 });
+          return;
+        }
+        setRows((r) => r.filter((x) => x.id !== id));
+        toast.success("Invitado eliminado de la lista", { duration: 4000 });
+      } finally {
+        setDeletingId(null);
       }
-    } catch {
-      setSendFlash({ id, ok: false, msg: "Error de red" });
-    } finally {
-      setSendingId(null);
-    }
-  }
+    },
+    [supabase]
+  );
+
+  const handleSendEmail = useCallback(
+    async (id: string) => {
+      const row = rows.find((x) => x.id === id);
+      if (!row?.email?.trim()) {
+        toast.error("Añade un correo al invitado antes de enviar.", { duration: 4000 });
+        return;
+      }
+      setSendingId(id);
+      try {
+        const res = await fetch("/api/invitaciones/enviar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ invitadoId: id }),
+        });
+        const json = (await res.json()) as { ok?: boolean; error?: string };
+        if (!res.ok) {
+          toast.error(json.error ?? "No se pudo enviar. Intenta nuevamente.", { duration: 4000 });
+        } else {
+          toast.success("Invitación enviada", { duration: 4000 });
+        }
+      } catch {
+        toast.error("No se pudo enviar. Intenta nuevamente.", { duration: 4000 });
+      } finally {
+        setSendingId(null);
+      }
+    },
+    [rows]
+  );
+
+  const toggleMesa = useCallback((key: string) => {
+    setOpenMesaKey((cur) => {
+      const next = cur === key ? null : key;
+      if (next) {
+        requestAnimationFrame(() => {
+          mesaHeaderRefs.current.get(next)?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        });
+      }
+      return next;
+    });
+  }, []);
+
+  const toggleRowExpand = useCallback((id: string) => {
+    setExpandedRowId((cur) => (cur === id ? null : id));
+  }, []);
 
   const rsvpLabel: Record<string, string> = {
     pendiente: "Pendiente",
@@ -309,111 +447,247 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
     declinado: "No asiste",
   };
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap justify-end gap-2">
-        <button
-          type="button"
-          onClick={() => setBulkOpen(true)}
-          className="rounded-full border border-white/15 bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-slate-200 hover:bg-white/10"
-        >
-          Importar lista
-        </button>
-        <button
-          type="button"
-          onClick={openCreate}
-          className="rounded-full bg-teal-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-400"
-        >
-          Añadir invitado
-        </button>
-      </div>
+  function rsvpTone(estado: string | null | undefined): "success" | "danger" | "muted" {
+    const e = estado ?? "pendiente";
+    if (e === "confirmado") return "success";
+    if (e === "declinado") return "danger";
+    return "muted";
+  }
 
-      <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/5">
-        <table className="w-full min-w-[800px] text-left text-sm text-slate-200">
-          <thead>
-            <tr className="border-b border-white/10 text-xs uppercase tracking-wide text-slate-500">
-              <th className="px-4 py-3">Nombre</th>
-              <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Teléfono</th>
-              <th className="px-4 py-3">Asiento</th>
-              <th className="px-4 py-3">Respuesta</th>
-              <th className="px-4 py-3 text-right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-slate-500">
-                  Aún no hay nadie en la lista. Usa «Añadir invitado» arriba.
-                </td>
-              </tr>
-            ) : (
-              rows.map((row) => (
-                <tr key={row.id} className="border-b border-white/5 hover:bg-white/[0.03]">
-                  <td className="px-4 py-3 font-medium text-white">
-                    <span className="block">{row.nombre_pasajero}</span>
-                    {nombresAcompanantes(row).map((n, i) => (
-                      <span key={`${i}-${n}`} className="mt-0.5 block text-xs font-normal text-slate-400">
-                        + {n}
-                      </span>
-                    ))}
-                  </td>
-                  <td className="px-4 py-3">{row.email ?? "—"}</td>
-                  <td className="px-4 py-3">{row.telefono ?? "—"}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-slate-300">
-                    {row.asiento?.trim() ? row.asiento.trim() : "—"}
-                  </td>
-                  <td className="px-4 py-3">{rsvpLabel[row.rsvp_estado ?? "pendiente"] ?? "—"}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap items-center justify-end gap-2">
-                      {sendFlash?.id === row.id && (
-                        <span
-                          className={
-                            sendFlash.ok ? "text-xs text-teal-300" : "text-xs text-orange-300"
-                          }
-                        >
-                          {sendFlash.msg}
-                        </span>
-                      )}
-                      <CopyInviteLinkButton
-                        tokenAcceso={String(row.token_acceso ?? row.id)}
-                        source="invitados_list"
-                        invitadoId={row.id}
-                      />
-                      <WhatsAppInviteButton
-                        nombreInvitado={row.nombre_pasajero ?? ""}
-                        telefono={row.telefono ?? ""}
-                        tokenAcceso={String(row.token_acceso ?? row.id)}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleSendEmail(row.id)}
-                        disabled={sendingId === row.id}
-                        className="rounded-full border border-[#001d66]/80 bg-[#001d66]/30 px-3 py-1 text-xs font-medium text-teal-100 hover:bg-[#001d66]/50 disabled:opacity-50"
+  const mesasAgrupadas = useMemo(() => groupInvitadosByMesaYRsvp(rows), [rows]);
+  const defaultOpenMesaKey = useMemo(
+    () => computeDefaultOpenMesaKey(mesasAgrupadas),
+    [mesasAgrupadas]
+  );
+
+  useEffect(() => {
+    setOpenMesaKey((prev) => {
+      if (prev != null && mesasAgrupadas.some((m) => m.key === prev)) return prev;
+      return defaultOpenMesaKey;
+    });
+  }, [rows, mesasAgrupadas, defaultOpenMesaKey]);
+
+  useEffect(() => {
+    if (!openMesaKey) {
+      setExpandedRowId(null);
+      return;
+    }
+    const mesa = mesasAgrupadas.find((m) => m.key === openMesaKey);
+    if (!mesa || !expandedRowId) return;
+    const inMesa = RSVP_SECTION_ORDER.some((e) =>
+      mesa.byRsvp[e].some((r) => r.id === expandedRowId)
+    );
+    if (!inMesa) setExpandedRowId(null);
+  }, [openMesaKey, mesasAgrupadas, expandedRowId]);
+
+  return (
+    <div className="space-y-4">
+      <div className="overflow-hidden rounded-xl border border-white/10 bg-black/30 backdrop-blur-sm">
+        <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+          <div className="min-w-0">
+            <h2 className="font-display text-lg font-semibold tracking-tight text-white md:text-xl">
+              Personas invitadas
+            </h2>
+            <p className="mt-1 text-xs leading-snug text-white/60">
+              Agrupado por mesa (asiento) y confirmación; acompañantes con el titular.
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
+            <button
+              type="button"
+              onClick={() => setBulkOpen(true)}
+              className="inline-flex rounded-full border border-white/20 px-5 py-2 text-sm font-medium text-white/80 transition hover:border-white/30 hover:bg-white/[0.04] hover:text-white"
+            >
+              Importar lista
+            </button>
+            <button
+              id="invitados-btn-add"
+              type="button"
+              onClick={openCreate}
+              className="inline-flex rounded-full bg-teal-400 px-5 py-2 text-sm font-semibold text-black transition hover:bg-teal-300"
+            >
+              Añadir invitado
+            </button>
+          </div>
+        </div>
+
+        {rows.length === 0 ? (
+          <div className="px-4 py-6 text-center">
+            <p className="font-display text-sm font-medium text-white/70">Lista vacía</p>
+            <p className="mt-2 text-sm text-white/45">
+              Usa «Añadir invitado» o «Importar lista» para comenzar.
+            </p>
+          </div>
+        ) : (
+          <>
+          <div
+            className={`space-y-3 px-4 pb-4 pt-4 md:hidden transition-opacity duration-200 ease-out ${isNavPending ? "opacity-75" : "opacity-100"}`}
+            aria-busy={isNavPending}
+          >
+            {mesasAgrupadas.map((mesa) => {
+              const isOpen = openMesaKey === mesa.key;
+              const stats = mesaInvitadoStats(mesa);
+              const idFrag = mesaDomIdSafe(mesa.key);
+              return (
+                <section key={mesa.key} aria-label={mesa.label}>
+                  <InvitadosMesaAccordion
+                    label={mesa.label}
+                    isOpen={isOpen}
+                    onToggle={() => toggleMesa(mesa.key)}
+                    headerRef={(el) => {
+                      if (el) mesaHeaderRefs.current.set(mesa.key, el);
+                      else mesaHeaderRefs.current.delete(mesa.key);
+                    }}
+                    totalPasajeros={stats.total}
+                    confirmados={stats.confirmados}
+                    pendientes={stats.pendientes}
+                    progressPct={stats.progressPct}
+                    headerId={`invitados-mesa-h-${idFrag}`}
+                    contentId={`invitados-mesa-c-${idFrag}`}
+                  >
+                    {isOpen ? (
+                      <div className="space-y-5">
+                        {RSVP_SECTION_ORDER.map((estado) => {
+                          const list = mesa.byRsvp[estado];
+                          if (list.length === 0) return null;
+                          return (
+                            <div key={`${mesa.key}-${estado}`} className="space-y-3">
+                              <div className="flex flex-wrap items-center gap-2 px-0.5">
+                                <Chip tone={rsvpTone(estado)}>{rsvpLabel[estado]}</Chip>
+                                <span className="text-[10px] text-jurnex-text-muted">
+                                  {list.length}{" "}
+                                  {list.length === 1 ? "invitación" : "invitaciones"}
+                                </span>
+                              </div>
+                              {list.map((row) => (
+                                <InvitadoMesaMobileCard
+                                  key={row.id}
+                                  row={row}
+                                  sendingId={sendingId}
+                                  deletingId={deletingId}
+                                  onEdit={openEdit}
+                                  onDelete={handleDelete}
+                                  onSendEmail={handleSendEmail}
+                                />
+                              ))}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : null}
+                  </InvitadosMesaAccordion>
+                </section>
+              );
+            })}
+          </div>
+
+          <div
+            className={`hidden md:block space-y-3 px-4 pb-4 pt-0 transition-opacity duration-200 ease-out ${isNavPending ? "opacity-75" : "opacity-100"}`}
+            aria-busy={isNavPending}
+          >
+            <p id="invitados-tabla-desc" className="sr-only">
+              Lista de invitados agrupada por mesa y estado de confirmación; expande cada mesa
+              para ver la tabla.
+            </p>
+            {mesasAgrupadas.map((mesa) => {
+              const isOpen = openMesaKey === mesa.key;
+              const stats = mesaInvitadoStats(mesa);
+              const idFrag = mesaDomIdSafe(mesa.key);
+              return (
+                <InvitadosMesaAccordion
+                  key={mesa.key}
+                  label={mesa.label}
+                  isOpen={isOpen}
+                  onToggle={() => toggleMesa(mesa.key)}
+                  headerRef={(el) => {
+                    if (el) mesaHeaderRefs.current.set(mesa.key, el);
+                    else mesaHeaderRefs.current.delete(mesa.key);
+                  }}
+                  totalPasajeros={stats.total}
+                  confirmados={stats.confirmados}
+                  pendientes={stats.pendientes}
+                  progressPct={stats.progressPct}
+                  headerId={`invitados-mesa-d-h-${idFrag}`}
+                  contentId={`invitados-mesa-d-c-${idFrag}`}
+                >
+                  {isOpen ? (
+                    <div className="overflow-x-auto">
+                      <div
+                        className="w-full min-w-[880px] text-left text-sm text-white/90"
+                        aria-describedby="invitados-tabla-desc"
                       >
-                        {sendingId === row.id ? "Enviando…" : "Enviar invitación"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => openEdit(row)}
-                        className="rounded-full border border-white/20 px-3 py-1 text-xs font-medium hover:bg-white/10"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(row.id)}
-                        className="rounded-full border border-red-500/40 px-3 py-1 text-xs font-medium text-red-300 hover:bg-red-500/20"
-                      >
-                        Eliminar
-                      </button>
+                        <div role="rowgroup">
+                          <div
+                            role="row"
+                            className={`${INVITADOS_DESKTOP_GRID} sticky top-0 z-10 border-b border-white/10 bg-white/[0.03] text-xs font-medium uppercase tracking-wider text-white/40 backdrop-blur-md`}
+                          >
+                            <div className="py-2 pl-4 pr-2 text-left" role="columnheader">
+                              Nombre
+                            </div>
+                            <div className="px-2 py-2 text-left" role="columnheader">
+                              Correo
+                            </div>
+                            <div className="px-2 py-2 text-left" role="columnheader">
+                              Teléfono
+                            </div>
+                            <div className="px-2 py-2 text-left" role="columnheader">
+                              Restricciones
+                            </div>
+                            <div
+                              className="border-l border-white/10 py-2 pl-3 pr-4 text-right"
+                              role="columnheader"
+                            >
+                              Acciones
+                            </div>
+                          </div>
+                        </div>
+                        <div role="rowgroup">
+                          {RSVP_SECTION_ORDER.map((estado) => {
+                            const list = mesa.byRsvp[estado];
+                            if (list.length === 0) return null;
+                            return (
+                              <Fragment key={`${mesa.key}-${estado}`}>
+                                <div
+                                  role="row"
+                                  className={`${INVITADOS_DESKTOP_GRID} border-b border-white/5 bg-black/15`}
+                                >
+                                  <div className="col-span-5 px-4 py-1 pl-7" role="cell">
+                                    <Chip tone={rsvpTone(estado)} className="py-0.5">
+                                      {rsvpLabel[estado]}
+                                    </Chip>
+                                    <span className="ml-2 text-[10px] text-jurnex-text-muted">
+                                      {list.length}{" "}
+                                      {list.length === 1 ? "invitación" : "invitaciones"}
+                                    </span>
+                                  </div>
+                                </div>
+                                {list.map((row) => (
+                                  <InvitadoMesaDesktopBlock
+                                    key={row.id}
+                                    row={row}
+                                    isExpanded={expandedRowId === row.id}
+                                    isNewHighlight={highlightNewId === row.id}
+                                    onToggleExpand={toggleRowExpand}
+                                    sendingId={sendingId}
+                                    deletingId={deletingId}
+                                    onEdit={openEdit}
+                                    onDelete={handleDelete}
+                                    onSendEmail={handleSendEmail}
+                                  />
+                                ))}
+                              </Fragment>
+                            );
+                          })}
+                        </div>
+                      </div>
                     </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                  ) : null}
+                </InvitadosMesaAccordion>
+              );
+            })}
+          </div>
+        </>
+      )}
       </div>
 
       {modalOpen && (
@@ -423,20 +697,20 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
         >
           <form
             onSubmit={handleSave}
-            className="flex max-h-[78vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-xl animate-fadeIn sm:max-h-[80vh]"
+            className="flex max-h-[78vh] w-full max-w-lg flex-col overflow-hidden rounded-jurnex-lg border border-jurnex-border bg-jurnex-bg/95 shadow-jurnex-card backdrop-blur-xl animate-fadeIn sm:max-h-[80vh]"
             role="dialog"
             aria-modal="true"
             aria-labelledby="invitado-form-title"
           >
             <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-6">
-              <h2 id="invitado-form-title" className="font-display text-xl font-bold text-white">
+              <h2 id="invitado-form-title" className="font-display text-xl font-bold text-jurnex-text-primary">
                 {editingId ? "Editar persona" : "Añadir invitado"}
               </h2>
               <div className="mt-6 space-y-4 pb-4">
               <div>
                 <label className={label}>Nombre (titular de la invitación)</label>
-                <input
-                  className={input}
+                <Input
+                  className="mt-1"
                   value={form.nombre}
                   onChange={(e) => setForm({ ...form, nombre: e.target.value })}
                   required
@@ -444,14 +718,14 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
               </div>
               <div>
                 <label className={label}>Acompañantes en la misma invitación (opcional)</label>
-                <p className="mb-2 text-xs text-slate-500">
+                <p className="mb-2 text-xs text-jurnex-text-muted">
                   Familia o personas que comparten esta misma invitación; puedes añadir varias líneas.
                 </p>
                 <div className="space-y-2">
                   {form.acompanantes.map((line, i) => (
                     <div key={i} className="flex gap-2">
-                      <input
-                        className={input}
+                      <Input
+                        className="mt-0 flex-1"
                         value={line}
                         onChange={(e) => {
                           const next = [...form.acompanantes];
@@ -461,9 +735,10 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
                         placeholder={`Acompañante ${i + 1}`}
                         autoComplete="name"
                       />
-                      <button
+                      <Button
                         type="button"
-                        className="shrink-0 rounded-lg border border-white/15 px-3 text-xs text-slate-300 hover:bg-white/10"
+                        variant="ghost"
+                        className="shrink-0 rounded-jurnex-sm px-3 py-2 text-xs"
                         onClick={() =>
                           setForm({
                             ...form,
@@ -472,23 +747,24 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
                         }
                       >
                         Quitar
-                      </button>
+                      </Button>
                     </div>
                   ))}
                 </div>
-                <button
+                <Button
                   type="button"
-                  className="mt-2 text-sm font-medium text-teal-300 hover:text-teal-200"
+                  variant="ghost"
+                  className="mt-2 px-0 text-sm text-jurnex-primary hover:bg-transparent"
                   onClick={() => setForm({ ...form, acompanantes: [...form.acompanantes, ""] })}
                 >
                   + Añadir acompañante
-                </button>
+                </Button>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className={label}>Correo (para enviar la invitación)</label>
-                  <input
-                    className={input}
+                  <Input
+                    className="mt-1"
                     type="email"
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -496,8 +772,8 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
                 </div>
                 <div>
                   <label className={label}>Teléfono</label>
-                  <input
-                    className={input}
+                  <Input
+                    className="mt-1"
                     value={form.telefono}
                     onChange={(e) => setForm({ ...form, telefono: e.target.value })}
                   />
@@ -505,49 +781,44 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
               </div>
               <div>
                 <label className={label}>Asiento en la invitación</label>
-                <input
-                  className={input}
+                <Input
+                  className="mt-1"
                   value={form.asiento}
                   onChange={(e) => setForm({ ...form, asiento: e.target.value })}
                   placeholder="Ej: 12A (opcional)"
                   autoComplete="off"
                 />
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1 text-xs text-jurnex-text-muted">
                   Si lo dejas vacío, usamos el asiento por defecto que definiste en los datos del evento.
                 </p>
               </div>
               <div>
                 <label className={label}>Restricciones alimenticias</label>
-                <textarea
-                  className={`${input} min-h-[72px]`}
+                <Textarea
+                  className="mt-1"
                   value={form.restricciones_alimenticias}
                   onChange={(e) => setForm({ ...form, restricciones_alimenticias: e.target.value })}
                 />
               </div>
 
               {formError && (
-                <p className="rounded-lg bg-orange-500/20 px-3 py-2 text-sm text-orange-200">
+                <p className="rounded-jurnex-sm border border-jurnex-warning/30 bg-jurnex-warning/10 px-3 py-2 text-sm text-jurnex-warning">
                   {formError}
                 </p>
               )}
             </div>
             </div>
-            <div className="sticky bottom-0 border-t border-white/10 bg-slate-900 px-6 py-4">
+            <div className="sticky bottom-0 border-t border-jurnex-border bg-jurnex-bg/95 px-6 py-4 backdrop-blur-md">
               <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="flex-1 rounded-full border border-white/20 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/10"
-                >
+                <Button type="button" variant="secondary" className="flex-1 rounded-full" onClick={closeModal}>
                   Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="flex-1 rounded-full bg-teal-500 py-2.5 text-sm font-semibold text-white hover:bg-teal-400 disabled:opacity-50"
-                >
+                </Button>
+                <Button type="submit" disabled={saving} className="flex flex-1 items-center justify-center gap-2 rounded-full">
+                  {saving ? (
+                    <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
+                  ) : null}
                   {saving ? "Guardando…" : "Guardar"}
-                </button>
+                </Button>
               </div>
             </div>
           </form>
@@ -563,7 +834,7 @@ export function InvitadosManager({ eventoId, initialInvitados }: Props) {
           email: r.email,
         }))}
         onImported={() => {
-          router.refresh();
+          refreshList();
         }}
       />
     </div>

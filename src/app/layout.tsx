@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   title: "Dreams Wedding — Tu boda, tu viaje",
   description: "Plataforma de matrimonios con invitaciones estilo boarding pass y marketplace.",
   manifest: "/manifest.json",
-  themeColor: "#0f172a",
+  themeColor: "#060B14",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

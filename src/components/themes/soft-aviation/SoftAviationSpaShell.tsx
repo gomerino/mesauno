@@ -2,6 +2,7 @@
 
 import { InvitacionCheckInQr } from "@/components/InvitacionCheckInQr";
 import { InvitacionCronograma } from "@/components/invitacion/InvitacionCronograma";
+import { PhotoUpload } from "@/components/invitacion/PhotoUpload";
 import { InvitacionMusicaColaborativa } from "@/components/invitacion/InvitacionMusicaColaborativa";
 import { InvitacionViewTracker } from "@/components/InvitacionViewTracker";
 import type { InvitacionThemePageProps } from "@/components/themes/invitacion-theme-props";
@@ -12,11 +13,13 @@ import { SoftAviationPostalMotivo } from "@/components/themes/soft-aviation/Soft
 import { SoftAviationRegalosPanel } from "@/components/themes/soft-aviation/SoftAviationRegalosPanel";
 import { SoftAviationTicket } from "@/components/themes/soft-aviation/SoftAviationTicket";
 import { formatFechaEventoLarga } from "@/lib/format-fecha-evento";
+import { emitInvitacionFotoSubida } from "@/lib/invitacion-foto-upload-client";
 import { hasAnyPlaylist } from "@/lib/event-playlist-env";
 import { computeSoftAviationInviteFlags } from "@/lib/soft-aviation-invite-state";
 import type { LucideIcon } from "lucide-react";
 import { CalendarDays, Camera, Gift, Mail, Music2, QrCode, Ticket, X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -53,6 +56,7 @@ export function SoftAviationSpaShell({
   topTracks,
   apoyoTrackUris,
 }: InvitacionThemePageProps) {
+  const router = useRouter();
   const trackingToken = invitado.token_acceso ?? invitado.id;
   const tituloNovios =
     merged.footerNovios ||
@@ -174,6 +178,16 @@ export function SoftAviationSpaShell({
   return (
     <div className="flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#F4F1EA] font-inviteBody text-[#1A2B48] antialiased [color-scheme:light]">
       <InvitacionViewTracker accessToken={trackingToken} />
+      {activeTab === "itinerario" && isEventDay && eventoId && token.trim() ? (
+        <PhotoUpload
+          invitacionToken={token}
+          fabBottomExtra={photoFabBottomExtra}
+          onUploaded={(foto) => {
+            emitInvitacionFotoSubida(foto);
+            router.refresh();
+          }}
+        />
+      ) : null}
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-row">
         {/* Desktop/tablet: rail izquierdo. Móvil: oculto (navegación abajo, más ancho útil y pulgar). */}
@@ -250,6 +264,7 @@ export function SoftAviationSpaShell({
               merged={merged}
               mapUrl={qrValue}
               programaHitos={programaHitos}
+              isEventDay={isEventDay}
             />
           </div>
         ) : null}
@@ -400,7 +415,13 @@ export function SoftAviationSpaShell({
         ) : null}
           </div>
 
-          <div className="shrink-0 border-t border-[#1A2B48]/8 bg-[#F4F1EA]/95 px-2 pt-2 pb-2 shadow-[0_-4px_20px_rgba(26,43,72,0.06)] backdrop-blur-md supports-[backdrop-filter]:bg-[#F4F1EA]/88 md:pb-[max(0.35rem,env(safe-area-inset-bottom,0px))]">
+          <div
+            className={
+              isEventDay && isConfirmed
+                ? "contents"
+                : "shrink-0 border-t border-[#1A2B48]/8 bg-[#F4F1EA]/95 px-2 pt-2 pb-2 shadow-[0_-4px_20px_rgba(26,43,72,0.06)] backdrop-blur-md supports-[backdrop-filter]:bg-[#F4F1EA]/88 md:pb-[max(0.35rem,env(safe-area-inset-bottom,0px))]"
+            }
+          >
             <SoftAviationGuestActions
               invitadoId={invitado.id}
               invitado={invitado}
@@ -409,6 +430,7 @@ export function SoftAviationSpaShell({
               restriccionesRaw={invitado.restricciones_alimenticias}
               spotifyPlaylistUrl={spotifyUrl}
               footerMode="embedded"
+              isEventDay={isEventDay}
               onRsvpEstadoChange={setRsvpEstadoLive}
             />
           </div>

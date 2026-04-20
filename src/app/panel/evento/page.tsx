@@ -107,9 +107,6 @@ export default async function PanelEventoPage({
           progressPrimary={journeyProgress.primary}
           progressHint={journeyProgress.hint}
         />
-        <div className="mt-3 md:mt-3">
-          <PanelThemeSelector />
-        </div>
       </div>
 
       <header className="mt-3 border-b border-white/[0.06] pb-4">
@@ -143,6 +140,19 @@ export default async function PanelEventoPage({
       <div className="mt-4">
         <EventoForm initial={(evento ?? null) as Evento | null} />
       </div>
+
+      <section
+        className="mt-8 border-t border-white/[0.06] pt-6"
+        aria-label="Apariencia del panel en tu dispositivo"
+      >
+        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">Apariencia del panel</p>
+        <p className="mt-1 text-sm text-slate-400">
+          Elige el tema visual del panel; se guarda solo en este navegador.
+        </p>
+        <div className="mt-4 max-w-xl">
+          <PanelThemeSelector />
+        </div>
+      </section>
 
       {hasAccess && isAdmin && eventoId ? (
         <div id="musica-spotify" className="mt-8 scroll-mt-24">

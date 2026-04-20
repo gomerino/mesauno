@@ -44,6 +44,16 @@ Organiza tu matrimonio completo en un solo lugar:
 - Priorizar simplicidad y claridad UX sobre features.
 - Toda decisión de copy debe ser warm, no transaccional (evitar "contratar", "reservar" en favor de "agregar a mi viaje", "conocer más").
 
+## Copy y look & feel (lo que ve el usuario)
+
+- **Sin jerga técnica en producto:** en invitación, panel, marketplace y emails visibles no se explica implementación (bases de datos, RPC, ventanas de tiempo, bloques, timestamps, etc.). El texto habla de bodas, invitados y momentos del día.
+- **Criterio de validación:** microcopy nuevo sigue español LATAM neutro (tuteo: tú, puedes, agrega) y las reglas de voz del repo (`AGENTS.md`). Para tono de marca y prioridades visuales, `workflows/B01-panel-momentos-marca/branding.md` es referencia; si hay tensión entre un borrador y una guía UX de `workflows/*/ux.md`, gana el criterio UX revisado para esa HU.
+- **Línea visual:** mantener coherencia con lo ya definido en lugar de introducir paletas o estilos sueltos:
+  - **Panel novios:** tokens navy + oro premium (`src/theme/panel-themes.ts`).
+  - **Invitación tema clásico:** marino `#001d66`, fondos claros en degradé suave, sombras discretas en tarjetas (misma familia que `InvitacionCronograma` / álbum).
+  - **Invitación tema carta (Soft Aviation):** marino `#1A2B48`, crema `#F4F1EA`, acento oro `#D4AF37`, tipografías `font-inviteSerif` / `font-inviteBody` del shell.
+- **Comentarios en código:** no narrar la implementación línea por línea; si hace falta nota, solo para restricciones o comportamiento no obvio (ver convenciones en `AGENTS.md`).
+
 ## Stack
 - Next.js (App Router, React, TypeScript).
 - Supabase (PostgreSQL + Auth + RLS + Storage).

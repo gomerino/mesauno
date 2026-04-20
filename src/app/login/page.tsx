@@ -1,7 +1,8 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
+import { Button, Card, Input } from "@/components/jurnex-ui";
 import { SiteHeader } from "@/components/SiteHeader";
+import { createClient } from "@/lib/supabase/client";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 
@@ -57,69 +58,69 @@ function LoginForm() {
   }
 
   return (
-    <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur">
-      <h1 className="font-display text-2xl font-bold text-white">Acceso</h1>
-      <p className="mt-2 text-sm text-slate-400">
+    <Card className="mx-auto max-w-md">
+      <h1 className="font-display text-2xl font-bold text-jurnex-text-primary">Acceso</h1>
+      <p className="mt-2 text-sm text-jurnex-text-secondary">
         Entra al panel de tu evento: invitados, invitación y regalos. Si administras la plataforma, usa el email
         configurado como administrador.
       </p>
       {(err || message) && (
-        <p className="mt-4 rounded-lg bg-orange-500/20 px-3 py-2 text-sm text-orange-200">
+        <p className="mt-4 rounded-jurnex-sm border border-jurnex-warning/30 bg-jurnex-warning/10 px-3 py-2 text-sm text-jurnex-warning">
           {message ?? "Error de autenticación"}
         </p>
       )}
       <form onSubmit={handlePasswordLogin} className="mt-6 space-y-5">
         <div>
-          <label className="block text-xs font-medium text-slate-400">Email</label>
-          <input
+          <label className="block text-xs font-medium text-jurnex-text-secondary">Email</label>
+          <Input
             type="email"
             required
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-white outline-none ring-teal-500 focus:ring-2"
+            className="mt-1"
           />
         </div>
 
-        <div className="rounded-xl border border-teal-500/25 bg-teal-500/10 p-4">
-          <button
+        <Card
+          interactive={false}
+          padded
+          className="border-jurnex-primary/25 bg-jurnex-primary-soft shadow-none"
+        >
+          <Button
             type="button"
             disabled={loading || !email.trim()}
             onClick={() => void handleMagicLink()}
-            className="w-full rounded-full bg-teal-500 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-900/30 transition hover:bg-teal-400 disabled:opacity-50"
+            className="w-full rounded-jurnex-md"
           >
             {loading ? "Enviando…" : "Continuar con enlace mágico"}
-          </button>
-          <p className="mt-2 text-center text-xs text-teal-100/90">
+          </Button>
+          <p className="mt-2 text-center text-xs text-jurnex-text-secondary">
             Si no tienes contraseña, usa este método. Te enviamos un enlace seguro al correo.
           </p>
-        </div>
+        </Card>
 
         <div className="relative flex items-center gap-3 py-1">
-          <span className="h-px flex-1 bg-white/10" />
-          <span className="text-[11px] uppercase tracking-wider text-slate-500">o con contraseña</span>
-          <span className="h-px flex-1 bg-white/10" />
+          <span className="h-px flex-1 bg-jurnex-border" />
+          <span className="text-[11px] uppercase tracking-wider text-jurnex-text-muted">o con contraseña</span>
+          <span className="h-px flex-1 bg-jurnex-border" />
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-400">Contraseña</label>
-          <input
+          <label className="block text-xs font-medium text-jurnex-text-secondary">Contraseña</label>
+          <Input
             type="password"
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-white outline-none ring-teal-500 focus:ring-2"
+            className="mt-1"
           />
         </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-full border border-white/20 py-3 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-50"
-        >
+        <Button type="submit" disabled={loading} variant="secondary" className="w-full rounded-jurnex-md">
           {loading ? "Entrando…" : "Entrar con contraseña"}
-        </button>
+        </Button>
       </form>
-    </div>
+    </Card>
   );
 }
 
@@ -128,7 +129,7 @@ export default function LoginPage() {
     <div className="min-h-screen">
       <SiteHeader />
       <main className="mx-auto max-w-lg px-4 py-16">
-        <Suspense fallback={<div className="text-white">Cargando…</div>}>
+        <Suspense fallback={<div className="text-jurnex-text-muted">Cargando…</div>}>
           <LoginForm />
         </Suspense>
       </main>

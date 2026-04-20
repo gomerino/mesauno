@@ -1,7 +1,6 @@
 import { JourneyPrimaryCta } from "@/components/panel/journey/JourneyPrimaryCta";
 import { JourneyPhasesBar } from "@/components/panel/journey/JourneyPhasesBar";
 import { MissionContextBanner } from "@/components/panel/MissionContextBanner";
-import { PanelThemeSelector } from "@/components/panel/PanelThemeSelector";
 import { ProgramaHitosManager } from "@/components/dashboard/ProgramaHitosManager";
 import { formatEventTitle } from "@/lib/couple-event-title";
 import { requirePanelScopedEventoId } from "@/lib/panel-evento-scope";
@@ -97,9 +96,6 @@ export default async function PanelProgramaPage({
           progressPrimary={journeyProgress.primary}
           progressHint={journeyProgress.hint}
         />
-        <div className="mt-3 md:mt-3">
-          <PanelThemeSelector />
-        </div>
       </div>
 
       <header className="mt-3 border-b border-white/[0.06] pb-4">

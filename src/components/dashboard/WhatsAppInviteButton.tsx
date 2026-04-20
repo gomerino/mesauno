@@ -19,6 +19,10 @@ type Props = {
   telefono: string;
   tokenAcceso: string;
   className?: string;
+  /** Solo icono (barra táctil en móvil); `title` y `aria-label` describen la acción. */
+  iconOnly?: boolean;
+  /** Tras abrir el enlace (solo si hay teléfono válido). */
+  onOpen?: () => void;
 };
 
 function WhatsAppGlyph({ className }: { className?: string }) {
@@ -29,7 +33,14 @@ function WhatsAppGlyph({ className }: { className?: string }) {
   );
 }
 
-export function WhatsAppInviteButton({ nombreInvitado, telefono, tokenAcceso, className }: Props) {
+export function WhatsAppInviteButton({
+  nombreInvitado,
+  telefono,
+  tokenAcceso,
+  className,
+  iconOnly = false,
+  onOpen,
+}: Props) {
   const [sent, setSent] = useState(false);
 
   const phoneDigits = useMemo(() => sanitizeWhatsAppPhone(telefono), [telefono]);
@@ -51,6 +62,7 @@ export function WhatsAppInviteButton({ nombreInvitado, telefono, tokenAcceso, cl
         e.preventDefault();
         return;
       }
+      onOpen?.();
       setSent(true);
       trackEvent("invite_link_copied", {
         source: "invitados_list",
@@ -58,10 +70,23 @@ export function WhatsAppInviteButton({ nombreInvitado, telefono, tokenAcceso, cl
         has_invitado_id: true,
       });
     },
-    [phoneDigits]
+    [phoneDigits, onOpen]
   );
 
   const disabled = !phoneDigits;
+
+  const baseIcon =
+    iconOnly && !disabled
+      ? "min-h-[44px] min-w-[44px] justify-center gap-0 rounded-xl px-0"
+      : iconOnly && disabled
+        ? "min-h-[44px] min-w-[44px] justify-center gap-0 rounded-xl px-0 opacity-60"
+        : "";
+
+  const ariaLabel = disabled
+    ? "WhatsApp no disponible: añade un teléfono con código de país"
+    : sent
+      ? "Enlace abierto en WhatsApp"
+      : "Abrir WhatsApp con mensaje listo";
 
   return (
     <a
@@ -70,9 +95,11 @@ export function WhatsAppInviteButton({ nombreInvitado, telefono, tokenAcceso, cl
       rel={disabled ? undefined : "noopener noreferrer"}
       onClick={handleClick}
       aria-disabled={disabled}
+      aria-label={iconOnly ? ariaLabel : undefined}
       title={disabled ? "Añade un teléfono con código de país (ej. 56912345678)" : "Abrir WhatsApp con mensaje listo"}
       className={[
         "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm transition",
+        baseIcon,
         disabled
           ? "cursor-not-allowed border border-white/10 bg-white/5 text-slate-500 opacity-60"
           : sent
@@ -82,7 +109,12 @@ export function WhatsAppInviteButton({ nombreInvitado, telefono, tokenAcceso, cl
       ].join(" ")}
     >
       {sent ? (
-        <svg className="h-3.5 w-3.5 shrink-0 text-emerald-300" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <svg
+          className={`${iconOnly ? "h-5 w-5" : "h-3.5 w-3.5"} shrink-0 text-emerald-300`}
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden
+        >
           <path
             d="M20 6L9 17l-5-5"
             stroke="currentColor"
@@ -92,9 +124,9 @@ export function WhatsAppInviteButton({ nombreInvitado, telefono, tokenAcceso, cl
           />
         </svg>
       ) : (
-        <WhatsAppGlyph className="h-3.5 w-3.5 shrink-0 text-white" />
+        <WhatsAppGlyph className={`${iconOnly ? "h-5 w-5" : "h-3.5 w-3.5"} shrink-0 text-white`} />
       )}
-      {sent ? "Enviado" : "WhatsApp"}
+      {iconOnly ? null : sent ? "Enviado" : "WhatsApp"}
     </a>
   );
 }

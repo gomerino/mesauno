@@ -23,20 +23,21 @@ export function GuestsMissionContextClient({ fromMission, missionState, hasInvit
 
   const message =
     missionState === "empty"
-      ? "Agregá tu primera persona para iniciar el check-in."
+      ? "Añade tu primera persona para iniciar el check-in."
       : missionState === "in_progress"
-        ? "Vas muy bien. Completá o compartí para marcar misión cumplida."
+        ? "Vas muy bien. Completa la lista o comparte para marcar la misión cumplida."
         : "Excelente: misión invitados completada.";
 
   return (
     <MissionBannerBase
+      variant="premium"
       title="Misión Invitados"
       message={message}
       action={
         <div className="flex flex-wrap items-center gap-2">
           <a
             href="#agregar-invitados"
-            className="inline-flex items-center gap-1 rounded-full bg-teal-500 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-teal-400"
+            className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-teal-500 to-teal-400 px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-teal-950/25 transition hover:brightness-110"
           >
             {hasInvitados ? "Continuar invitados" : "Agregar invitados"}
           </a>
@@ -46,7 +47,7 @@ export function GuestsMissionContextClient({ fromMission, missionState, hasInvit
               trackEvent("mission_back_to_panel", { target: "invitados" });
               router.push(`/panel?focus=invitados&t=${Date.now()}`);
             }}
-            className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-xs font-medium text-slate-300 transition-colors hover:border-white/25 hover:bg-white/[0.08] hover:text-white"
+            className="inline-flex items-center gap-1 rounded-full border border-[#D4AF37]/30 bg-white/[0.05] px-4 py-2.5 text-xs font-medium text-slate-200 transition hover:border-[#D4AF37]/45 hover:bg-white/10 hover:text-white"
           >
             ← Volver al panel
           </button>

@@ -12,7 +12,7 @@ export type InvitacionThemePageProps = {
   qrValue: string;
   playlists: EventPlaylistUrls;
   programaHitos: EventoProgramaHito[];
-  /** Fotos agrupadas por hito (RPC `programa_con_fotos_ventanas_publica`); vacío si no aplica. */
+  /** Fotos del álbum asociadas a cada momento del programa (lectura pública). Vacío si no aplica. */
   programaFotosPorHito: Record<string, ProgramaHitoFotoPublic[]>;
   albumFotos: EventoFoto[];
   musicColabEnabled: boolean;

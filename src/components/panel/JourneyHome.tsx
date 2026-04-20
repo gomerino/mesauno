@@ -2,7 +2,6 @@ import { JourneyViajeClient } from "@/components/panel/JourneyViajeClient";
 import { JourneyPrimaryCta } from "@/components/panel/journey/JourneyPrimaryCta";
 import { PanelInviteShareCard } from "@/components/panel/PanelInviteShareCard";
 import { PanelSlimProgress } from "@/components/panel/PanelSlimProgress";
-import { PanelThemeSelector } from "@/components/panel/PanelThemeSelector";
 import { JourneyPhasesBar } from "@/components/panel/journey/JourneyPhasesBar";
 import { resolveGuestMissionState } from "@/lib/guest-mission";
 import { resolveInvitationToken } from "@/lib/invitation-url";
@@ -85,7 +84,7 @@ export async function JourneyHome({
     <div className="mx-auto w-full max-w-4xl">
       {bundle.evento ? (
         <>
-          {/* Above the fold: un solo foco (CTA) + selector de estilo secundario */}
+          {/* Above the fold: CTA + fases del viaje */}
           <div className="flex min-h-[13.5rem] flex-col gap-3 md:min-h-[15rem] md:gap-4">
             {(!hasAccess || showSuccessHero) && (
               <JourneyPrimaryCta
@@ -111,9 +110,6 @@ export async function JourneyHome({
               progressPrimary={journeyProgress.primary}
               progressHint={journeyProgress.hint}
             />
-            <div className="mt-3 md:mt-3">
-              <PanelThemeSelector />
-            </div>
           </div>
 
           {/* Below the fold: PanelSlimProgress en móvil solo si falta completar el journey; luego cards */}
@@ -153,9 +149,6 @@ export async function JourneyHome({
             progressPrimary={journeyProgress.primary}
             progressHint={journeyProgress.hint}
           />
-          <div className="mt-3 md:mt-3">
-            <PanelThemeSelector />
-          </div>
           <JourneyViajeClient
             evento={bundle.evento}
             phase={journeyPhase}

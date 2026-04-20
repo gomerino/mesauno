@@ -1,6 +1,5 @@
 import { JourneyPrimaryCta } from "@/components/panel/journey/JourneyPrimaryCta";
 import { JourneyPhasesBar } from "@/components/panel/journey/JourneyPhasesBar";
-import { PanelThemeSelector } from "@/components/panel/PanelThemeSelector";
 import { EquipoPageClient } from "@/components/dashboard/EquipoPageClient";
 import { formatEventTitle } from "@/lib/couple-event-title";
 import { requirePanelScopedEventoId } from "@/lib/panel-evento-scope";
@@ -104,9 +103,6 @@ export default async function PanelEquipoPage() {
           progressPrimary={journeyProgress.primary}
           progressHint={journeyProgress.hint}
         />
-        <div className="mt-3 md:mt-3">
-          <PanelThemeSelector />
-        </div>
       </div>
 
       <header className="mt-3 border-b border-white/[0.06] pb-4">
