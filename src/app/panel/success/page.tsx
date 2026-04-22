@@ -1,3 +1,4 @@
+import { PanelLayout } from "@/components/panel/ds";
 import { PanelPostPaymentSuccess } from "@/components/panel/PanelPostPaymentSuccess";
 import { selectEventoForMember } from "@/lib/evento-membership";
 import { loadPanelProgressBundle } from "@/lib/panel-progress-load";
@@ -6,7 +7,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Tu viaje despegó — Dreams",
+  title: "Tu viaje despegó — Jurnex",
   robots: { index: false, follow: false },
 };
 
@@ -64,11 +65,13 @@ export default async function PanelSuccessPage({
       : null;
 
   return (
-    <PanelPostPaymentSuccess
-      invitadosCount={invitadosCount}
-      planKind={planKind}
-      paymentId={paymentId}
-      montoPago={montoPago}
-    />
+    <PanelLayout narrow>
+      <PanelPostPaymentSuccess
+        invitadosCount={invitadosCount}
+        planKind={planKind}
+        paymentId={paymentId}
+        montoPago={montoPago}
+      />
+    </PanelLayout>
   );
 }

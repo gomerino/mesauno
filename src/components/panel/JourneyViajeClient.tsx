@@ -1,39 +1,72 @@
 "use client";
 
-import { JourneyCard } from "@/components/panel/journey/JourneyCard";
+import {
+  JourneyCard,
+  type JourneyMissionStep,
+} from "@/components/panel/journey/JourneyCard";
 import type { PanelProgressBundle } from "@/lib/panel-progress-load";
+import type { JourneyStepId } from "@/lib/panel-setup-progress";
+import { JOURNEY_STEP_ORDER } from "@/lib/panel-setup-progress";
 import type { JourneyPhaseId } from "@/lib/journey-phases";
-import { guestMissionCtaLabel, type GuestMissionState } from "@/lib/guest-mission";
+import {
+  GUEST_MISSION_ORDER,
+  guestMissionCtaLabelFromSteps,
+  guestMissionDescriptionFromSteps,
+  guestMissionStripProps,
+  type GuestMissionSteps,
+} from "@/lib/guest-mission";
 import { trackEvent } from "@/lib/analytics";
 import { getPhaseBaseOrder, type JourneyCardKey } from "@/lib/journey-card-order";
-import { Plane } from "lucide-react";
+import { Plane, Users } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 type EventoViaje = NonNullable<PanelProgressBundle["evento"]>;
 
 type Props = {
   evento: EventoViaje | null;
   phase: JourneyPhaseId;
-  /** Estado derivado por la fuente única (`resolveGuestMissionState`). */
-  invitadosMission: GuestMissionState;
+  /** Misiones de invitados (lista, mesas, envío, meta); misma fuente que la página Pasajeros. */
+  guestMissionSteps: GuestMissionSteps;
   /** `"invitados"` / `"pasajeros"` / `"evento"` / `"programa"` / `"experiencia"`. */
   focusTarget?: string | null;
-  /** Básicos del evento completos (novios + fecha). */
+  /** Las 4 misiones de configuración del viaje completas (misma fuente que `bundle.steps`). */
   eventoComplete: boolean;
   /** Cantidad de hitos del programa del día. */
   programaHitosCount: number;
+  /** Pasos `evento_datos` … `evento_musica`; misma fuente que el % del panel. */
+  journeySteps: Record<JourneyStepId, boolean>;
 };
 
-function missionDescription(state: GuestMissionState): string {
-  switch (state) {
-    case "empty":
-      return "Aún no invitaste a nadie";
-    case "in_progress":
-      return "Sigue tu tripulación 👥";
-    case "completed":
-      return "Tripulación lista ✓";
-  }
+/** Etiquetas cortas alineadas a `JOURNEY_STEP_ORDER` / journey del panel. */
+const VIAJE_MISSION_LABELS: Record<JourneyStepId, string> = {
+  evento_datos: "Datos",
+  evento_ubicacion: "Lugar",
+  evento_programa: "Programa",
+  evento_musica: "Música",
+};
+
+/** Las 4 misiones de configuración (`getJourneyProgress`), mismos criterios que el % del panel. */
+function viajeMissionStrip(
+  journeySteps: Record<JourneyStepId, boolean>
+): { steps: JourneyMissionStep[]; doneCount: number; totalCount: number } {
+  const firstIncomplete = JOURNEY_STEP_ORDER.findIndex((id) => !journeySteps[id]);
+
+  const steps: JourneyMissionStep[] = JOURNEY_STEP_ORDER.map((id, i) => {
+    if (journeySteps[id]) {
+      return {
+        id,
+        label: VIAJE_MISSION_LABELS[id],
+        state: "done" as const,
+      };
+    }
+    const state: JourneyMissionStep["state"] =
+      i === firstIncomplete ? "active" : "pending";
+    return { id, label: VIAJE_MISSION_LABELS[id], state };
+  });
+
+  const doneCount = JOURNEY_STEP_ORDER.filter((id) => journeySteps[id]).length;
+  return { steps, doneCount, totalCount: JOURNEY_STEP_ORDER.length };
 }
 
 /** Emite `mission_card_completed` una sola vez por sesión para cada misión. */
@@ -53,15 +86,18 @@ function emitIfCompletedOnce(target: "invitados" | "evento", completed: boolean)
 export function JourneyViajeClient({
   evento,
   phase,
-  invitadosMission,
+  guestMissionSteps,
   focusTarget = null,
   eventoComplete,
   programaHitosCount,
+  journeySteps,
 }: Props) {
+  const invitadosMissionDone = GUEST_MISSION_ORDER.every((id) => guestMissionSteps[id]);
+
   useEffect(() => {
-    emitIfCompletedOnce("invitados", invitadosMission === "completed");
+    emitIfCompletedOnce("invitados", invitadosMissionDone);
     emitIfCompletedOnce("evento", eventoComplete);
-  }, [invitadosMission, eventoComplete]);
+  }, [invitadosMissionDone, eventoComplete]);
 
   const isPaid = evento?.plan_status === "paid";
 
@@ -75,17 +111,20 @@ export function JourneyViajeClient({
     (id === "pasajeros" && focusTarget === "invitados") ||
     (id === "invitados" && focusTarget === "pasajeros");
 
-  // Evento
-  const eventoDescription = eventoComplete ? "Destino confirmado ✓" : "Define tu destino ✈️";
+  // Viaje (franja = 4 pasos de configuración)
+  const eventoDescription = eventoComplete
+    ? "Viaje configurado ✓"
+    : "Datos, lugar, programa y música";
   const eventoCardStatus = eventoComplete ? "completed" : "active";
-  const eventoCta = eventoComplete ? "Editar destino" : "Completar destino";
+  const eventoCta = eventoComplete ? "Revisar viaje" : "Completar viaje";
 
   // Pasajeros
-  const pasajerosCardStatus = invitadosMission === "completed" ? "completed" : "active";
-  const pasajerosCta = guestMissionCtaLabel(invitadosMission);
-  const pasajerosDescription = missionDescription(invitadosMission);
-  const pasajerosHref = "/panel/invitados?from=mission";
+  const pasajerosCardStatus = invitadosMissionDone ? "completed" : "active";
+  const pasajerosCta = guestMissionCtaLabelFromSteps(guestMissionSteps);
+  const pasajerosDescription = guestMissionDescriptionFromSteps(guestMissionSteps);
+  const pasajerosHref = "/panel/pasajeros?from=mission";
   const pasajerosFocused = focusIs("pasajeros");
+  const pasajerosStrip = guestMissionStripProps(guestMissionSteps);
 
   // Programa
   const tieneHitos = programaHitosCount > 0;
@@ -97,36 +136,33 @@ export function JourneyViajeClient({
 
   // Experiencia
   const experienciaDescription = "Lo que vivirán ✨";
-  const experienciaCta = "Personalizar experiencia";
+  const experienciaCta = "Definir experiencia";
 
   type MissionStatus = "empty" | "in_progress" | "completed" | "locked";
 
   const eventoMissionStatus: MissionStatus = eventoComplete ? "completed" : "empty";
-  const pasajerosMissionStatus: MissionStatus = invitadosMission;
+  const pasajerosMissionStatus: MissionStatus = invitadosMissionDone
+    ? "completed"
+    : !guestMissionSteps.invitados_lista
+      ? "empty"
+      : "in_progress";
   const programaMissionStatus: MissionStatus = tieneHitos ? "in_progress" : "empty";
   const experienciaMissionStatus: MissionStatus = isPaid ? "empty" : "locked";
 
-  /** Base por fase: menor = más arriba. Tabla única en `getPhaseBaseOrder` (JUR-51). */
+  /** Orden fijo en pantalla: Viaje → Pasajeros → Experiencia → Programa (sin reordenar por estado). */
   const phaseBase = getPhaseBaseOrder(phase);
 
-  /** Penalización por estado: lo ya resuelto cae al final sin desaparecer. */
-  function statusPenalty(s: MissionStatus): number {
-    switch (s) {
-      case "empty":
-        return 0;
-      case "in_progress":
-        return 2;
-      case "completed":
-        return 20;
-      case "locked":
-        return 30;
-    }
-  }
+  const viajeStrip = viajeMissionStrip(journeySteps);
+  const pasajerosStripProps = {
+    steps: pasajerosStrip.steps,
+    doneCount: pasajerosStrip.doneCount,
+    totalCount: pasajerosStrip.totalCount,
+    ariaLabel: "Misiones de invitados",
+  };
 
   type CardSpec = {
     key: JourneyCardKey;
     status: MissionStatus;
-    rank: number;
     node: ReactNode;
   };
 
@@ -134,18 +170,18 @@ export function JourneyViajeClient({
     {
       key: "evento",
       status: eventoMissionStatus,
-      rank: phaseBase.evento + statusPenalty(eventoMissionStatus),
       node: (
         <JourneyCard
           key="evento"
-          title="Evento"
+          title="Viaje"
           description={eventoDescription}
-          icon={<span aria-hidden>✈️</span>}
+          icon={<Plane className="text-white/85" strokeWidth={1.65} aria-hidden />}
           status={eventoCardStatus}
-          href="/panel/evento?from=mission"
+          href="/panel/viaje?from=mission"
           phaseHighlight={phaseFocusEvento || focusIs("evento")}
           ctaLabel={eventoCta}
           pulse={focusIs("evento")}
+          missionStrip={viajeStrip}
           onNavigate={() =>
             trackEvent("panel_mission_cta_clicked", {
               target: "evento",
@@ -158,22 +194,22 @@ export function JourneyViajeClient({
     {
       key: "pasajeros",
       status: pasajerosMissionStatus,
-      rank: phaseBase.pasajeros + statusPenalty(pasajerosMissionStatus),
       node: (
         <JourneyCard
           key="pasajeros"
-          title="Pasajeros"
+          title="Invitados"
           description={pasajerosDescription}
-          icon={<span aria-hidden>👥</span>}
+          icon={<Users className="text-white/85" strokeWidth={1.65} aria-hidden />}
           status={pasajerosCardStatus}
           href={pasajerosHref}
           phaseHighlight={phaseFocusPasajeros || pasajerosFocused}
           ctaLabel={pasajerosCta}
           pulse={pasajerosFocused}
+          missionStrip={pasajerosStripProps}
           onNavigate={() =>
             trackEvent("panel_mission_cta_clicked", {
               target: "invitados",
-              state: invitadosMission,
+              state: invitadosMissionDone ? "completed" : "in_progress",
             })
           }
         />
@@ -182,7 +218,6 @@ export function JourneyViajeClient({
     {
       key: "programa",
       status: programaMissionStatus,
-      rank: phaseBase.programa + statusPenalty(programaMissionStatus),
       node: (
         <JourneyCard
           key="programa"
@@ -190,7 +225,7 @@ export function JourneyViajeClient({
           description={programaDescription}
           icon={<span aria-hidden>📋</span>}
           status={programaCardStatus}
-          href="/panel/programa?from=mission"
+          href="/panel/viaje/programa?from=mission"
           phaseHighlight={phaseFocusPrograma || focusIs("programa")}
           ctaLabel={programaCta}
           pulse={focusIs("programa")}
@@ -206,7 +241,6 @@ export function JourneyViajeClient({
     {
       key: "experiencia",
       status: experienciaMissionStatus,
-      rank: phaseBase.experiencia + statusPenalty(experienciaMissionStatus),
       node: (
         <JourneyCard
           key="experiencia"
@@ -214,7 +248,7 @@ export function JourneyViajeClient({
           description={experienciaDescription}
           icon={<span aria-hidden>✨</span>}
           status={isPaid ? "active" : "locked"}
-          href={isPaid ? "/panel/experiencia?from=mission" : undefined}
+          href={isPaid ? "/panel/viaje?from=mission" : undefined}
           phaseHighlight={phaseFocusExperiencia || focusIs("experiencia")}
           ctaLabel={isPaid ? experienciaCta : undefined}
           pulse={isPaid && focusIs("experiencia")}
@@ -232,26 +266,10 @@ export function JourneyViajeClient({
     },
   ];
 
-  const ordered = [...cards].sort((a, b) => a.rank - b.rank);
+  const ordered = [...cards].sort((a, b) => phaseBase[a.key] - phaseBase[b.key]);
   const topActionable = ordered.find((c) => c.status === "empty" || c.status === "in_progress");
 
-  const [isNarrowViewport, setIsNarrowViewport] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 639px)");
-    const sync = () => setIsNarrowViewport(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-
-  /** Mobile: la tarjeta “Siguiente” arriba del todo; desktop/tablet: orden por fase + penalización. */
-  const displayOrdered = useMemo(() => {
-    if (!isNarrowViewport || !topActionable) return ordered;
-    if (ordered[0]?.key === topActionable.key) return ordered;
-    return [topActionable, ...ordered.filter((c) => c.key !== topActionable.key)];
-  }, [isNarrowViewport, ordered, topActionable]);
-
-  const orderKeys = displayOrdered.map((c) => c.key).join("|");
+  const orderKeys = ordered.map((c) => c.key).join("|");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -292,8 +310,8 @@ export function JourneyViajeClient({
             </span>
           ) : null}
         </div>
-        <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 md:mt-4 md:gap-4">
-          {displayOrdered.map((c) => c.node)}
+        <div className="mt-2 grid grid-cols-1 items-stretch gap-2 sm:grid-cols-2 sm:gap-3 md:mt-4 md:gap-4">
+          {ordered.map((c) => c.node)}
         </div>
       </section>
     </div>
@@ -305,7 +323,7 @@ function labelForKey(key: JourneyCardKey): string {
     case "evento":
       return "Evento";
     case "pasajeros":
-      return "Pasajeros";
+      return "Invitados";
     case "programa":
       return "Programa";
     case "experiencia":

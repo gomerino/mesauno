@@ -1,13 +1,14 @@
 "use client";
 
 import { disconnectSpotifyAction, saveSpotifyPlaylistIdAction } from "@/app/panel/actions/spotify";
+import { panelBtnGhost, panelBtnPrimary, panelBtnSecondary } from "@/components/panel/ds";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-const label = "block text-xs font-medium text-slate-400";
+const label = "block text-xs font-medium text-white/50";
 const input =
-  "mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-white outline-none ring-green-500 focus:ring-2";
+  "mt-1 w-full rounded-lg border border-emerald-400/20 bg-black/20 px-3 py-2 text-sm text-white outline-none ring-emerald-500/40 focus:ring-2";
 
 type Props = {
   eventoId: string;
@@ -28,14 +29,14 @@ export function SpotifyPlaylistConnect({ eventoId, spotifyConnected, initialPlay
     if (searchParams.get("spotify") === "connected") {
       flashHandled.current = true;
       toast.success("Cuenta de Spotify vinculada. Si no había playlist, creamos una oficial automáticamente.");
-      router.replace("/panel/evento#musica-spotify");
+      router.replace("/panel/viaje#musica-spotify");
       return;
     }
     const err = searchParams.get("spotify_error");
     if (err) {
       flashHandled.current = true;
       toast.error(decodeURIComponent(err));
-      router.replace("/panel/evento#musica-spotify");
+      router.replace("/panel/viaje#musica-spotify");
     }
   }, [searchParams, router]);
 
@@ -68,38 +69,38 @@ export function SpotifyPlaylistConnect({ eventoId, spotifyConnected, initialPlay
   const authUrl = `/api/auth/spotify/authorize?evento_id=${encodeURIComponent(eventoId)}`;
 
   return (
-    <section className="space-y-4 rounded-2xl border border-green-500/25 bg-gradient-to-br from-green-950/40 to-black/40 p-5">
+    <section className="space-y-4 rounded-xl border border-emerald-400/20 bg-emerald-500/10 p-4">
       <div>
-        <h2 className="font-display text-lg font-semibold text-green-400">Música colaborativa (Spotify)</h2>
-        <p className="mt-1 text-sm text-slate-400">
+        <h2 className="font-display text-base font-semibold text-white/90">Música colaborativa (Spotify)</h2>
+        <p className="mt-1 text-xs leading-relaxed text-white/55">
           Los invitados podrán buscar canciones y sumarlas a la playlist oficial. Al vincular tu cuenta creamos una
           playlist &quot;Boda: …&quot; automáticamente; puedes reemplazarla pegando otro enlace si prefieres una lista
           existente.
         </p>
-        <details className="mt-3 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-left text-xs text-slate-400">
-          <summary className="cursor-pointer font-medium text-slate-300">
+        <details className="mt-3 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-left text-xs text-white/50">
+          <summary className="cursor-pointer font-medium text-white/70">
             Si los invitados ven error al añadir canciones (403)
           </summary>
-          <ol className="mt-2 list-decimal space-y-1.5 pl-4 leading-relaxed text-slate-400">
+          <ol className="mt-2 list-decimal space-y-1.5 pl-4 leading-relaxed text-white/45">
             <li>
               En{" "}
               <a
                 href="https://developer.spotify.com/dashboard"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-green-400 underline underline-offset-2 hover:text-green-300"
+                className="text-emerald-300/90 underline underline-offset-2 hover:text-emerald-200"
               >
                 Spotify for Developers
               </a>
-              , abre tu app → <strong className="text-slate-300">Users and access</strong> y añade el correo de la
+              , abre tu app → <strong className="text-white/75">Users and access</strong> y añade el correo de la
               misma cuenta de Spotify que vinculaste (modo desarrollo).
             </li>
             <li>
-              La playlist debe ser <strong className="text-slate-300">de esa cuenta</strong> (o la que creó la app al
+              La playlist debe ser <strong className="text-white/75">de esa cuenta</strong> (o la que creó la app al
               conectar). Listas de otro usuario o solo de lectura suelen fallar.
             </li>
             <li>
-              Pulsa <strong className="text-slate-300">Volver a autorizar Spotify</strong> arriba y guarda de nuevo el
+              Pulsa <strong className="text-white/75">Volver a autorizar Spotify</strong> arriba y guarda de nuevo el
               enlace de la playlist si la cambiaste.
             </li>
           </ol>
@@ -109,13 +110,13 @@ export function SpotifyPlaylistConnect({ eventoId, spotifyConnected, initialPlay
       <div className="flex flex-wrap items-center gap-3">
         <a
           href={authUrl}
-          className="inline-flex rounded-full bg-[#1DB954] px-5 py-2.5 text-sm font-bold text-black hover:bg-[#1ed760]"
+          className={`${panelBtnPrimary} rounded-full px-5 py-2.5 !bg-emerald-500/90 !text-black hover:!bg-emerald-400`}
         >
           {spotifyConnected ? "Volver a autorizar Spotify" : "Vincular Spotify"}
         </a>
-        {spotifyConnected && (
-          <span className="text-xs font-medium text-green-300/90">Cuenta conectada</span>
-        )}
+        {spotifyConnected ? (
+          <span className="text-xs font-medium text-emerald-200/80">Cuenta conectada</span>
+        ) : null}
       </div>
 
       <form onSubmit={savePlaylist} className="space-y-3">
@@ -129,27 +130,27 @@ export function SpotifyPlaylistConnect({ eventoId, spotifyConnected, initialPlay
             disabled={!spotifyConnected}
           />
           {!spotifyConnected && (
-            <p className="mt-1 text-xs text-slate-500">Conecta Spotify antes de guardar la playlist.</p>
+            <p className="mt-1 text-xs text-white/40">Conecta Spotify antes de guardar la playlist.</p>
           )}
         </div>
         <div className="flex flex-wrap gap-2">
           <button
             type="submit"
             disabled={!spotifyConnected || saving}
-            className="rounded-full bg-white/10 px-5 py-2 text-sm font-semibold text-white hover:bg-white/15 disabled:opacity-40"
+            className={`${panelBtnSecondary} rounded-full px-5 py-2 text-sm font-medium text-white/90`}
           >
             {saving ? "Guardando…" : "Guardar enlace de playlist"}
           </button>
-          {spotifyConnected && (
+          {spotifyConnected ? (
             <button
               type="button"
               disabled={disconnecting}
               onClick={() => void disconnect()}
-              className="rounded-full border border-white/15 px-4 py-2 text-sm text-slate-400 hover:text-white"
+              className={`${panelBtnGhost} rounded-full border border-white/10 px-4 py-2 text-sm`}
             >
               Desvincular Spotify
             </button>
-          )}
+          ) : null}
         </div>
       </form>
     </section>

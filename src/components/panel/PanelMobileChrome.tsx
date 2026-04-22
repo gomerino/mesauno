@@ -1,5 +1,6 @@
 "use client";
 
+import { JurnexOrbitIcon } from "@/components/brand/JurnexOrbitIcon";
 import { PANEL_MOBILE_TABS } from "@/components/panel/panel-nav-config";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -15,8 +16,8 @@ export function PanelMobileHeader({ userEmail }: { userEmail: string }) {
   return (
     <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#070b14]/85 px-4 py-2 backdrop-blur-xl md:hidden">
       <div className="flex items-center justify-between gap-3">
-        <Link href="/panel" className="font-display text-base font-bold tracking-tight text-white">
-          Dreams
+        <Link href="/panel" className="flex shrink-0 items-center p-0.5" aria-label="Jurnex, inicio del panel">
+          <JurnexOrbitIcon className="h-7 w-7 shrink-0" alt="Jurnex" />
         </Link>
         <p className="min-w-0 truncate text-[10px] text-slate-500" title={userEmail}>
           {userEmail}
@@ -42,7 +43,7 @@ export function PanelMobileBottomNav() {
               key={href}
               href={href}
               className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-lg py-0.5 transition-colors duration-200 ${
-                active ? "text-teal-400" : "text-white/40"
+                active ? "text-teal-400" : "text-white/50 hover:text-white/75"
               }`}
             >
               <Icon className="h-[1.15rem] w-[1.15rem] shrink-0" strokeWidth={active ? 2.5 : 2} aria-hidden />

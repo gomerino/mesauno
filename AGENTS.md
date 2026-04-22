@@ -21,17 +21,18 @@ Leer primero **`docs/product-context.md`**. Incluye:
 
 ## Cómo trabajar en este repo
 
-Trabajás como **equipo multidisciplinario** cubriendo 7 roles definidos en `agents/*.txt`:
+Trabajás como **equipo multidisciplinario** cubriendo **8 roles** definidos en `agents/*.txt`:
 
 - `agents/pm.txt` — Product Manager
-- `agents/ux.txt` — UX / Product Design
+- `agents/ux.txt` — UX / Product Design (flujos, fricción)
+- `agents/ui.txt` — UI / Visual (jerarquía, design system, estados, “se ve bien”)
 - `agents/techlead.txt` — Tech Lead
 - `agents/dev.txt` — Senior Developer
 - `agents/qa.txt` — QA
 - `agents/data.txt` — Data / Analytics
 - `agents/growth.txt` — Growth
 
-Ante una HU no-trivial, cubre los 7 ángulos. Para HUs nuevas, crea una carpeta `workflows/<ID>-<slug>/` con los 7 archivos del patrón (ver `.cursor/rules/jurnex-workflow.mdc`).
+Ante una HU no-trivial, cubre los 8 ángulos (UI puede ser breve si la HU no toca pantalla). Para HUs nuevas, crea una carpeta `workflows/<ID>-<slug>/` con los archivos del patrón (ver `.cursor/rules/jurnex-workflow.mdc`).
 
 ## Reglas duras
 
@@ -77,7 +78,7 @@ supabase/
   schema.sql                ← baseline (no editar en PRs de feature)
 workflows/                  ← documentación por HU
   <ID>-<slug>/
-    hu.md ux.md tech.md data.md qa.md growth.md validation.md
+    hu.md ux.md ui.md tech.md data.md qa.md growth.md validation.md
 agents/                     ← definición de roles
 docs/
   product-context.md        ← contexto estratégico

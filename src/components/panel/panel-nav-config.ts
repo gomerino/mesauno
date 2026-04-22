@@ -1,40 +1,57 @@
 import type { LucideIcon } from "lucide-react";
-import { CalendarDays, MapPin, Plane, Settings, Users } from "lucide-react";
+import { Home, Image, Plane, Settings, Users } from "lucide-react";
 
-/** Entradas de navegación desktop: rutas siguen existiendo; algunas se ocultan del menú (acceso vía cards en inicio). */
 export type PanelSidebarItem = {
+  id: string;
   href: string;
   label: string;
+  icon: LucideIcon;
+  /** Coincide solo con la ruta exacta (p. ej. panel de control). */
   end?: boolean;
-  /** No mostrar en sidebar ni en barra móvil inferior. */
-  hideInNav?: boolean;
 };
 
-export const PANEL_SIDEBAR_ITEMS: PanelSidebarItem[] = [
-  { href: "/panel", label: "Viaje", end: true },
-  { href: "/panel/evento", label: "Evento" },
-  { href: "/panel/programa", label: "Programa" },
-  { href: "/panel/invitacion", label: "Invitaciones" },
-  { href: "/panel/invitados", label: "Pasajeros", hideInNav: true },
-  { href: "/panel/experiencia", label: "Experiencia", hideInNav: true },
-  { href: "/panel/finanzas", label: "Regalos", hideInNav: true },
-  { href: "/panel/invitados/confirmaciones", label: "¿Van o no van?" },
-  { href: "/panel/invitados/vista", label: "Vista previa" },
-  { href: "/panel/equipo", label: "Ajustes" },
-  { href: "/marketplace", label: "Marketplace" },
-];
+const panel: PanelSidebarItem = {
+  id: "panel",
+  href: "/panel",
+  label: "Panel de control",
+  icon: Home,
+  end: true,
+};
+const viaje: PanelSidebarItem = { id: "viaje", href: "/panel/viaje", label: "Viaje", icon: Plane };
+const pasajeros: PanelSidebarItem = {
+  id: "pasajeros",
+  href: "/panel/pasajeros",
+  label: "Pasajeros",
+  icon: Users,
+};
+const aterrizaje: PanelSidebarItem = {
+  id: "aterrizaje",
+  href: "/panel/recuerdos",
+  label: "Aterrizaje",
+  icon: Image,
+};
+const ajustes: PanelSidebarItem = {
+  id: "ajustes",
+  href: "/panel/ajustes",
+  label: "Ajustes",
+  icon: Settings,
+};
+
+/** Grupos del sidebar: control · viaje+pasajeros+aterrizaje · ajustes */
+export const PANEL_SIDEBAR_GROUPS: PanelSidebarItem[][] = [[panel], [viaje, pasajeros, aterrizaje], [ajustes]];
+
+export const PANEL_SIDEBAR_ITEMS: PanelSidebarItem[] = PANEL_SIDEBAR_GROUPS.flat();
 
 export function panelSidebarVisibleItems(): PanelSidebarItem[] {
-  return PANEL_SIDEBAR_ITEMS.filter((i) => !i.hideInNav);
+  return PANEL_SIDEBAR_ITEMS;
 }
 
-/** Barra inferior móvil: pocas entradas; pasajeros / experiencia / regalos solo desde cards o URLs directas. */
 export type PanelMobileTab = { href: string; label: string; icon: LucideIcon; end?: boolean };
 
 export const PANEL_MOBILE_TABS: PanelMobileTab[] = [
-  { href: "/panel", label: "Viaje", icon: Plane, end: true },
-  { href: "/panel/evento", label: "Destino", icon: MapPin },
-  { href: "/panel/programa", label: "Día", icon: CalendarDays },
-  { href: "/panel/invitados", label: "Invitados", icon: Users },
-  { href: "/panel/equipo", label: "Ajustes", icon: Settings },
+  { href: "/panel", label: "Panel", icon: Home, end: true },
+  { href: "/panel/viaje", label: "Viaje", icon: Plane },
+  { href: "/panel/pasajeros", label: "Pasajeros", icon: Users },
+  { href: "/panel/recuerdos", label: "Recuerdos", icon: Image },
+  { href: "/panel/ajustes", label: "Ajustes", icon: Settings },
 ];

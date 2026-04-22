@@ -44,7 +44,7 @@ export function JourneyPrimaryCta({
   let title = "Siguiente paso ✈️";
   let text = "Agrega tus pasajeros para empezar el viaje";
   let ctaLabel = "Agregar pasajeros 👥";
-  let href = "/panel/invitados";
+  let href = "/panel/pasajeros";
   let mode: "link" | "checkout" = "link";
 
   // Prioridad de render explícita:
@@ -53,17 +53,17 @@ export function JourneyPrimaryCta({
     title = "✨ Experiencia activada";
     if (phase === "check-in") {
       ctaLabel = "Invitar pasajeros";
-      href = "/panel/invitacion";
+      href = "/panel/pasajeros/envios";
       text = hasInvitaciones
         ? "Comparte el acceso y sigue sumando a quienes vuelan contigo."
         : "Tu plan está activo: invita y completa los detalles cuando quieras.";
     } else if (phase === "despegue") {
       ctaLabel = "Ver programa";
-      href = "/panel/programa";
+      href = "/panel/viaje/programa";
       text = "Coordina los últimos detalles y ten el día a mano, sin apuros.";
     } else {
       ctaLabel = "Ver experiencia";
-      href = "/panel/experiencia";
+      href = "/panel/viaje";
       text = "Muestra lo que armaste y comparte el momento con quienes vuelan contigo.";
     }
   } else if (paymentStatus === "pending") {
@@ -94,17 +94,17 @@ export function JourneyPrimaryCta({
     title = "Tu viaje comienza pronto ✈️";
     text = "Completa la información clave e invita cuando te sientas listo.";
     ctaLabel = "Completar datos";
-    href = "/panel/evento";
+    href = "/panel/viaje";
   } else if (phase === "despegue") {
     title = "Todo listo para el gran día";
     text = "Revisa el programa y coordina con tus pasajeros sin perder el ritmo.";
     ctaLabel = "Ver programa";
-    href = "/panel/programa";
+    href = "/panel/viaje/programa";
   } else {
     title = "Disfruta la experiencia";
     text = "Explora lo que preparaste y compártelo con quienes vuelan contigo.";
     ctaLabel = "Ver experiencia";
-    href = "/panel/experiencia";
+    href = "/panel/viaje";
   }
 
   const ctaClasses =

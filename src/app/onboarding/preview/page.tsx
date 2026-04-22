@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "Tu pase — Dreams",
+  title: "Tu pase — Jurnex",
   description: "Vista previa instantánea de tu invitación estilo boarding pass.",
 };
 

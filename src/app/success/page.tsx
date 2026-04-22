@@ -12,7 +12,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Pago recibido — Dreams",
+  title: "Pago recibido — Jurnex",
   robots: { index: false, follow: false },
 };
 

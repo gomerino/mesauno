@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Crear tu viaje — Dreams",
+  title: "Crear tu viaje — Jurnex",
   description: "Creá tu cuenta y tu evento en un solo paso. Sin demo: directo al panel.",
 };
 

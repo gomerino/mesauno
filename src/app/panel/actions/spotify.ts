@@ -93,7 +93,7 @@ export async function saveSpotifyPlaylistIdAction(
     return { ok: false, error: res.error ?? "No se pudo guardar." };
   }
 
-  revalidatePath("/panel/evento");
+  revalidatePath("/panel/viaje");
   return { ok: true };
 }
 
@@ -125,6 +125,6 @@ export async function disconnectSpotifyAction(eventoId: string): Promise<{ ok: b
     return { ok: false, error: error.message };
   }
 
-  revalidatePath("/panel/evento");
+  revalidatePath("/panel/viaje");
   return { ok: true };
 }

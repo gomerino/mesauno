@@ -23,10 +23,6 @@ export default function PanelHomePage({
     typeof mockPayment === "string" ? mockPayment : Array.isArray(mockPayment) ? mockPayment[0] : undefined;
   const mockPaymentStatus = isMockPaymentStatus(rawMockPayment) ? rawMockPayment : null;
   const focusTarget = typeof focus === "string" ? focus : Array.isArray(focus) ? focus[0] : null;
-  const forceFresh = forceFreshFromWelcome || Boolean(mockPaymentStatus);
-  const optimisticPlanActive = process.env.NODE_ENV === "development" && mockPaymentStatus === "approved";
-  const optimisticPaymentStatus = process.env.NODE_ENV === "development" ? mockPaymentStatus : null;
-
   const celebrateRaw =
     typeof celebrate === "string" ? celebrate : Array.isArray(celebrate) ? celebrate[0] : undefined;
   const resultadoRaw =
@@ -55,13 +51,7 @@ export default function PanelHomePage({
         redirectAfterMockTo={redirectAfterMockTo}
       />
       <PanelWelcomeCleanup enabled={forceFreshFromWelcome} />
-      <JourneyHome
-        forceFresh={forceFresh}
-        showSuccessHero={forceFreshFromWelcome}
-        optimisticPlanActive={optimisticPlanActive}
-        optimisticPaymentStatus={optimisticPaymentStatus}
-        focusTarget={focusTarget}
-      />
+      <JourneyHome focusTarget={focusTarget} />
     </>
   );
 }

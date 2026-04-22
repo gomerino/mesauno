@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "Detalles del evento — Dreams",
+  title: "Detalles del evento — Jurnex",
   robots: { index: false, follow: false },
 };
 

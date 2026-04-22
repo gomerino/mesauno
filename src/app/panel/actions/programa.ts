@@ -30,7 +30,7 @@ async function requireEditor(eventoId: string) {
 }
 
 function revalidatePrograma() {
-  revalidatePath("/panel/programa");
+  revalidatePath("/panel/viaje/programa");
   revalidatePath("/panel");
 }
 

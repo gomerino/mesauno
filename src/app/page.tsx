@@ -12,14 +12,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Dreams — Invitaciones boarding pass para tu evento",
+  title: "Jurnex — Invitaciones boarding pass para tu evento",
   description:
     "Invita, organiza y comparte bodas, cumpleaños y eventos corporativos. Invitación digital, RSVP, mesas y check-in QR en un solo lugar.",
 };
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-jurnex-bg pb-[5.5rem] md:pb-0">
+    <div className="jurnex-brand-layers min-h-screen bg-jurnex-bg pb-[5.5rem] md:pb-0">
       <SiteHeader />
       <Hero />
       <div className="border-b border-jurnex-border bg-jurnex-surface/50">
@@ -48,7 +48,7 @@ export default function HomePage() {
             Invitación real
           </a>
         </div>
-        <p className="mt-4">© {new Date().getFullYear()} Dreams Wedding</p>
+        <p className="mt-4">© {new Date().getFullYear()} Jurnex</p>
       </footer>
       <LandingStickyCta />
     </div>

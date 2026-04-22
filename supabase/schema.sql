@@ -22,6 +22,8 @@ create table if not exists public.eventos (
   frecuencia_recordatorios int not null default 3 check (frecuencia_recordatorios >= 2 and frecuencia_recordatorios <= 14),
   recordatorios_activos boolean not null default false,
   fecha_inicio_recordatorios date,
+  objetivo_invitaciones_enviar integer null,
+  objetivo_personas_total integer null,
   created_at timestamptz default now()
 );
 

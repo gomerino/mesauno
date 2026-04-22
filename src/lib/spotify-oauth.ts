@@ -29,7 +29,7 @@ export async function spotifyOAuthAuthorizeGET(request: Request): Promise<Respon
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    return NextResponse.redirect(new URL(`/login?next=${encodeURIComponent("/panel/evento")}`, request.url));
+    return NextResponse.redirect(new URL(`/login?next=${encodeURIComponent("/panel/viaje")}`, request.url));
   }
 
   const { data: isAdmin, error } = await supabase.rpc("user_is_evento_admin", { p_evento_id: eventoId });
@@ -58,7 +58,7 @@ export async function spotifyOAuthCallbackGET(request: Request): Promise<Respons
   const err = url.searchParams.get("error");
 
   const origin = await getSiteOrigin();
-  const fail = (msg: string) => NextResponse.redirect(`${origin}/panel/evento?spotify_error=${encodeURIComponent(msg)}`);
+  const fail = (msg: string) => NextResponse.redirect(`${origin}/panel/viaje?spotify_error=${encodeURIComponent(msg)}`);
 
   if (err) {
     return fail("Autorización cancelada o denegada.");
@@ -116,5 +116,5 @@ export async function spotifyOAuthCallbackGET(request: Request): Promise<Respons
     }
   }
 
-  return NextResponse.redirect(`${origin}/panel/evento?spotify=connected`);
+  return NextResponse.redirect(`${origin}/panel/viaje?spotify=connected`);
 }

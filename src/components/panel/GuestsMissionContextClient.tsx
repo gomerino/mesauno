@@ -2,17 +2,16 @@
 
 import { MissionBannerBase } from "@/components/panel/MissionBannerBase";
 import { trackEvent } from "@/lib/analytics";
-import type { GuestMissionState } from "@/lib/guest-mission";
+import { guestMissionCtaLabel, type GuestMissionState } from "@/lib/guest-mission";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 type Props = {
   fromMission: boolean;
   missionState: GuestMissionState;
-  hasInvitados: boolean;
 };
 
-export function GuestsMissionContextClient({ fromMission, missionState, hasInvitados }: Props) {
+export function GuestsMissionContextClient({ fromMission, missionState }: Props) {
   const router = useRouter();
 
   useEffect(() => {
@@ -39,7 +38,7 @@ export function GuestsMissionContextClient({ fromMission, missionState, hasInvit
             href="#agregar-invitados"
             className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-teal-500 to-teal-400 px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-teal-950/25 transition hover:brightness-110"
           >
-            {hasInvitados ? "Continuar invitados" : "Agregar invitados"}
+            {guestMissionCtaLabel(missionState)}
           </a>
           <button
             type="button"

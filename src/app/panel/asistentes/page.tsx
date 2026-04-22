@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-/** @deprecated Usa /panel/invitados/confirmaciones */
+/** @deprecated Usa /panel/pasajeros/confirmaciones */
 export default function PanelAsistentesRedirect() {
-  redirect("/panel/invitados/confirmaciones");
+  redirect("/panel/pasajeros/confirmaciones");
 }

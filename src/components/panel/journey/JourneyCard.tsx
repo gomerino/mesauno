@@ -1,10 +1,14 @@
 "use client";
 
+import { JourneyMissionStrip } from "@/components/panel/journey/JourneyMissionStrip";
+import type { JourneyMissionStep, MissionStripProps } from "@/components/panel/journey/journey-mission-types";
 import { ArrowRight, Lock } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
 export type JourneyCardStatus = "active" | "locked" | "completed";
+
+export type { JourneyMissionStep, JourneyMissionStepState } from "@/components/panel/journey/journey-mission-types";
 
 type Props = {
   title: string;
@@ -20,6 +24,8 @@ type Props = {
   pulse?: boolean;
   /** Callback opcional al navegar (analytics). No bloquea la navegación. */
   onNavigate?: () => void;
+  /** Resumen de misiones del viaje o invitados. */
+  missionStrip?: MissionStripProps;
 };
 
 export function JourneyCard({
@@ -32,9 +38,11 @@ export function JourneyCard({
   ctaLabel,
   pulse,
   onNavigate,
+  missionStrip,
 }: Props) {
-  const base =
-    "group relative overflow-hidden rounded-2xl border p-4 transition-[opacity,transform,border-color] duration-300 ease-out";
+  const base = `group relative flex h-full min-h-[10.75rem] w-full flex-col overflow-hidden rounded-2xl border p-4 transition-[opacity,transform,border-color] duration-300 ease-out sm:min-h-[10.25rem] ${
+    missionStrip ? "md:min-h-[15rem]" : "md:min-h-[11rem]"
+  }`;
 
   const glass = "border-white/[0.09] bg-white/[0.05] backdrop-blur-md";
 
@@ -77,18 +85,25 @@ export function JourneyCard({
 
   const inner = (
     <>
-      <div
-        className={`mb-2 flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-lg transition-transform duration-300 group-hover:scale-[1.02] md:mb-2.5 md:h-10 md:w-10 md:text-xl ${status === "locked" ? "opacity-80" : ""}`}
-      >
-        {icon}
-      </div>
-      <h3 className="font-display text-base font-semibold text-white">{title}</h3>
-      <p className="mt-1.5 text-xs leading-relaxed text-slate-400">{description}</p>
+      <div className="relative z-[1] flex flex-1 flex-col">
+        <div
+          className={`mb-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-lg transition-transform duration-300 group-hover:scale-[1.02] md:mb-2.5 md:h-10 md:w-10 [&_svg]:h-5 [&_svg]:w-5 [&_svg]:shrink-0 md:[&_svg]:h-[1.35rem] md:[&_svg]:w-[1.35rem] ${status === "locked" ? "opacity-80" : ""}`}
+        >
+          {icon}
+        </div>
+        <h3 className="font-display text-base font-semibold text-white">{title}</h3>
+        <p className="mt-1.5 flex-1 text-xs leading-relaxed text-slate-400 max-sm:line-clamp-3 sm:min-h-[2.75rem]">
+          {description}
+        </p>
 
-      {ctaLabel && status !== "locked" && href ? (
-        <div className={`mt-3 flex items-center justify-between border-t border-dashed ${ctaTone.divider} pt-2.5`}>
+        {missionStrip ? <JourneyMissionStrip {...missionStrip} /> : null}
+
+        {ctaLabel && status !== "locked" && href ? (
+          <div
+            className={`mt-auto flex items-center justify-between border-t border-dashed ${ctaTone.divider} pt-2.5 max-sm:pt-2`}
+          >
           <span
-            className={`font-display text-[10px] font-semibold uppercase tracking-[0.22em] transition-colors ${ctaTone.label}`}
+            className={`min-w-0 flex-1 pr-2 text-left font-display text-[10px] font-semibold uppercase leading-snug tracking-[0.18em] transition-colors max-sm:tracking-[0.14em] ${ctaTone.label}`}
           >
             {ctaLabel}
           </span>
@@ -99,11 +114,12 @@ export function JourneyCard({
             <ArrowRight className="h-3 w-3" strokeWidth={2.25} />
           </span>
         </div>
-      ) : null}
+        ) : null}
+      </div>
 
       {status === "locked" ? (
         <div
-          className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-2xl bg-[#030712]/70 px-4 text-center backdrop-blur-sm transition-opacity duration-300"
+          className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-2xl bg-[#030712]/70 px-4 text-center backdrop-blur-sm transition-opacity duration-300"
           aria-hidden
         >
           <Lock className="h-6 w-6 text-slate-100/80" strokeWidth={2} />
@@ -113,7 +129,7 @@ export function JourneyCard({
 
       {status === "completed" ? (
         <div
-          className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full border border-emerald-400/30 bg-emerald-500/20 text-[10px] text-emerald-200"
+          className="absolute right-3 top-3 z-[11] flex h-6 w-6 items-center justify-center rounded-full border border-emerald-400/30 bg-emerald-500/20 text-[10px] text-emerald-200"
           aria-hidden
         >
           ✓
@@ -132,7 +148,7 @@ export function JourneyCard({
     <Link
       href={href}
       onClick={onNavigate}
-      className={`${shellClass} block focus:outline-none focus-visible:ring-2 ${
+      className={`${shellClass} focus:outline-none focus-visible:ring-2 ${
         phaseHighlight ? "focus-visible:ring-teal-400/35" : "focus-visible:ring-[#D4AF37]/40"
       }`}
     >

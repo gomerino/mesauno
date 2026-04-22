@@ -21,7 +21,15 @@ Guía breve para mover una idea desde el backlog hasta código y métricas, usan
 
 ---
 
-## 3. Growth (`agents/growth.txt`)
+## 3. UI (`agents/ui.txt`)
+
+1. Adjunta `agents/ui.txt` + `ux.md` / capturas + rutas de componentes (`src/components/panel/ds`, `panel-themes`).
+2. Pide jerarquía de CTAs, consistencia de botones/superficies, estados y checklist visual (mobile + desktop).
+3. Incorpora el resultado en `workflows/HU-xxx/ui.md`.
+
+---
+
+## 4. Growth (`agents/growth.txt`)
 
 1. Adjunta `agents/growth.txt` + `idea.md` / `hu.md`.
 2. Pide hipótesis, copy de urgencia ética, ranking y experimentos alineados a eventos analytics.
@@ -29,7 +37,7 @@ Guía breve para mover una idea desde el backlog hasta código y métricas, usan
 
 ---
 
-## 4. Validación
+## 5. Validación
 
 1. Usa `workflows/HU-xxx/validation.md` como plantilla.
 2. Con PM + QA, marca criterios de éxito y checklist antes de merge.
@@ -37,7 +45,7 @@ Guía breve para mover una idea desde el backlog hasta código y métricas, usan
 
 ---
 
-## 5. Tech (`agents/techlead.txt`)
+## 6. Tech (`agents/techlead.txt`)
 
 1. Adjunta `agents/techlead.txt`, `docs/architecture.md` y `workflows/HU-xxx/hu.md`.
 2. Pide modelo de datos, rutas REST y riesgos (concurrencia, authz).
@@ -45,7 +53,7 @@ Guía breve para mover una idea desde el backlog hasta código y métricas, usan
 
 ---
 
-## 6. Dev (Cursor)
+## 7. Dev (Cursor)
 
 1. Adjunta `agents/dev.txt` + `tech.md` + archivos relevantes del código.
 2. Pide implementación por módulos de dominio, sin duplicar lógica entre rutas y UI.
@@ -53,7 +61,7 @@ Guía breve para mover una idea desde el backlog hasta código y métricas, usan
 
 ---
 
-## 7. QA (`agents/qa.txt`)
+## 8. QA (`agents/qa.txt`)
 
 1. Adjunta `agents/qa.txt` + `hu.md` + PR diff o lista de archivos tocados.
 2. Pide plan de pruebas, casos borde y riesgos de seguridad (IDOR, carrera en reservas).
@@ -61,7 +69,7 @@ Guía breve para mover una idea desde el backlog hasta código y métricas, usan
 
 ---
 
-## 8. Data (`agents/data.txt`)
+## 9. Data (`agents/data.txt`)
 
 1. Adjunta `agents/data.txt` + `growth.md` / `hu.md`.
 2. Pide diccionario de eventos, propiedades y métricas; alinea nombres con instrumentación real.

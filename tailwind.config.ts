@@ -137,9 +137,9 @@ const config: Config = {
       },
       boxShadow: {
         "jurnex-glow":
-          "0 0 24px -8px rgba(47, 230, 195, 0.18), inset 0 1px 0 0 rgba(255,255,255,0.06)",
+          "0 0 24px -8px rgba(20, 184, 166, 0.2), inset 0 1px 0 0 rgba(255,255,255,0.06)",
         "jurnex-glow-hover":
-          "0 0 32px -6px rgba(47, 230, 195, 0.28), inset 0 1px 0 0 rgba(255,255,255,0.08)",
+          "0 0 32px -6px rgba(20, 184, 166, 0.3), inset 0 1px 0 0 rgba(255,255,255,0.08)",
         "jurnex-card": "0 8px 40px -12px rgba(0, 0, 0, 0.55)",
       },
       transitionDuration: {

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { JurnexMark } from "@/components/brand/JurnexMark";
 import { CrearMiEventoLink } from "@/components/marketing/CrearMiEventoLink";
 import { VerPlanesCtaLink } from "@/components/marketing/VerPlanesCtaLink";
 
@@ -14,8 +14,8 @@ export function Hero() {
       />
       <div className="relative mx-auto flex max-w-6xl flex-col gap-10 lg:flex-row lg:items-center lg:gap-14">
         <div className="min-w-0 flex-1 text-center lg:text-left">
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-[#D4AF37]/90">
-            Dreams · invitaciones estilo boarding pass
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-jurnex-secondary/90">
+            Jurnex · invitaciones estilo boarding pass
           </p>
           <h1 className="font-display text-[clamp(1.85rem,5vw,3.25rem)] font-bold leading-[1.12] tracking-tight text-white">
             Celebra tu evento como nunca antes <span aria-hidden>✨</span>
@@ -35,14 +35,10 @@ export function Hero() {
           </div>
         </div>
         <div className="relative mx-auto w-full max-w-[20rem] shrink-0 lg:mx-0">
-          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-sm border border-white/15 bg-[#1e293b]/40 shadow-[0_24px_80px_rgba(0,0,0,0.45)] ring-1 ring-[#D4AF37]/25">
-            <Image
-              src="/dreams-airlines-logo.png"
-              alt="Estética premium tipo pase de abordaje"
-              fill
-              className="object-contain object-center p-6 sm:p-8"
-              sizes="(max-width: 1024px) 100vw, 320px"
-              priority
+          <div className="relative flex aspect-[4/5] w-full items-center justify-center overflow-hidden rounded-sm border border-white/15 bg-[#1e293b]/40 shadow-[0_24px_80px_rgba(0,0,0,0.45)] ring-1 ring-jurnex-secondary/25">
+            <JurnexMark
+              variant="fullPng"
+              className="h-auto w-full max-w-[min(100%,17rem)] object-contain px-6 py-8 sm:px-8"
             />
           </div>
           <p className="mt-3 text-center text-[11px] text-slate-500 lg:text-left">Bodas, cumpleaños, corporativos y más</p>

@@ -48,7 +48,7 @@ export function ExperienciaPageClient({ isPaid }: Props) {
           status={locked ? "locked" : "active"}
         >
           <Link
-            href="/panel/invitacion"
+            href="/panel/pasajeros/envios"
             className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] px-5 text-sm font-semibold text-[#0f172a] shadow-lg transition hover:brightness-110 active:scale-[0.99]"
           >
             Mandar invitaciones ✈️
@@ -62,7 +62,7 @@ export function ExperienciaPageClient({ isPaid }: Props) {
           status={locked ? "locked" : "active"}
         >
           <Link
-            href="/panel/evento#musica-spotify"
+            href="/panel/viaje#musica-spotify"
             className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-gradient-to-r from-[#1DB954] to-[#169c46] px-5 text-sm font-semibold text-black shadow-lg transition hover:brightness-110 active:scale-[0.99]"
           >
             Configurar música en Spotify

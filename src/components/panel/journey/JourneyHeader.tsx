@@ -9,13 +9,14 @@ function subtitleForPath(pathname: string): string {
   if (pathname === "/panel" || pathname === "/panel/" || pathname === "/panel/overview") {
     return "Tu centro de control · cada detalle del viaje";
   }
-  if (pathname.startsWith("/panel/evento")) return "Evento, destino y música del viaje";
-  if (pathname.startsWith("/panel/invitados/confirmaciones")) return "¿Van o no van? · respuestas de tus invitados";
-  if (pathname.startsWith("/panel/invitados/vista")) return "Vista previa del pase y la invitación";
-  if (pathname.startsWith("/panel/invitados")) return "Quién vuela con ustedes en este viaje";
-  if (pathname.startsWith("/panel/invitacion")) return "Invitaciones y experiencia para quienes vienen";
-  if (pathname.startsWith("/panel/programa")) return "Itinerario del gran día";
-  if (pathname.startsWith("/panel/equipo")) return "Equipo y permisos";
+  if (pathname.startsWith("/panel/viaje/programa")) return "Itinerario del gran día";
+  if (pathname.startsWith("/panel/viaje")) return "Datos, invitación y experiencia del viaje";
+  if (pathname.startsWith("/panel/pasajeros/confirmaciones")) return "Confirmaciones · quién viene y quién no";
+  if (pathname.startsWith("/panel/pasajeros/vista")) return "Vista previa del pase y la invitación";
+  if (pathname.startsWith("/panel/pasajeros/envios")) return "Canales y mensaje de la invitación";
+  if (pathname.startsWith("/panel/pasajeros")) return "Lista, envíos y confirmaciones del viaje";
+  if (pathname.startsWith("/panel/recuerdos")) return "Lo que queda cuando el viaje aterriza";
+  if (pathname.startsWith("/panel/ajustes")) return "Equipo, cuenta y permisos";
   if (pathname.startsWith("/panel/finanzas")) return "Regalos y números";
   if (pathname.startsWith("/panel/pareja-evento")) return "Tu pareja y el evento";
   return "Seguí armando tu viaje con calma";

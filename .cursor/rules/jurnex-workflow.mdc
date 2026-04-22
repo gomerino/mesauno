@@ -6,12 +6,13 @@ alwaysApply: false
 
 # Patrón de workflow por HU
 
-Cada carpeta en `workflows/<ID>-<kebab-slug>/` documenta una HU y contiene **7 archivos fijos** (todos opcionales pero preferible completos):
+Cada carpeta en `workflows/<ID>-<kebab-slug>/` documenta una HU y contiene **8 archivos** (todos opcionales pero preferible completos; `ui.md` puede ser un stub si la HU no tiene superficie visual nueva):
 
 | Archivo | Rol dueño | Contenido mínimo |
 |---|---|---|
 | `hu.md` | PM | User story · Acceptance criteria numerados · Edge cases · Out of scope · Dependencies |
 | `ux.md` | UX | Flow ASCII · Screen inventory · Friction audit (S/M/L) · Copy tone · Mobile spec |
+| `ui.md` | UI | Jerarquía CTAs · Mapeo a DS (`panelBtn*` / tokens) · densidad · estados · checklist visual |
 | `tech.md` | Tech Lead + Dev | Domain model · API sketch · DDL/migration · Types · Risks |
 | `data.md` | Data | Event dictionary (tabla) · Metrics · Quality rules · Guardrails |
 | `qa.md` | QA | Cases tabla con ID · Non-functional · Security · Sign-off checklist |

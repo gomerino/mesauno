@@ -23,9 +23,9 @@ export async function sendInvitationsFromPanelAction(eventoId: string, mode: Bul
 
   if (result.ok) {
     revalidatePath("/panel");
-    revalidatePath("/panel/invitados");
-    revalidatePath("/panel/invitacion");
-    revalidatePath("/panel/invitados/vista");
+    revalidatePath("/panel/pasajeros");
+    revalidatePath("/panel/pasajeros/envios");
+    revalidatePath("/panel/pasajeros/vista");
   }
 
   return result;

@@ -23,14 +23,14 @@ export function PanelPostPaymentSuccess({
   const planLine =
     planKind === "esencial" ? "✔ Plan Esencial activado" : "✔ Plan Experiencia activado";
 
-  const primaryHref = invitadosCount === 0 ? "/panel/invitados" : "/panel/invitacion";
+  const primaryHref = invitadosCount === 0 ? "/panel/pasajeros" : "/panel/pasajeros/envios";
   const primaryLabel =
     invitadosCount === 0 ? "👥 Cargar pasajeros" : "🚀 Enviar primeras invitaciones";
 
   const secondaries = [
     { emoji: "🎵", label: "Activar música", href: "/panel/experiencia" },
     { emoji: "📸", label: "Ver álbum", href: "/panel/experiencia" },
-    { emoji: "✉️", label: "Personalizar invitación", href: "/panel/invitacion" },
+    { emoji: "✉️", label: "Personalizar invitación", href: "/panel/pasajeros/envios" },
   ] as const;
 
   return (

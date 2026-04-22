@@ -31,15 +31,24 @@ const nextConfig = {
   async redirects() {
     return [
       { source: "/panel/overview", destination: "/panel", permanent: true },
+      { source: "/panel/evento", destination: "/panel/viaje", permanent: true },
+      { source: "/panel/evento/:path*", destination: "/panel/viaje/:path*", permanent: true },
+      { source: "/panel/invitados", destination: "/panel/pasajeros", permanent: true },
+      { source: "/panel/invitados/:path*", destination: "/panel/pasajeros/:path*", permanent: true },
+      { source: "/panel/equipo", destination: "/panel/ajustes", permanent: true },
+      { source: "/panel/equipo/:path*", destination: "/panel/ajustes/:path*", permanent: true },
+      { source: "/panel/programa", destination: "/panel/viaje/programa", permanent: true },
+      { source: "/panel/invitacion", destination: "/panel/pasajeros/envios", permanent: true },
+      { source: "/panel/experiencia", destination: "/panel/viaje", permanent: true },
       { source: "/dashboard", destination: "/panel", permanent: true },
       {
         source: "/dashboard/:evento_id/programa",
-        destination: "/panel/programa",
+        destination: "/panel/viaje/programa",
         permanent: true,
       },
       {
         source: "/dashboard/:evento_id/equipo",
-        destination: "/panel/equipo",
+        destination: "/panel/ajustes",
         permanent: true,
       },
       {

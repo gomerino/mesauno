@@ -10,7 +10,7 @@ export async function requirePanelScopedEventoId(
 ): Promise<{ ok: true; eventoId: string } | { ok: false; redirect: string }> {
   const { data: evento } = await selectEventoForMember(supabase, userId, "id");
   if (!evento?.id) {
-    return { ok: false, redirect: "/panel/evento" };
+    return { ok: false, redirect: "/panel/viaje" };
   }
   const { data: canAccess, error } = await supabase.rpc("user_is_evento_dashboard_member", {
     p_evento_id: evento.id,

@@ -1,5 +1,5 @@
 ---
-description: Marco de roles (PM, UX, Tech Lead, Dev, QA, Data, Growth) + reglas maestras de Jurnex. Se aplica a todo el proyecto.
+description: Marco de roles (PM, UX, UI, Tech Lead, Dev, QA, Data, Growth) + reglas maestras de Jurnex. Se aplica a todo el proyecto.
 alwaysApply: true
 ---
 
@@ -9,15 +9,16 @@ Estás trabajando en **Jurnex**, un marketplace especializado en eventos de matr
 
 ## Cómo trabajar
 
-Operás como **equipo multidisciplinario**. Ante cualquier HU no-trivial, cubrí estos 7 roles (en ese orden mental, aunque el output pueda mezclarlos):
+Operás como **equipo multidisciplinario**. Ante cualquier HU no-trivial, cubrí estos **8 roles** (en ese orden mental, aunque el output pueda mezclarlos):
 
 1. **PM** (`agents/pm.txt`) — user story, acceptance criteria numerados, edge cases, out of scope, dependencies.
 2. **UX** (`agents/ux.txt`) — flows, friction audit, copy tone warm, mobile-first, wireframes ASCII si ayudan.
-3. **Tech Lead** (`agents/techlead.txt`) — arquitectura, modelo de datos, API sketch, migration strategy, risks.
-4. **Dev** (`agents/dev.txt`) — código limpio, modular, typed; `snake_case` SQL / `camelCase` TS frontend; no duplicación.
-5. **QA** (`agents/qa.txt`) — test plan con IDs, edge cases, security (IDOR, auth bypass, webhooks), sign-off.
-6. **Data** (`agents/data.txt`) — event dictionary, metrics, quality, sin PII.
-7. **Growth** (`agents/growth.txt`) — funnel, hipótesis medibles, sin dark patterns.
+3. **UI** (`agents/ui.txt`) — jerarquía visual, DS (navy/teal/oro), densidad, estados, consistencia de botones/superficies; checklist “se ve premium y alineado”.
+4. **Tech Lead** (`agents/techlead.txt`) — arquitectura, modelo de datos, API sketch, migration strategy, risks.
+5. **Dev** (`agents/dev.txt`) — código limpio, modular, typed; `snake_case` SQL / `camelCase` TS frontend; no duplicación.
+6. **QA** (`agents/qa.txt`) — test plan con IDs, edge cases, security (IDOR, auth bypass, webhooks), sign-off.
+7. **Data** (`agents/data.txt`) — event dictionary, metrics, quality, sin PII.
+8. **Growth** (`agents/growth.txt`) — funnel, hipótesis medibles, sin dark patterns.
 
 Lee los archivos en `agents/*.txt` cuando necesites el detalle exacto de cada rol.
 
@@ -51,7 +52,7 @@ Lee los archivos en `agents/*.txt` cuando necesites el detalle exacto de cada ro
 - `src/lib/` — helpers server/client. Módulos por dominio (`providers/`, `guest-mission.ts`, `analytics.ts`).
 - `src/types/database.ts` — tipos Supabase. Append-only cuando sea posible.
 - `supabase/` — migraciones SQL numeradas por fecha (`YYYY-MM-DD_descripcion.sql`).
-- `workflows/<HU>/` — documentación por HU: `hu.md`, `ux.md`, `data.md`, `tech.md`, `qa.md`, `growth.md`, `validation.md`.
+- `workflows/<HU>/` — documentación por HU: `hu.md`, `ux.md`, `ui.md` (impacto visual), `data.md`, `tech.md`, `qa.md`, `growth.md`, `validation.md`.
 - `agents/*.txt` — definición de cada rol.
 - `docs/product-context.md` — contexto producto + estrategia + KPIs.
 - `scripts/linear-*.mjs` — seeds Linear idempotentes.

@@ -21,13 +21,21 @@ function parseTargetMs(fechaIso: string | null, hora: string): number | null {
 type Props = {
   fechaEvento: string | null;
   horaEmbarque: string;
-  /** `headerMono`: una línea, mono, sobre fondo oscuro. `blocks`: tarjetas (tema claro). */
-  variant?: "blocks" | "inlineLight" | "headerMono";
+  /** `headerMono`: una línea, mono, sobre fondo carta. `jurnexPanel`: hero del panel (Jurnex dark). */
+  variant?: "blocks" | "inlineLight" | "headerMono" | "jurnexPanel";
   /** Menos margen y tamaño (hero compacto / pestaña pase). */
   dense?: boolean;
+  /** Cuenta regresiva más grande (hero del panel). */
+  prominent?: boolean;
 };
 
-export function SoftAviationCountdown({ fechaEvento, horaEmbarque, variant = "blocks", dense = false }: Props) {
+export function SoftAviationCountdown({
+  fechaEvento,
+  horaEmbarque,
+  variant = "blocks",
+  dense = false,
+  prominent = false,
+}: Props) {
   const target = useMemo(() => parseTargetMs(fechaEvento, horaEmbarque), [fechaEvento, horaEmbarque]);
   const [now, setNow] = useState(() => Date.now());
 
@@ -37,6 +45,15 @@ export function SoftAviationCountdown({ fechaEvento, horaEmbarque, variant = "bl
   }, []);
 
   if (target == null || Number.isNaN(target)) {
+    if (variant === "jurnexPanel") {
+      return (
+        <p
+          className={`max-w-full font-mono text-white/45 ${prominent ? "mt-6 text-sm md:text-base" : dense ? "mt-1 text-[9px] sm:text-[10px]" : "mt-1.5 text-[10px] sm:text-[11px]"}`}
+        >
+          Fecha de aterrizaje por confirmar
+        </p>
+      );
+    }
     if (variant === "headerMono") {
       return (
         <p
@@ -78,6 +95,34 @@ export function SoftAviationCountdown({ fechaEvento, horaEmbarque, variant = "bl
         <span className="text-[#1A2B48]/40"> : </span>
         <span className="font-semibold">{pad2(s)}</span>
         <span className="text-[#1A2B48]/45">s</span>
+      </p>
+    );
+  }
+
+  if (variant === "jurnexPanel") {
+    return (
+      <p
+        className={`max-w-full whitespace-normal break-words font-mono tabular-nums tracking-tight text-teal-100/90 ${
+          prominent
+            ? "mt-6 text-sm md:text-base"
+            : dense
+              ? "mt-1 text-[9px] sm:text-[10px]"
+              : "mt-1.5 text-[10px] sm:text-[11px]"
+        }`}
+        aria-live="polite"
+      >
+        <span className="text-teal-200/65">Faltan</span>{" "}
+        <span className="font-semibold text-white">{pad2(d)}</span>
+        <span className="text-teal-400/55">d</span>
+        <span className="text-white/25"> : </span>
+        <span className="font-semibold text-white">{pad2(h)}</span>
+        <span className="text-teal-400/55">h</span>
+        <span className="text-white/25"> : </span>
+        <span className="font-semibold text-white">{pad2(m)}</span>
+        <span className="text-teal-400/55">m</span>
+        <span className="text-white/25"> : </span>
+        <span className="font-semibold text-white">{pad2(s)}</span>
+        <span className="text-teal-400/55">s</span>
       </p>
     );
   }

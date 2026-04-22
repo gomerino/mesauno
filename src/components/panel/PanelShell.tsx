@@ -2,18 +2,19 @@
 
 import { JourneyHeader } from "@/components/panel/journey/JourneyHeader";
 import { JourneyPhasesBar } from "@/components/panel/journey/JourneyPhasesBar";
-import { panelSidebarVisibleItems } from "@/components/panel/panel-nav-config";
+import { PANEL_SIDEBAR_GROUPS } from "@/components/panel/panel-nav-config";
 import { PanelJourneyThemeContext } from "@/components/panel/panel-journey-theme-context";
 import { PanelMobileBottomNav, PanelMobileHeader } from "@/components/panel/PanelMobileChrome";
+import { JurnexOrbitIcon } from "@/components/brand/JurnexOrbitIcon";
 import {
   JOURNEY_THEME_CHANGE_EVENT,
   journeyAmbientGlowClass,
-  journeyNavActiveClasses,
   journeyPublicLinkHoverClass,
   readJourneyThemeFromStorage,
   type JourneyThemeId,
 } from "@/theme/panel-themes";
 import type { JourneyPhaseId } from "@/lib/journey-phases";
+import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -33,53 +34,64 @@ function isPanelPostPaymentPath(pathname: string): boolean {
   return pathname === "/panel/success" || pathname === "/panel/post-pago";
 }
 
-function isPanelEventoPath(pathname: string): boolean {
-  return pathname === "/panel/evento" || pathname.startsWith("/panel/evento/");
+function isPanelViajePath(pathname: string): boolean {
+  return pathname === "/panel/viaje" || pathname.startsWith("/panel/viaje/");
 }
 
-function isPanelInvitadosPath(pathname: string): boolean {
-  return pathname === "/panel/invitados" || pathname.startsWith("/panel/invitados/");
-}
-
-function isPanelProgramaPath(pathname: string): boolean {
-  return pathname === "/panel/programa" || pathname.startsWith("/panel/programa/");
+function isPanelPasajerosPath(pathname: string): boolean {
+  return pathname === "/panel/pasajeros" || pathname.startsWith("/panel/pasajeros/");
 }
 
 function isPanelExperienciaPath(pathname: string): boolean {
   return pathname === "/panel/experiencia" || pathname.startsWith("/panel/experiencia/");
 }
 
-function isPanelEquipoPath(pathname: string): boolean {
-  return pathname === "/panel/equipo" || pathname.startsWith("/panel/equipo/");
+function isPanelAjustesPath(pathname: string): boolean {
+  return pathname === "/panel/ajustes" || pathname.startsWith("/panel/ajustes/");
 }
 
 function isPanelFinanzasPath(pathname: string): boolean {
   return pathname === "/panel/finanzas" || pathname.startsWith("/panel/finanzas/");
 }
 
-function isPanelInvitacionPath(pathname: string): boolean {
-  return pathname === "/panel/invitacion" || pathname.startsWith("/panel/invitacion/");
+function isPanelRecuerdosPath(pathname: string): boolean {
+  return pathname === "/panel/recuerdos" || pathname.startsWith("/panel/recuerdos/");
 }
 
 function NavLink({
   href,
   label,
   active,
-  theme,
+  icon: Icon,
 }: {
   href: string;
   label: string;
   active: boolean;
-  theme: JourneyThemeId;
+  icon: LucideIcon;
 }) {
-  const activeCls = journeyNavActiveClasses(theme);
+  if (active) {
+    return (
+      <Link
+        href={href}
+        aria-current="page"
+        className="relative flex items-center gap-3 rounded-md bg-white/5 px-3 py-2 text-sm text-white transition-all"
+      >
+        <span
+          className="absolute left-0 top-1/2 h-5 w-[2px] -translate-y-1/2 rounded-full bg-teal-400"
+          aria-hidden
+        />
+        <Icon className="h-4 w-4 shrink-0 text-teal-400 opacity-100" strokeWidth={2.5} aria-hidden />
+        {label}
+      </Link>
+    );
+  }
+
   return (
     <Link
       href={href}
-      className={`rounded-xl px-3 py-2 text-sm transition-all duration-200 ${
-        active ? `border ${activeCls}` : "text-jurnex-text-secondary hover:bg-jurnex-surface-hover hover:text-jurnex-text-primary"
-      }`}
+      className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/60 transition-all hover:bg-white/5 hover:text-white"
     >
+      <Icon className="h-4 w-4 shrink-0 opacity-70" strokeWidth={2} aria-hidden />
       {label}
     </Link>
   );
@@ -106,23 +118,21 @@ export function PanelShell({
   const pathname = usePathname();
   const journeyHome = isJourneyHomePath(pathname);
   const postPaymentPage = isPanelPostPaymentPath(pathname);
-  const eventoPage = isPanelEventoPath(pathname);
-  const invitadosPage = isPanelInvitadosPath(pathname);
-  const programaPage = isPanelProgramaPath(pathname);
+  const viajePage = isPanelViajePath(pathname);
+  const pasajerosPage = isPanelPasajerosPath(pathname);
   const experienciaPage = isPanelExperienciaPath(pathname);
-  const equipoPage = isPanelEquipoPath(pathname);
+  const ajustesPage = isPanelAjustesPath(pathname);
   const finanzasPage = isPanelFinanzasPath(pathname);
-  const invitacionPage = isPanelInvitacionPath(pathname);
+  const recuerdosPage = isPanelRecuerdosPath(pathname);
   const showJourneyChrome =
     !journeyHome &&
     !postPaymentPage &&
-    !eventoPage &&
-    !invitadosPage &&
-    !programaPage &&
+    !viajePage &&
+    !pasajerosPage &&
     !experienciaPage &&
-    !equipoPage &&
+    !ajustesPage &&
     !finanzasPage &&
-    !invitacionPage;
+    !recuerdosPage;
   const [theme, setTheme] = useState<JourneyThemeId>("relax");
 
   useEffect(() => {
@@ -141,36 +151,61 @@ export function PanelShell({
 
   return (
     <PanelJourneyThemeContext.Provider value={theme}>
-      <div data-theme={theme} className="flex min-h-screen flex-col bg-jurnex-bg md:flex-row">
+      <div
+        data-theme={theme}
+        className="jurnex-brand-layers flex min-h-screen flex-col bg-jurnex-bg md:flex-row"
+      >
         <div className={`pointer-events-none fixed inset-0 transition-colors duration-300 ${glow}`} aria-hidden />
 
-        <aside className="relative z-[1] hidden w-56 shrink-0 border-r border-jurnex-border bg-jurnex-surface/90 backdrop-blur-xl md:block lg:w-60">
-          <div className="flex h-full flex-col gap-1 p-4 lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto lg:py-6">
+        <aside className="relative z-[1] hidden w-64 shrink-0 flex-col bg-black/40 border-r border-white/10 px-3 py-4 md:flex md:flex-col">
+          <div className="flex min-h-0 flex-1 flex-col lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto">
             <Link
               href="/panel"
-              className="mb-2 font-display text-lg font-bold tracking-tight text-jurnex-text-primary"
+              className="mb-2 flex items-center gap-2 rounded-lg px-3 py-2 text-jurnex-text-primary transition hover:bg-white/[0.04]"
+              aria-label="Jurnex, inicio del panel"
             >
-              Dreams
+              <JurnexOrbitIcon className="h-6 w-6 shrink-0" alt="" />
+              <span className="font-display text-sm font-semibold tracking-tight text-white">Jurnex</span>
             </Link>
-            <p className="mb-4 truncate border-b border-jurnex-border pb-3 text-[11px] text-jurnex-text-muted">
+            <p className="mb-4 truncate border-b border-white/10 pb-3 text-[11px] text-white/50">
               {userEmail}
             </p>
 
             <nav className="flex flex-col gap-0.5" aria-label="Navegación principal">
-              {panelSidebarVisibleItems().map(({ href, label, ...rest }) => (
+              {PANEL_SIDEBAR_GROUPS[0].map(({ href, label, icon, end }) => (
                 <NavLink
                   key={href}
                   href={href}
                   label={label}
-                  theme={theme}
-                  active={navActive(pathname, href, "end" in rest ? rest.end : false)}
+                  icon={icon}
+                  active={navActive(pathname, href, end)}
+                />
+              ))}
+              <div className="mt-6 border-t border-white/10 pt-4" aria-hidden />
+              {PANEL_SIDEBAR_GROUPS[1].map(({ href, label, icon, end }) => (
+                <NavLink
+                  key={href}
+                  href={href}
+                  label={label}
+                  icon={icon}
+                  active={navActive(pathname, href, end)}
+                />
+              ))}
+              <div className="mt-6 border-t border-white/10 pt-4" aria-hidden />
+              {PANEL_SIDEBAR_GROUPS[2].map(({ href, label, icon, end }) => (
+                <NavLink
+                  key={href}
+                  href={href}
+                  label={label}
+                  icon={icon}
+                  active={navActive(pathname, href, end)}
                 />
               ))}
             </nav>
 
             <Link
               href="/"
-              className={`mt-8 text-[11px] text-jurnex-text-muted transition ${publicHover}`}
+              className={`mt-8 text-[11px] text-white/45 transition hover:text-white/70 ${publicHover}`}
             >
               ← Sitio público
             </Link>
@@ -185,7 +220,7 @@ export function PanelShell({
                 {unlockBanner}
               </div>
             ) : null}
-            {!pathname.startsWith("/panel/experiencia") && showJourneyChrome ? <JourneyHeader /> : null}
+            {showJourneyChrome ? <JourneyHeader /> : null}
             {showJourneyChrome ? (
               <div className="mt-4 md:mt-6">
                 <JourneyPhasesBar

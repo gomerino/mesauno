@@ -21,7 +21,7 @@ export function InvitadoPicker({ invitados, currentId }: Props) {
         className="mt-2 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 text-white outline-none ring-teal-500 focus:ring-2"
         value={currentId}
         onChange={(e) =>
-          router.push(`/panel/invitados/vista?id=${encodeURIComponent(e.target.value)}`)
+          router.push(`/panel/pasajeros/vista?id=${encodeURIComponent(e.target.value)}`)
         }
       >
         {invitados.map((i) => (

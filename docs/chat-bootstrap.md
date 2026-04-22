@@ -35,7 +35,7 @@ Arrancá como equipo (Tech Lead + Dev + QA + Data) implementando JUR-36 M1
 "Modelo de datos real (providers, services, media, leads)".
 
 Lee primero:
-- workflows/M01-providers-schema/ (los 7 archivos — hu, ux, data, tech, qa, growth, validation)
+- workflows/M01-providers-schema/ (los 8 archivos — hu, ux, ui, data, tech, qa, growth, validation; `ui.md` puede ser stub si no hay pantalla nueva)
 - docs/product-context.md sección marketplace
 - supabase/schema.sql para el baseline existente
 

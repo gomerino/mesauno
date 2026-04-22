@@ -17,14 +17,14 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Dreams Wedding — Tu boda, tu viaje",
+  title: "Jurnex — Tu boda, tu viaje",
   description: "Plataforma de matrimonios con invitaciones estilo boarding pass y marketplace.",
   manifest: "/manifest.json",
-  themeColor: "#060B14",
+  themeColor: "#0B1220",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Dreams Wedding",
+    title: "Jurnex",
   },
 };
 

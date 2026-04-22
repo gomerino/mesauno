@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none" aria-hidden="true">
+  <title>Jurnex</title>
+  <circle cx="128" cy="128" r="102" stroke="#14B8A6" stroke-width="1.75" opacity="0.92"/>
+  <circle cx="128" cy="128" r="94" stroke="#F5C451" stroke-width="1" opacity="0.42"/>
+  <path
+    d="M 52 168 A 88 88 0 0 1 210 96"
+    stroke="#14B8A6"
+    stroke-width="2"
+    stroke-linecap="round"
+    fill="none"
+  />
+  <path
+    d="M 52 168 A 88 88 0 0 1 200 100"
+    stroke="#14B8A6"
+    stroke-width="4"
+    stroke-linecap="round"
+    fill="none"
+    opacity="0.12"
+  />
+  <g transform="translate(198 92) rotate(18)">
+    <path fill="#14B8A6" d="M -10 2 L 8 -4 L 10 0 L 4 6 L -2 8 Z" />
+    <path stroke="#14B8A6" stroke-width="1.2" stroke-linecap="round" d="M -6 4 L -14 6" />
+  </g>
+  <g opacity="0.88" fill="#F5C451">
+    <ellipse cx="118" cy="176" rx="5" ry="12" />
+    <circle cx="118" cy="158" r="7" />
+    <ellipse cx="142" cy="176" rx="5" ry="12" />
+    <circle cx="142" cy="158" r="7" />
+    <path stroke="#F5C451" stroke-width="1.5" stroke-linecap="round" fill="none" d="M 123 168 Q 130 172 137 168" />
+  </g>
+</svg>

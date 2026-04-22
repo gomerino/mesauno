@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Planes — Dreams",
+  title: "Planes — Jurnex",
   description:
     "Evento Esencial o Evento Experiencia. Pago único. Invitaciones boarding pass, RSVP, mesas y más.",
 };

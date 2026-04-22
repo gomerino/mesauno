@@ -148,7 +148,9 @@ export function PaywallModal({
     >
       <button type="button" className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" aria-label="Cerrar" onClick={onClose} />
       <div className="relative w-full max-w-md animate-fadeIn rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-b from-[#0f172a] to-[#020617] p-6 shadow-2xl sm:p-8">
-        <p className="text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AF37]/85">Dreams Wedding</p>
+        <p className="text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-jurnex-secondary/85">
+          Jurnex
+        </p>
         <h2 id="paywall-title" className="mt-2 text-center font-display text-xl font-bold text-white sm:text-2xl">
           Activa tu viaje <span aria-hidden>✈️</span>
         </h2>

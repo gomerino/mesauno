@@ -1,12 +1,13 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { cache } from "react";
 import { selectEventoForMember } from "@/lib/evento-membership";
-import { createClient } from "@/lib/supabase/server";
+import { spotifyGetPanelPublicState } from "@/lib/spotify-credentials";
+import { createClient, createStrictServiceClient } from "@/lib/supabase/server";
 import {
   getJourneyProgress,
   type JourneyStepId,
 } from "@/lib/panel-setup-progress";
-import { fetchInvitadosPanelRows } from "@/lib/panel-invitados";
+import { fetchInvitadosPanelRows, mergeInvitadoAcompanantesIntoRows } from "@/lib/panel-invitados";
 import type { Evento, Invitado } from "@/types/database";
 import { parseMockPaymentStatusFromPaymentId, type MockPaymentStatus } from "@/lib/mock-payment";
 
@@ -22,9 +23,13 @@ export type PanelProgressBundle = {
     | "nombre_novio_2"
     | "fecha_boda"
     | "fecha_evento"
+    | "hora_embarque"
     | "plan_status"
     | "destino"
+    | "lugar_evento_linea"
     | "payment_id"
+    | "objetivo_invitaciones_enviar"
+    | "objetivo_personas_total"
   > | null;
   mockPaymentStatus: MockPaymentStatus | null;
   invitados: Invitado[];
@@ -42,7 +47,7 @@ async function loadPanelProgressBundleInner(
   const { data: evento } = await selectEventoForMember(
     supabase,
     userId,
-    "id, nombre_novio_1, nombre_novio_2, fecha_boda, fecha_evento, plan_status, destino, payment_id"
+    "id, nombre_novio_1, nombre_novio_2, fecha_boda, fecha_evento, hora_embarque, plan_status, destino, lugar_evento_linea, payment_id, objetivo_invitaciones_enviar, objetivo_personas_total"
   );
 
   let programaHitosCount = 0;
@@ -58,23 +63,26 @@ async function loadPanelProgressBundleInner(
     supabase,
     userId,
     evento?.id ?? null,
-    "id, rsvp_estado, email_enviado, invitacion_vista, token_acceso",
+    "id, asiento, rsvp_estado, email_enviado, invitacion_vista, token_acceso, telefono, nombre_acompanante",
     { orderBy: false }
   );
 
-  const invitados = (invRows ?? []) as unknown as Invitado[];
-  const emailsEnviados = invitados.filter((r) => r.email_enviado === true).length;
-  const invitacionesVistas = invitados.filter((r) => r.invitacion_vista === true).length;
-  const respuestasRsvp = invitados.filter(
-    (r) => r.rsvp_estado === "confirmado" || r.rsvp_estado === "declinado"
-  ).length;
+  const merged = await mergeInvitadoAcompanantesIntoRows(
+    supabase,
+    (invRows ?? []) as Record<string, unknown>[]
+  );
+  const invitados = merged as unknown as Invitado[];
 
-  const j = getJourneyProgress(evento ?? null, {
-    totalInvitados: invitados.length,
-    emailsEnviados,
-    invitacionesVistas,
-    respuestasRsvp,
-  });
+  let spotifyConnected = false;
+  if (evento?.id) {
+    const strictDb = await createStrictServiceClient();
+    if (strictDb) {
+      const st = await spotifyGetPanelPublicState(strictDb, evento.id);
+      spotifyConnected = st.connected;
+    }
+  }
+
+  const j = getJourneyProgress(evento ?? null, programaHitosCount, spotifyConnected);
 
   return {
     pct: j.pct,
@@ -99,11 +107,10 @@ export const loadPanelProgressBundle = cache(async (userId: string): Promise<Pan
 });
 
 const STEP_DETAIL: Record<JourneyStepId, string> = {
-  evento: "completar los datos de tu evento",
-  invitados: "añadir a tus invitados",
-  invitacion_lista: "revisar tu invitación",
-  invitacion_compartida: "compartir tu invitación",
-  seguimiento: "ver cómo van las confirmaciones",
+  evento_datos: "completar datos de pareja y fechas del evento",
+  evento_ubicacion: "definir lugar o destino y hora",
+  evento_programa: "añadir al menos un momento al programa del día",
+  evento_musica: "conectar Spotify y tu playlist",
 };
 
 /** Mensaje principal del journey (home y barra slim). */
@@ -119,38 +126,33 @@ export function journeyHeadline(nextStep: JourneyStepId | null, remainingSteps: 
 /** CTA principal: siguiente pantalla del journey. */
 export function panelNextActionHref(nextStep: JourneyStepId | null): string {
   if (nextStep == null) {
-    return "/panel/invitados/confirmaciones";
+    return "/panel/pasajeros";
   }
   switch (nextStep) {
-    case "evento":
-      return "/panel/evento";
-    case "invitados":
-      return "/panel/invitados";
-    case "invitacion_lista":
-    case "invitacion_compartida":
-      return "/panel/invitacion";
-    case "seguimiento":
-      return "/panel/invitados/confirmaciones";
+    case "evento_datos":
+    case "evento_ubicacion":
+      return "/panel/viaje";
+    case "evento_programa":
+      return "/panel/viaje/programa";
+    case "evento_musica":
+      return "/panel/experiencia";
     default:
-      return "/panel";
+      return "/panel/viaje";
   }
 }
 
 export function panelNextActionLabel(nextStep: JourneyStepId | null): string {
   if (nextStep == null) {
-    return "Ver confirmaciones";
+    return "Gestionar invitados";
   }
   switch (nextStep) {
-    case "evento":
-      return "Completar evento";
-    case "invitados":
-      return "Agregar invitados";
-    case "invitacion_lista":
-      return "Ver invitación";
-    case "invitacion_compartida":
-      return "Compartir invitación";
-    case "seguimiento":
-      return "Ver confirmaciones";
+    case "evento_datos":
+    case "evento_ubicacion":
+      return "Completar tu viaje";
+    case "evento_programa":
+      return "Armar programa";
+    case "evento_musica":
+      return "Conectar música";
     default:
       return "Continuar";
   }

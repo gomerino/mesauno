@@ -1,0 +1,13 @@
+:root {
+  --jurnex-navy: #0b1220;
+  --jurnex-teal: #14b8a6;
+  --jurnex-gold: #f5c451;
+  --jurnex-gray: #94a3b8;
+
+  --jurnex-bg: #020617;
+  --jurnex-surface: rgba(255, 255, 255, 0.04);
+  --jurnex-border: rgba(255, 255, 255, 0.1);
+
+  --jurnex-gradient-primary: linear-gradient(90deg, #14b8a6, #f5c451);
+}
+

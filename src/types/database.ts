@@ -32,6 +32,10 @@ export type Evento = {
   fecha_inicio_recordatorios?: string | null;
   /** Tema visual de las invitaciones (`themes.id`). Se propaga a todos los invitados del evento. */
   theme_id?: string | null;
+  /** Meta opcional: invitaciones (unidades de envío) a alcanzar. */
+  objetivo_invitaciones_enviar?: number | null;
+  /** Meta opcional: personas totales (incluye acompañantes) a alcanzar. */
+  objetivo_personas_total?: number | null;
   created_at?: string | null;
 };
 
@@ -50,6 +54,12 @@ export type InvitadoAcompanante = {
   orden?: number | null;
   created_at?: string | null;
 };
+
+/** Canal de envío (invitación y preferencias). */
+export type CanalEnvioInvitacion = "correo" | "whatsapp" | "ambos";
+
+/** Estado del envío/seguimiento de la invitación (`invitados.estado_envio`). */
+export type EstadoEnvioInvitacion = "pendiente" | "enviado" | "abierto" | "confirmado";
 
 export type Invitado = {
   id: string;
@@ -74,6 +84,11 @@ export type Invitado = {
   /** Usuario que creó el invitado cuando aún no hay evento vinculado (RLS). */
   owner_user_id?: string | null;
   email_enviado?: boolean | null;
+  /** Flujo de invitación; si falta en filas legacy, derivar en cliente. */
+  estado_envio?: EstadoEnvioInvitacion | null;
+  canal_envio?: CanalEnvioInvitacion | null;
+  fecha_apertura?: string | null;
+  fecha_confirmacion?: string | null;
   fecha_envio?: string | null;
   conteo_recordatorios?: number | null;
   ultimo_recordatorio_at?: string | null;
@@ -110,6 +125,18 @@ export type EventoProgramaHito = {
   icono: "Church" | "Beer" | "Utensils" | "Music";
   orden: number;
   created_at?: string | null;
+};
+
+/** Preferencias persistidas del tab Invitación (envío y regalos; `estilo` alineado con `eventos.theme_id`). */
+export type ConfiguracionInvitacionEvento = {
+  id: string;
+  evento_id: string;
+  estilo: string | null;
+  canal_envio: CanalEnvioInvitacion;
+  regalos_activos: boolean;
+  url_regalos: string | null;
+  created_at: string | null;
+  updated_at: string | null;
 };
 
 /** Fila en `evento_fotos`; `storage_path` relativo al bucket `fotos_eventos`. */

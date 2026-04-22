@@ -61,7 +61,7 @@ export function PanelSlimProgress({
             {quickLabel}
           </Link>
           <span className="text-slate-700"> · </span>
-          <Link href="/panel/invitacion" className="text-teal-400/80 hover:text-teal-300">
+          <Link href="/panel/pasajeros/envios" className="text-teal-400/80 hover:text-teal-300">
             Invitación
           </Link>
         </p>

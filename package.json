@@ -11,8 +11,10 @@
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.49.1",
+    "@tanstack/react-virtual": "^3.13.24",
     "adm-zip": "^0.5.16",
     "browser-image-compression": "^2.0.2",
+    "clsx": "^2.1.1",
     "html5-qrcode": "^2.3.8",
     "lucide-react": "^0.468.0",
     "mercadopago": "^2.12.0",

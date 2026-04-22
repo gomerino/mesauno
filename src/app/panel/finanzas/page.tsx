@@ -1,3 +1,5 @@
+import { PanelBackLink } from "@/components/panel/PanelBackLink";
+import { MainCard } from "@/components/panel/ds";
 import { PanelPageContainer } from "@/components/panel/PanelPageContainer";
 import { PanelPageHeader } from "@/components/panel/PanelPageHeader";
 import { PanelSubpageProgress } from "@/components/panel/PanelSubpageProgress";
@@ -86,6 +88,7 @@ export default async function PanelFinanzasPage({ searchParams }: { searchParams
   return (
     <PanelPageContainer>
       {pagoBanner(pago)}
+      <PanelBackLink />
 
       <PanelPageHeader
         eyebrow="Finanzas"
@@ -96,7 +99,7 @@ export default async function PanelFinanzasPage({ searchParams }: { searchParams
       <PanelSubpageProgress />
 
       <div className="mt-6 space-y-8 md:mt-8 md:space-y-10">
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <MainCard className="p-6">
           <h2 className="font-display text-lg font-bold text-white">Datos para transferencia</h2>
           <p className="mt-2 text-sm text-slate-400">
             Comparte estos datos con quien quiera hacerte un regalo en dinero (misma referencia que en la invitación, si
@@ -123,7 +126,7 @@ export default async function PanelFinanzasPage({ searchParams }: { searchParams
           <p className="mt-4 text-xs text-slate-500">
             En una versión futura podrás conectar cobros automáticos; hoy el registro de regalos es manual.
           </p>
-        </div>
+        </MainCard>
 
         {evento ? (
           <AportesManager
@@ -140,7 +143,7 @@ export default async function PanelFinanzasPage({ searchParams }: { searchParams
               bancarios de arriba los puedes compartir igualmente mientras tanto.
             </p>
             <Link
-              href="/panel/evento"
+              href="/panel/viaje"
               className="mt-4 inline-block text-sm font-medium text-teal-300 hover:text-teal-200"
             >
               Ir a datos del evento →

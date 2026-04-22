@@ -22,7 +22,7 @@ type Props = {
 
 /**
  * Banner + botón "Volver al panel" para sub-pantallas del panel.
- * Generaliza el patrón ya usado en `/panel/invitados` para evento/programa/experiencia.
+ * Generaliza el patrón ya usado en `/panel/pasajeros` para evento/programa/experiencia.
  */
 export function MissionContextBanner({ fromMission, missionKey, title, message, focusOnReturn }: Props) {
   const router = useRouter();
