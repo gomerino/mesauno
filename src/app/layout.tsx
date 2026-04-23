@@ -20,7 +20,11 @@ export const metadata: Metadata = {
   title: "Jurnex — Tu boda, tu viaje",
   description: "Plataforma de matrimonios con invitaciones estilo boarding pass y marketplace.",
   manifest: "/manifest.json",
-  themeColor: "#0B1220",
+  themeColor: "#02182a",
+  icons: {
+    icon: [{ url: "/brand/jurnex/logos/full/jurnex-logo-full.png", type: "image/png", sizes: "1024x1024" }],
+    apple: "/brand/jurnex/logos/full/jurnex-logo-full.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

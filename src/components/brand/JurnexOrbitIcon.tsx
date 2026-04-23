@@ -1,6 +1,7 @@
 "use client";
 
 import { JURNEX_BRAND } from "@/components/brand/jurnex-assets";
+import clsx from "clsx";
 
 type Props = {
   className?: string;
@@ -9,16 +10,16 @@ type Props = {
 };
 
 /**
- * Icono de marca (avión + órbita). Si el SVG no carga, se oculta el nodo para no mostrar imagen rota.
+ * Marca en panel: mismo logo circular PNG que en cabecera (tamaño vía `className`, p. ej. `h-6 w-6`).
  */
-export function JurnexOrbitIcon({ className = "h-6 w-6 shrink-0", alt = "" }: Props) {
+export function JurnexOrbitIcon({ className = "h-9 w-9", alt = "" }: Props) {
   return (
     <img
-      src={JURNEX_BRAND.logos.icon}
+      src={JURNEX_BRAND.logos.fullPng}
       alt={alt}
-      width={48}
-      height={48}
-      className={className}
+      width={1024}
+      height={1024}
+      className={clsx("shrink-0 object-contain", className)}
       decoding="async"
       onError={(e) => {
         e.currentTarget.style.display = "none";

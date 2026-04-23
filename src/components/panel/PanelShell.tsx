@@ -157,15 +157,14 @@ export function PanelShell({
       >
         <div className={`pointer-events-none fixed inset-0 transition-colors duration-300 ${glow}`} aria-hidden />
 
-        <aside className="relative z-[1] hidden w-64 shrink-0 flex-col bg-black/40 border-r border-white/10 px-3 py-4 md:flex md:flex-col">
+        <aside className="relative z-[1] hidden w-64 shrink-0 flex-col border-r border-white/10 bg-transparent px-3 py-4 md:flex md:flex-col">
           <div className="flex min-h-0 flex-1 flex-col lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto">
             <Link
               href="/panel"
-              className="mb-2 flex items-center gap-2 rounded-lg px-3 py-2 text-jurnex-text-primary transition hover:bg-white/[0.04]"
+              className="mb-3 flex w-full justify-center py-1 transition hover:opacity-95"
               aria-label="Jurnex, inicio del panel"
             >
-              <JurnexOrbitIcon className="h-6 w-6 shrink-0" alt="" />
-              <span className="font-display text-sm font-semibold tracking-tight text-white">Jurnex</span>
+              <JurnexOrbitIcon className="h-24 w-24" alt="" />
             </Link>
             <p className="mb-4 truncate border-b border-white/10 pb-3 text-[11px] text-white/50">
               {userEmail}

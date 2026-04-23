@@ -11,10 +11,10 @@ export function SiteHeader({ compact = false }: Props) {
       <div className={`mx-auto flex max-w-5xl items-center justify-between px-3 sm:px-4 ${pad}`}>
         <Link href="/" className={`block shrink-0 ${logoH} w-auto max-w-[min(100%,10.5rem)] sm:max-w-[12rem]`}>
           <img
-            src={JURNEX_BRAND.logos.simplified}
+            src={JURNEX_BRAND.logos.fullPng}
             alt="Jurnex"
-            width={256}
-            height={256}
+            width={1024}
+            height={1024}
             className="h-full w-auto object-contain object-left"
             decoding="async"
           />

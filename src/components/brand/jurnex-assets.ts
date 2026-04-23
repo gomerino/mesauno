@@ -1,14 +1,14 @@
 /**
  * Rutas públicas del sistema de marca Jurnex (`/public/brand/jurnex/`).
- * Logo full en PNG: colocá el archivo original en `logos/full/jurnex-logo-full.png` (no commitear reemplazos si son privados).
+ * Marca principal: círculo JURNEX en `fullPng` (1024²). `vectorFallback` = ilustración SVGO si hace falta impresión.
  */
 export const JURNEX_BRAND = {
   logos: {
-    /** Navbar, UI compacta — círculo + órbita + avión + pareja simplificada */
+    /** @deprecated Respaldo vectorial; UI usa `fullPng` */
     simplified: "/brand/jurnex/logos/simplified/jurnex-logo-simplified.svg",
-    /** Sidebar / mobile — avión + trayectoria */
+    /** Respaldo: avión+órbita SVG. Panel usa `JurnexOrbitIcon` → `fullPng` */
     icon: "/brand/jurnex/logos/icon/jurnex-icon-orbit.svg",
-    /** Landing — asset raster original (si falta el archivo, el componente usa simplified como respaldo) */
+    /** Logo círculo (PNG oficial, cabecera, hero, JurnexMark) */
     fullPng: "/brand/jurnex/logos/full/jurnex-logo-full.png",
     /** Versión monocromo (blanco) del simplified */
     mono: "/brand/jurnex/logos/mono/jurnex-logo-white.svg",

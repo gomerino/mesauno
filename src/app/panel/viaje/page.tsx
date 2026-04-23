@@ -1,22 +1,23 @@
 import { EventoCentroTabProvider } from "@/components/panel/evento/EventoCentroTabContext";
 import { EventoConfigCompleteNote, EventoConfigPrimaryCta } from "@/components/panel/evento/EventoConfigPrimaryCta";
 import { EventoMobileStickyCta } from "@/components/panel/evento/EventoMobileStickyCta";
-import { EventoProgressCompact } from "@/components/panel/evento/EventoProgressCompact";
 import { EventoTabs } from "@/components/panel/evento/EventoTabs";
-import { PanelBackLink } from "@/components/panel/PanelBackLink";
+import { ViajeMisionBlock } from "@/components/panel/viaje/ViajeMisionBlock";
 import { PanelLayout } from "@/components/panel/ds";
 import { JourneyPrimaryCta } from "@/components/panel/journey/JourneyPrimaryCta";
 import { EventoForm } from "@/components/panel/EventoForm";
 import {
   PANEL_VIAJE_SUBTITLE,
   PANEL_VIAJE_TITLE,
+  panelJourneyPageWrapClass,
   panelSectionSubtitleClass,
   panelSectionTitleClass,
 } from "@/lib/panel-section-copy";
 import { getEventoConfigCTA } from "@/lib/evento-config-cta";
 import { selectEventoForMember } from "@/lib/evento-membership";
 import { resolveJourneyPhase } from "@/lib/journey-phases";
-import { isEventBasicsComplete, JOURNEY_STEP_ORDER } from "@/lib/panel-setup-progress";
+import { isEventBasicsComplete } from "@/lib/panel-setup-progress";
+import { getViajeMisionMicroFromBundle } from "@/lib/viaje-mission";
 import { loadPanelProgressBundle } from "@/lib/panel-progress-load";
 import { spotifyGetPanelPublicState } from "@/lib/spotify-credentials";
 import { createClient, createStrictServiceClient } from "@/lib/supabase/server";
@@ -27,11 +28,6 @@ function pickWelcome(raw: Record<string, string | string[] | undefined> | undefi
   const v = raw.welcome;
   const s = typeof v === "string" ? v : Array.isArray(v) ? v[0] : undefined;
   return s === "1" || s === "true";
-}
-
-function buildViajeProgress(bundle: Awaited<ReturnType<typeof loadPanelProgressBundle>>) {
-  const doneCount = JOURNEY_STEP_ORDER.filter((id) => bundle.steps[id]).length;
-  return { doneCount, total: JOURNEY_STEP_ORDER.length };
 }
 
 export default async function PanelViajePage({
@@ -55,9 +51,6 @@ export default async function PanelViajePage({
 
   const invitadosCount = bundle.invitados.length;
   const invitacionesEnviadas = bundle.invitados.filter((r) => r.email_enviado === true).length;
-  const abrieronTrasCorreo = bundle.invitados.filter(
-    (r) => r.email_enviado === true && r.invitacion_vista === true
-  ).length;
   const planStatus = eventoForProgress?.plan_status ?? null;
   const hasAccess = planStatus === "paid";
   let canCheckout = false;
@@ -104,14 +97,12 @@ export default async function PanelViajePage({
     spotifySectionAvailable,
   });
 
-  const viaje = buildViajeProgress(bundle);
-
   const mainBottomPad =
     hasAccess && configCta.status === "pending" ? "pb-28 md:pb-4" : "pb-4 md:pb-4";
 
   return (
     <PanelLayout>
-      <div className="mx-auto w-full max-w-5xl space-y-4 md:space-y-5">
+      <div className={panelJourneyPageWrapClass}>
         {showWelcomeBanner ? (
           <div
             className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-xs text-white/80"
@@ -141,18 +132,16 @@ export default async function PanelViajePage({
         <EventoCentroTabProvider>
           <div className={`space-y-4 md:space-y-5 ${mainBottomPad}`}>
             <header className="space-y-1">
-              <PanelBackLink />
               <h1 className={panelSectionTitleClass}>{PANEL_VIAJE_TITLE}</h1>
               <p className={panelSectionSubtitleClass}>{PANEL_VIAJE_SUBTITLE}</p>
             </header>
 
-            <EventoProgressCompact
-              doneCount={viaje.doneCount}
-              total={viaje.total}
-              totalInvitados={invitadosCount}
-              emailsEnviados={invitacionesEnviadas}
-              abrieronTrasCorreo={abrieronTrasCorreo}
-            />
+            {eventoId ? (
+              <ViajeMisionBlock
+                micro={getViajeMisionMicroFromBundle(bundle)}
+                journeySteps={bundle.steps}
+              />
+            ) : null}
 
             {hasAccess && configCta.status === "pending" ? (
               <div className="hidden md:block">

@@ -3,19 +3,20 @@
   "short_name": "Jurnex",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0B1220",
-  "theme_color": "#0B1220",
+  "background_color": "#02182a",
+  "theme_color": "#02182a",
   "icons": [
     {
-      "src": "/brand/jurnex/app/icon-base.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml"
+      "src": "/brand/jurnex/logos/full/jurnex-logo-full.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/brand/jurnex/app/icon-base.svg",
+      "src": "/brand/jurnex/logos/full/jurnex-logo-full.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

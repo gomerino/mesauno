@@ -18,14 +18,14 @@ export const JOURNEY_THEMES = [
     /** Texto corto para chips compactos en el panel. */
     chipLabel: "Relax",
     description: "Calma y claridad",
-    accent: "#14B8A6",
+    accent: "#E89A1E",
   },
   {
     id: "fiesta" as const,
     label: "✨ Fiesta",
     chipLabel: "Fiesta",
     description: "Calidez festiva",
-    accent: "#F5C451",
+    accent: "#E4CE5A",
   },
   {
     id: "intimo" as const,
@@ -146,10 +146,10 @@ export function journeyHeaderAccentClasses(theme: JourneyThemeId): {
   switch (theme) {
     case "relax":
       return {
-        headerShadow: "shadow-[0_0_40px_rgba(20,184,166,0.08)]",
+        headerShadow: "shadow-[0_0_40px_rgba(232,154,30,0.1)]",
         orb: "bg-teal-400/[0.07]",
         iconBox:
-          "border-teal-400/30 bg-gradient-to-br from-teal-400/20 to-transparent shadow-[0_8px_32px_rgba(20,184,166,0.14)]",
+          "border-teal-400/30 bg-gradient-to-br from-teal-400/20 to-transparent shadow-[0_8px_32px_rgba(232,154,30,0.16)]",
         plane: "text-teal-400",
         eyebrow: "text-teal-300/85",
       };
@@ -188,8 +188,8 @@ export const PANEL_THEME_STORAGE_KEY = LEGACY_PANEL_THEME_STORAGE_KEY;
 
 /** @deprecated Usar {@link JOURNEY_THEMES}. */
 export const PANEL_THEMES = [
-  { id: "teal" as const, label: "Brisa", description: "Calma y claridad", accent: "#14B8A6" },
-  { id: "gold" as const, label: "Celebración", description: "Calidez festiva", accent: "#F5C451" },
+  { id: "teal" as const, label: "Brisa", description: "Calma y claridad", accent: "#E89A1E" },
+  { id: "gold" as const, label: "Celebración", description: "Calidez festiva", accent: "#E4CE5A" },
   { id: "rose" as const, label: "Romántico", description: "Suave y cercano", accent: "#fb7185" },
 ] as const;
 

@@ -1,6 +1,24 @@
 import type { Config } from "tailwindcss";
 import { tokens } from "./styles/tokens";
 
+/**
+ * La escala `teal-*` en UI = oro/ámbar de marca (mantiene nombres de utilidades existentes).
+ * Paleta derivada del logotipo maestro (navy + oro).
+ */
+const jurnexTealAsGold = {
+  50: "#fffbeb",
+  100: "#fef3c7",
+  200: "#fde68a",
+  300: "#fcd34d",
+  400: "#f0a32b",
+  500: "#e89a1e",
+  600: "#c98318",
+  700: "#9e6a16",
+  800: "#715210",
+  900: "#4a350c",
+  950: "#1a1208",
+} as const;
+
 const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -100,6 +118,7 @@ const config: Config = {
         unlockParticle: "unlockParticle 1.1s ease-out forwards",
       },
       colors: {
+        teal: { ...jurnexTealAsGold },
         jurnex: {
           bg: tokens.colors.bg,
           surface: tokens.colors.surface,
@@ -137,9 +156,9 @@ const config: Config = {
       },
       boxShadow: {
         "jurnex-glow":
-          "0 0 24px -8px rgba(20, 184, 166, 0.2), inset 0 1px 0 0 rgba(255,255,255,0.06)",
+          "0 0 24px -8px rgba(232, 154, 30, 0.2), inset 0 1px 0 0 rgba(255,255,255,0.06)",
         "jurnex-glow-hover":
-          "0 0 32px -6px rgba(20, 184, 166, 0.3), inset 0 1px 0 0 rgba(255,255,255,0.08)",
+          "0 0 32px -6px rgba(232, 154, 30, 0.3), inset 0 1px 0 0 rgba(255,255,255,0.08)",
         "jurnex-card": "0 8px 40px -12px rgba(0, 0, 0, 0.55)",
       },
       transitionDuration: {

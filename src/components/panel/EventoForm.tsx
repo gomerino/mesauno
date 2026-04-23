@@ -21,7 +21,7 @@ import { toast } from "sonner";
 
 const label = "block text-xs font-medium text-white/70";
 const input =
-  "mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none ring-[#14B8A6] focus:ring-2";
+  "mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none ring-jurnex-primary focus:ring-2";
 
 const summaryText = "text-sm text-white/70";
 
@@ -783,7 +783,7 @@ export function EventoForm({
               ) : (
                 <Suspense
                   fallback={
-                    <div className="h-32 animate-pulse rounded-lg border border-[#14B8A6]/15 bg-black/20" aria-hidden />
+                    <div className="h-32 animate-pulse rounded-lg border border-jurnex-primary/15 bg-black/20" aria-hidden />
                   }
                 >
                   <SpotifyPlaylistConnect

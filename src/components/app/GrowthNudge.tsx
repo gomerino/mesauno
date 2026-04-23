@@ -11,7 +11,7 @@ type Props = {
 export function GrowthNudge({ message, href, ctaLabel = "Completar" }: Props) {
   return (
     <div
-      className="rounded-xl border border-teal-500/30 bg-teal-500/[0.12] px-4 py-3 text-sm text-teal-50 shadow-[0_0_0_1px_rgba(20,184,166,0.12)]"
+      className="rounded-xl border border-teal-500/30 bg-teal-500/[0.12] px-4 py-3 text-sm text-teal-50 shadow-[0_0_0_1px_rgba(232,154,30,0.14)]"
       role="status"
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

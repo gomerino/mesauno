@@ -2,7 +2,7 @@
 
 import { InvitadosManager } from "@/components/InvitadosManager";
 import { JourneyMissionStrip } from "@/components/panel/journey/JourneyMissionStrip";
-import { EstadoInvitaciones } from "@/components/panel/pasajeros/EstadoInvitaciones";
+import { PanelMissionCard } from "@/components/panel/PanelMissionCard";
 import { useEnvioInvitaciones } from "@/hooks/useEnvioInvitaciones";
 import { useInvitaciones } from "@/hooks/useInvitaciones";
 import {
@@ -68,14 +68,6 @@ export function PasajerosPage({ eventoId, initialInvitados, fromMission, eventoM
   const metaPer = eventoMeta?.objetivo_personas_total ?? null;
 
   const metricas = useInvitaciones(rows);
-  const emailsEnviados = useMemo(
-    () => rows.filter((r) => r.email_enviado === true).length,
-    [rows]
-  );
-  const abrieronTrasCorreo = useMemo(
-    () => rows.filter((r) => r.email_enviado === true && r.invitacion_vista === true).length,
-    [rows]
-  );
   const envio = useEnvioInvitaciones(eventoId, canal);
 
   const globalBusy = envio.busyScope === "global";
@@ -120,48 +112,49 @@ export function PasajerosPage({ eventoId, initialInvitados, fromMission, eventoM
             <p className={panelSectionSubtitleClass}>{PANEL_INVITADOS_SUBTITLE}</p>
           </div>
 
-          <EstadoInvitaciones
-            totalInvitados={rows.length}
-            emailsEnviados={emailsEnviados}
-            abrieronTrasCorreo={abrieronTrasCorreo}
-          />
-
           {eventoId ? (
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-4">
-              <p className="mb-2 text-xs text-slate-400">{misionHint}</p>
-              <JourneyMissionStrip
-                {...pasajerosStrip}
-                ariaLabel="Misiones de invitados"
-              />
-              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 border-t border-white/[0.06] pt-3 text-[11px] text-slate-500">
-                <span>
-                  Lista:{" "}
-                  <span className="font-medium text-slate-300 tabular-nums">{rows.length}</span>
-                  {metaInv != null && metaInv > 0 ? (
-                    <span className="text-slate-500">
-                      {" "}
-                      / <span className="tabular-nums text-teal-200/90">{metaInv}</span> invitaciones
-                    </span>
-                  ) : null}
-                </span>
-                <span>
-                  Personas:{" "}
-                  <span className="font-medium text-slate-300 tabular-nums">{totalPersonas}</span>
-                  {metaPer != null && metaPer > 0 ? (
-                    <span className="text-slate-500">
-                      {" "}
-                      / <span className="tabular-nums text-teal-200/90">{metaPer}</span> meta
-                    </span>
-                  ) : null}
-                </span>
-                <Link
-                  href="/panel/viaje"
-                  className="text-teal-300/90 underline decoration-teal-500/40 underline-offset-2 hover:text-teal-200"
-                >
-                  Editar metas en tu viaje
-                </Link>
-              </div>
-            </div>
+            <PanelMissionCard
+              micro={misionHint}
+              missionStrip={
+                <JourneyMissionStrip
+                  noTopRule
+                  hideMisionesLabel
+                  compact
+                  {...pasajerosStrip}
+                  ariaLabel="Misiones de invitados"
+                />
+              }
+              footer={
+                <>
+                  <span>
+                    Lista:{" "}
+                    <span className="font-medium text-slate-300 tabular-nums">{rows.length}</span>
+                    {metaInv != null && metaInv > 0 ? (
+                      <span className="text-slate-500">
+                        {" "}
+                        / <span className="tabular-nums text-teal-200/90">{metaInv}</span> invitaciones
+                      </span>
+                    ) : null}
+                  </span>
+                  <span>
+                    Personas:{" "}
+                    <span className="font-medium text-slate-300 tabular-nums">{totalPersonas}</span>
+                    {metaPer != null && metaPer > 0 ? (
+                      <span className="text-slate-500">
+                        {" "}
+                        / <span className="tabular-nums text-teal-200/90">{metaPer}</span> meta
+                      </span>
+                    ) : null}
+                  </span>
+                  <Link
+                    href="/panel/viaje"
+                    className="text-teal-300/90 underline decoration-teal-500/40 underline-offset-2 hover:text-teal-200"
+                  >
+                    Editar metas en tu viaje
+                  </Link>
+                </>
+              }
+            />
           ) : null}
 
           {/* Botonera: debajo del resumen / misión */}

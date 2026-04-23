@@ -34,7 +34,7 @@ export function EventoVistaConfianza({
       {vistaPreviaHref ? (
         <Link
           href={vistaPreviaHref}
-          className="mt-3 inline-flex text-sm font-medium text-[#14B8A6] transition hover:text-teal-300"
+          className="mt-3 inline-flex text-sm font-medium text-jurnex-primary transition hover:text-teal-300"
           target="_blank"
           rel="noopener noreferrer"
         >

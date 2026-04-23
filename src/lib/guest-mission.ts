@@ -1,4 +1,5 @@
 import type { JourneyMissionStep } from "@/components/panel/journey/journey-mission-types";
+import { deriveEstadoEnvio } from "@/lib/invitado-estado-envio";
 import type { Evento, Invitado } from "@/types/database";
 
 /** Pasos de la misión Invitados (franja de la tarjeta y página Pasajeros). */
@@ -40,8 +41,14 @@ function tieneMesaAsignada(invitados: Pick<Invitado, "asiento">[]): boolean {
   return invitados.some((r) => Boolean(r.asiento?.trim()));
 }
 
-function huboEnvioOVisita(invitados: Pick<Invitado, "email_enviado" | "invitacion_vista">[]): boolean {
-  return invitados.some((i) => i.email_enviado === true || i.invitacion_vista === true);
+/**
+ * Misma regla que `getInvitacionesMetricas` / `useInvitaciones` en Pasajeros:
+ * el paso «Envío» se cumple si al menos un invitado ya no está en `pendiente`
+ * (incluye enviado, abierto, confirmado vía `deriveEstadoEnvio`).
+ */
+function misionPasoEnvioCumplido(invitados: Invitado[]): boolean {
+  if (invitados.length === 0) return false;
+  return invitados.some((r) => deriveEstadoEnvio(r) !== "pendiente");
 }
 
 /**
@@ -84,15 +91,12 @@ export function guestMissionStripProps(steps: GuestMissionSteps): {
 }
 
 export function getGuestMissionSteps(
-  invitados: Pick<
-    Invitado,
-    "asiento" | "email_enviado" | "invitacion_vista" | "invitado_acompanantes" | "nombre_acompanante"
-  >[],
+  invitados: Invitado[],
   evento: Pick<Evento, "objetivo_invitaciones_enviar" | "objetivo_personas_total"> | null
 ): GuestMissionSteps {
   const lista = invitados.length >= 1;
   const mesas = lista && tieneMesaAsignada(invitados);
-  const envio = lista && huboEnvioOVisita(invitados);
+  const envio = lista && misionPasoEnvioCumplido(invitados);
   const meta = lista && isGuestMetaStepComplete(evento, invitados);
   return {
     invitados_lista: lista,
@@ -114,7 +118,7 @@ export function guestMissionAggregateState(steps: GuestMissionSteps): GuestMissi
 
 /** Compat: estado único usado antes del strip de 4 pasos. */
 export function resolveGuestMissionState(
-  invitados: Pick<Invitado, "asiento" | "email_enviado" | "invitacion_vista" | "invitado_acompanantes" | "nombre_acompanante">[],
+  invitados: Invitado[],
   evento: Pick<Evento, "objetivo_invitaciones_enviar" | "objetivo_personas_total"> | null
 ): GuestMissionState {
   return guestMissionAggregateState(getGuestMissionSteps(invitados, evento));

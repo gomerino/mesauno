@@ -2,8 +2,8 @@ import { GrowthNudge } from "@/components/app/GrowthNudge";
 import { PanelLayout } from "@/components/panel/ds";
 import { JourneyPrimaryCta } from "@/components/panel/journey/JourneyPrimaryCta";
 import { PasajerosPage } from "@/components/panel/pasajeros/PasajerosPage";
-import { PanelBackLink } from "@/components/panel/PanelBackLink";
 import { createClient } from "@/lib/supabase/server";
+import { panelJourneyPageWrapClass } from "@/lib/panel-section-copy";
 import { fetchInvitadosPanelRowsWithAcompanantes } from "@/lib/panel-invitados";
 import { resolveJourneyPhase } from "@/lib/journey-phases";
 import { loadPanelProgressBundle } from "@/lib/panel-progress-load";
@@ -55,10 +55,9 @@ export default async function PanelInvitadosPage({
 
   return (
     <PanelLayout>
-      <PanelBackLink className="!mb-2 md:!mb-3" />
-
-      {!hasAccess ? (
-        <div className="mt-6">
+      <div className={panelJourneyPageWrapClass}>
+        {!hasAccess ? (
+        <div>
           <JourneyPrimaryCta
             invitados_count={invitados.length}
             plan_status={planStatus}
@@ -74,33 +73,33 @@ export default async function PanelInvitadosPage({
       ) : null}
 
       {!evento && (
-        <div className="mt-4">
+        <div>
           <GrowthNudge
             message="Aún no creaste la ficha del viaje. Cuando la completes, los invitados quedarán asociados automáticamente."
             href="/panel/viaje"
             ctaLabel="Crear ficha del viaje"
           />
         </div>
-      )}
+        )}
 
-      {evento && !hasInvitados && (
+        {evento && !hasInvitados && (
         <div
-          className="mt-4 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/70"
+          className="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/70"
           role="status"
         >
           <strong className="font-medium text-white/90">Te falta un paso:</strong> añade al menos una persona
           para generar su invitación y compartirla.
         </div>
-      )}
+        )}
 
-      {invitadosError && (
-        <p className="mt-4 rounded-xl border border-red-500/30 bg-red-950/20 px-4 py-3 text-sm text-red-200/90">
+        {invitadosError && (
+        <p className="rounded-xl border border-red-500/30 bg-red-950/20 px-4 py-3 text-sm text-red-200/90">
           No pudimos cargar la lista. Intenta recargar la página. Si el problema sigue, contacta soporte.
         </p>
-      )}
+        )}
 
-      {!invitadosError ? (
-        <div id="agregar-invitados" className="mt-4 scroll-mt-24 md:mt-5">
+        {!invitadosError ? (
+        <div id="agregar-invitados" className="scroll-mt-24">
           <PasajerosPage
             eventoId={evento?.id ?? null}
             initialInvitados={invitados}
@@ -115,7 +114,8 @@ export default async function PanelInvitadosPage({
             }
           />
         </div>
-      ) : null}
+        ) : null}
+      </div>
     </PanelLayout>
   );
 }

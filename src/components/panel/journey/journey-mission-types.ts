@@ -16,4 +16,10 @@ export type MissionStripProps = {
   doneCount: number;
   totalCount: number;
   ariaLabel?: string;
+  /** En un card sin texto encima, oculta el `border-t` inicial del componente. */
+  noTopRule?: boolean;
+  /** Oculta la fila «Misiones» + contador (más bajo; el progreso sigue visible). */
+  hideMisionesLabel?: boolean;
+  /** Márgenes y círculos un poco más chicos. */
+  compact?: boolean;
 };

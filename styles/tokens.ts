@@ -1,22 +1,22 @@
 /**
  * Jurnex UI — design tokens (única fuente de verdad para color/radio).
- * Alineado a guía de marca: navy profundo, teal viaje, oro emocional, gris suave secundario.
- * Consumir desde componentes vía `@styles/tokens` y desde Tailwind en `tailwind.config.ts`.
+ * Alineado al arte de marca: navy invernal (#03182F) + oro/ámbar cálido (mismo eje cromático que el logotipo).
+ * Las utilidades `teal-*` de Tailwind apuntan a esta rampa (ver `tailwind.config.ts`).
  */
 export const tokens = {
   colors: {
-    /** Deep navy — fondo principal */
-    bg: "#0B1220",
+    /** Deep navy (del SVG maestro) — fondo principal */
+    bg: "#03182F",
     surface: "rgba(255,255,255,0.03)",
     surfaceHover: "rgba(255,255,255,0.05)",
     border: "rgba(255,255,255,0.08)",
-    /** Teal journey — acentos, CTAs, enlaces */
-    primary: "#14B8A6",
-    primarySoft: "rgba(20,184,166,0.15)",
-    /** Gold emocional — highlights, fase “celebración” */
-    secondary: "#F5C451",
-    textPrimary: "#EAF2FF",
-    /** Gris suave — texto secundario */
+    /** Acento principal: oro/ámbar (viaje, CTAs) — mapea a `teal-*` en tailwind */
+    primary: "#E89A1E",
+    primarySoft: "rgba(232, 154, 30, 0.16)",
+    /** Oro claro — highlight secundario, gradientes con primary */
+    secondary: "#E4CE5A",
+    textPrimary: "#EAF0F7",
+    /** Gris suave — texto secundario (frío para contrastar con el oro) */
     textSecondary: "#94A3B8",
     textMuted: "#64748B",
     success: "#22C55E",

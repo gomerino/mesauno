@@ -41,7 +41,7 @@ export async function JourneyHome({ focusTarget = null }: JourneyHomeProps) {
   return (
     <PanelLayout narrow>
       {bundle.evento ? (
-        <div className="flex flex-col gap-3 md:gap-4">
+        <div className="flex flex-col gap-2.5 md:gap-3">
           <PanelInviteHero
             tituloNovios={tituloNoviosHero}
             fechaEvento={fechaEventoParaHero}
@@ -64,19 +64,17 @@ export async function JourneyHome({ focusTarget = null }: JourneyHomeProps) {
             guestMissionSteps={guestMissionSteps}
             focusTarget={focusTarget}
             eventoComplete={eventoConfigComplete}
-            programaHitosCount={bundle.programaHitosCount}
             journeySteps={bundle.steps}
           />
         </div>
       ) : (
-        <div className="flex flex-col gap-3 md:gap-4">
+        <div className="flex flex-col gap-2.5 md:gap-3">
           <JourneyViajeClient
             evento={bundle.evento}
             phase={journeyPhase}
             guestMissionSteps={guestMissionSteps}
             focusTarget={focusTarget}
             eventoComplete={eventoConfigComplete}
-            programaHitosCount={bundle.programaHitosCount}
             journeySteps={bundle.steps}
           />
         </div>

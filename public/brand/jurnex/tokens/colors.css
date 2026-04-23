@@ -1,13 +1,14 @@
 :root {
-  --jurnex-navy: #0b1220;
-  --jurnex-teal: #14b8a6;
-  --jurnex-gold: #f5c451;
+  --jurnex-navy: #03182f;
+  /* Nombre legado: acento UI (oro; antes “teal” en producto) */
+  --jurnex-teal: #e89a1e;
+  --jurnex-gold: #e4ce5a;
   --jurnex-gray: #94a3b8;
 
-  --jurnex-bg: #020617;
+  --jurnex-bg: #02182a;
   --jurnex-surface: rgba(255, 255, 255, 0.04);
   --jurnex-border: rgba(255, 255, 255, 0.1);
 
-  --jurnex-gradient-primary: linear-gradient(90deg, #14b8a6, #f5c451);
+  --jurnex-gradient-primary: linear-gradient(90deg, #c98318, #f0c14d, #e4ce5a);
 }
 

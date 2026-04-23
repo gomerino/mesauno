@@ -1,13 +1,10 @@
 "use client";
 
-import {
-  JourneyCard,
-  type JourneyMissionStep,
-} from "@/components/panel/journey/JourneyCard";
+import { JourneyCard } from "@/components/panel/journey/JourneyCard";
 import type { PanelProgressBundle } from "@/lib/panel-progress-load";
-import type { JourneyStepId } from "@/lib/panel-setup-progress";
-import { JOURNEY_STEP_ORDER } from "@/lib/panel-setup-progress";
+import { getViajeMissionStripFromSteps } from "@/lib/viaje-mission";
 import type { JourneyPhaseId } from "@/lib/journey-phases";
+import type { JourneyStepId } from "@/lib/panel-setup-progress";
 import {
   GUEST_MISSION_ORDER,
   guestMissionCtaLabelFromSteps,
@@ -17,9 +14,17 @@ import {
 } from "@/lib/guest-mission";
 import { trackEvent } from "@/lib/analytics";
 import { getPhaseBaseOrder, type JourneyCardKey } from "@/lib/journey-card-order";
+import {
+  getRecuerdosFotosMissionStrip,
+  hasRecuerdosFotosDownloadMisionDone,
+  recuerdosMisionCtaLabel,
+  recuerdosMisionDescription,
+  RECUERDOS_MISSION_EVENT,
+  recuerdosMissionStorageKey,
+} from "@/lib/recuerdos-mission";
 import { Plane, Users } from "lucide-react";
 import Link from "next/link";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 type EventoViaje = NonNullable<PanelProgressBundle["evento"]>;
 
@@ -28,49 +33,19 @@ type Props = {
   phase: JourneyPhaseId;
   /** Misiones de invitados (lista, mesas, envío, meta); misma fuente que la página Pasajeros. */
   guestMissionSteps: GuestMissionSteps;
-  /** `"invitados"` / `"pasajeros"` / `"evento"` / `"programa"` / `"experiencia"`. */
+  /** `"invitados"` / `"pasajeros"` / `"evento"` / `"experiencia"` / `"aterrizaje"` / `"recuerdos"` (Aterrizaje). */
   focusTarget?: string | null;
   /** Las 4 misiones de configuración del viaje completas (misma fuente que `bundle.steps`). */
   eventoComplete: boolean;
-  /** Cantidad de hitos del programa del día. */
-  programaHitosCount: number;
   /** Pasos `evento_datos` … `evento_musica`; misma fuente que el % del panel. */
   journeySteps: Record<JourneyStepId, boolean>;
 };
 
-/** Etiquetas cortas alineadas a `JOURNEY_STEP_ORDER` / journey del panel. */
-const VIAJE_MISSION_LABELS: Record<JourneyStepId, string> = {
-  evento_datos: "Datos",
-  evento_ubicacion: "Lugar",
-  evento_programa: "Programa",
-  evento_musica: "Música",
-};
-
-/** Las 4 misiones de configuración (`getJourneyProgress`), mismos criterios que el % del panel. */
-function viajeMissionStrip(
-  journeySteps: Record<JourneyStepId, boolean>
-): { steps: JourneyMissionStep[]; doneCount: number; totalCount: number } {
-  const firstIncomplete = JOURNEY_STEP_ORDER.findIndex((id) => !journeySteps[id]);
-
-  const steps: JourneyMissionStep[] = JOURNEY_STEP_ORDER.map((id, i) => {
-    if (journeySteps[id]) {
-      return {
-        id,
-        label: VIAJE_MISSION_LABELS[id],
-        state: "done" as const,
-      };
-    }
-    const state: JourneyMissionStep["state"] =
-      i === firstIncomplete ? "active" : "pending";
-    return { id, label: VIAJE_MISSION_LABELS[id], state };
-  });
-
-  const doneCount = JOURNEY_STEP_ORDER.filter((id) => journeySteps[id]).length;
-  return { steps, doneCount, totalCount: JOURNEY_STEP_ORDER.length };
-}
-
 /** Emite `mission_card_completed` una sola vez por sesión para cada misión. */
-function emitIfCompletedOnce(target: "invitados" | "evento", completed: boolean) {
+function emitIfCompletedOnce(
+  target: "invitados" | "evento" | "recuerdos",
+  completed: boolean
+) {
   if (typeof window === "undefined") return;
   if (!completed) return;
   try {
@@ -89,27 +64,52 @@ export function JourneyViajeClient({
   guestMissionSteps,
   focusTarget = null,
   eventoComplete,
-  programaHitosCount,
   journeySteps,
 }: Props) {
   const invitadosMissionDone = GUEST_MISSION_ORDER.every((id) => guestMissionSteps[id]);
+  const [recuerdosDescargaHecha, setRecuerdosDescargaHecha] = useState(false);
 
   useEffect(() => {
     emitIfCompletedOnce("invitados", invitadosMissionDone);
     emitIfCompletedOnce("evento", eventoComplete);
-  }, [invitadosMissionDone, eventoComplete]);
+    emitIfCompletedOnce("recuerdos", recuerdosDescargaHecha);
+  }, [invitadosMissionDone, eventoComplete, recuerdosDescargaHecha]);
+
+  useEffect(() => {
+    if (!evento?.id) {
+      setRecuerdosDescargaHecha(false);
+      return;
+    }
+    const id = evento.id;
+    setRecuerdosDescargaHecha(hasRecuerdosFotosDownloadMisionDone(id));
+    const onCustom = (e: Event) => {
+      const d = (e as CustomEvent<{ eventoId?: string }>).detail;
+      if (d?.eventoId === id) setRecuerdosDescargaHecha(true);
+    };
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === recuerdosMissionStorageKey(id) && e.newValue === "1") {
+        setRecuerdosDescargaHecha(true);
+      }
+    };
+    window.addEventListener(RECUERDOS_MISSION_EVENT, onCustom);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener(RECUERDOS_MISSION_EVENT, onCustom);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, [evento?.id]);
 
   const isPaid = evento?.plan_status === "paid";
 
   const phaseFocusEvento = phase === "check-in";
   const phaseFocusPasajeros = phase === "check-in";
-  const phaseFocusPrograma = phase === "despegue";
   const phaseFocusExperiencia = phase === "en-vuelo";
 
   const focusIs = (id: string) =>
     focusTarget === id ||
     (id === "pasajeros" && focusTarget === "invitados") ||
-    (id === "invitados" && focusTarget === "pasajeros");
+    (id === "invitados" && focusTarget === "pasajeros") ||
+    (id === "experiencia" && (focusTarget === "aterrizaje" || focusTarget === "recuerdos"));
 
   // Viaje (franja = 4 pasos de configuración)
   const eventoDescription = eventoComplete
@@ -126,17 +126,19 @@ export function JourneyViajeClient({
   const pasajerosFocused = focusIs("pasajeros");
   const pasajerosStrip = guestMissionStripProps(guestMissionSteps);
 
-  // Programa
-  const tieneHitos = programaHitosCount > 0;
-  const programaDescription = tieneHitos
-    ? `${programaHitosCount} ${programaHitosCount === 1 ? "momento definido" : "momentos definidos"}`
-    : "Horarios y momentos clave 📋";
-  const programaCta = tieneHitos ? "Editar programa" : "Armar programa";
-  const programaCardStatus: "completed" | "active" = tieneHitos ? "completed" : "active";
-
-  // Experiencia
-  const experienciaDescription = "Lo que vivirán ✨";
-  const experienciaCta = "Definir experiencia";
+  // Aterrizaje (misma franja de misión que Viaje e Invitados: descargar fotos en ZIP)
+  const recuerdosStripProps = isPaid
+    ? {
+        ...getRecuerdosFotosMissionStrip(recuerdosDescargaHecha),
+        ariaLabel: "Misión de recuerdos: descargar fotos",
+      }
+    : undefined;
+  const experienciaDescription = isPaid
+    ? recuerdosMisionDescription(recuerdosDescargaHecha)
+    : "Cierre y recuerdos ✨";
+  const experienciaCta = isPaid
+    ? recuerdosMisionCtaLabel(recuerdosDescargaHecha)
+    : "Definir aterrizaje";
 
   type MissionStatus = "empty" | "in_progress" | "completed" | "locked";
 
@@ -146,13 +148,16 @@ export function JourneyViajeClient({
     : !guestMissionSteps.invitados_lista
       ? "empty"
       : "in_progress";
-  const programaMissionStatus: MissionStatus = tieneHitos ? "in_progress" : "empty";
-  const experienciaMissionStatus: MissionStatus = isPaid ? "empty" : "locked";
+  const experienciaMissionStatus: MissionStatus = !isPaid
+    ? "locked"
+    : recuerdosDescargaHecha
+      ? "completed"
+      : "in_progress";
 
-  /** Orden fijo en pantalla: Viaje → Pasajeros → Experiencia → Programa (sin reordenar por estado). */
+  /** Orden fijo en pantalla: Viaje → Pasajeros → Aterrizaje (sin reordenar por estado). */
   const phaseBase = getPhaseBaseOrder(phase);
 
-  const viajeStrip = viajeMissionStrip(journeySteps);
+  const viajeStrip = getViajeMissionStripFromSteps(journeySteps);
   const pasajerosStripProps = {
     steps: pasajerosStrip.steps,
     doneCount: pasajerosStrip.doneCount,
@@ -216,48 +221,26 @@ export function JourneyViajeClient({
       ),
     },
     {
-      key: "programa",
-      status: programaMissionStatus,
-      node: (
-        <JourneyCard
-          key="programa"
-          title="Programa"
-          description={programaDescription}
-          icon={<span aria-hidden>📋</span>}
-          status={programaCardStatus}
-          href="/panel/viaje/programa?from=mission"
-          phaseHighlight={phaseFocusPrograma || focusIs("programa")}
-          ctaLabel={programaCta}
-          pulse={focusIs("programa")}
-          onNavigate={() =>
-            trackEvent("panel_mission_cta_clicked", {
-              target: "programa",
-              state: tieneHitos ? "in_progress" : "empty",
-            })
-          }
-        />
-      ),
-    },
-    {
       key: "experiencia",
       status: experienciaMissionStatus,
       node: (
         <JourneyCard
           key="experiencia"
-          title="Experiencia del viaje"
+          title="Aterrizaje"
           description={experienciaDescription}
           icon={<span aria-hidden>✨</span>}
-          status={isPaid ? "active" : "locked"}
-          href={isPaid ? "/panel/viaje?from=mission" : undefined}
+          status={!isPaid ? "locked" : recuerdosDescargaHecha ? "completed" : "active"}
+          href={isPaid ? "/panel/recuerdos?from=mission" : undefined}
           phaseHighlight={phaseFocusExperiencia || focusIs("experiencia")}
           ctaLabel={isPaid ? experienciaCta : undefined}
-          pulse={isPaid && focusIs("experiencia")}
+          pulse={isPaid && !recuerdosDescargaHecha && focusIs("experiencia")}
+          missionStrip={recuerdosStripProps}
           onNavigate={
             isPaid
               ? () =>
                   trackEvent("panel_mission_cta_clicked", {
                     target: "experiencia",
-                    state: "active",
+                    state: recuerdosDescargaHecha ? "completed" : "in_progress",
                   })
               : undefined
           }
@@ -324,9 +307,7 @@ function labelForKey(key: JourneyCardKey): string {
       return "Evento";
     case "pasajeros":
       return "Invitados";
-    case "programa":
-      return "Programa";
     case "experiencia":
-      return "Experiencia";
+      return "Aterrizaje";
   }
 }

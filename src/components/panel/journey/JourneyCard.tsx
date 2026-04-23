@@ -16,7 +16,7 @@ type Props = {
   icon: ReactNode;
   status: JourneyCardStatus;
   href?: string;
-  /** Foco por etapa: borde teal discreto y leve degradado (sin glow fuerte). */
+  /** Foco por etapa: borde oro discreto y leve degradado (sin glow fuerte). */
   phaseHighlight?: boolean;
   /** Micro CTA visible bajo la descripción cuando la card es navegable. */
   ctaLabel?: string;
@@ -61,7 +61,7 @@ export function JourneyCard({
   const hierarchy = phaseHighlight === true ? "" : "opacity-70 hover:opacity-100";
 
   const pulseRing = pulse
-    ? "ring-2 ring-teal-400/50 shadow-[0_0_30px_rgba(45,212,191,0.25)] animate-pulse"
+    ? "ring-2 ring-teal-400/50 shadow-[0_0_30px_rgba(232,154,30,0.28)] animate-pulse"
     : "";
 
   const ctaTone =

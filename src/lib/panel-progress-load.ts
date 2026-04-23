@@ -7,7 +7,7 @@ import {
   getJourneyProgress,
   type JourneyStepId,
 } from "@/lib/panel-setup-progress";
-import { fetchInvitadosPanelRows, mergeInvitadoAcompanantesIntoRows } from "@/lib/panel-invitados";
+import { fetchInvitadosPanelRowsWithAcompanantes } from "@/lib/panel-invitados";
 import type { Evento, Invitado } from "@/types/database";
 import { parseMockPaymentStatusFromPaymentId, type MockPaymentStatus } from "@/lib/mock-payment";
 
@@ -59,19 +59,17 @@ async function loadPanelProgressBundleInner(
     if (!error) programaHitosCount = count ?? 0;
   }
 
-  const { data: invRows } = await fetchInvitadosPanelRows(
+  // Misma query que `/panel/pasajeros` para que `getGuestMissionSteps` coincida con la página.
+  const { data: invData, error: invErr } = await fetchInvitadosPanelRowsWithAcompanantes(
     supabase,
     userId,
     evento?.id ?? null,
-    "id, asiento, rsvp_estado, email_enviado, invitacion_vista, token_acceso, telefono, nombre_acompanante",
     { orderBy: false }
   );
-
-  const merged = await mergeInvitadoAcompanantesIntoRows(
-    supabase,
-    (invRows ?? []) as Record<string, unknown>[]
-  );
-  const invitados = merged as unknown as Invitado[];
+  if (invErr) {
+    console.error("[loadPanelProgressBundle] invitados:", invErr.message);
+  }
+  const invitados = (invData ?? []) as unknown as Invitado[];
 
   let spotifyConnected = false;
   if (evento?.id) {
