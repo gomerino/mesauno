@@ -96,7 +96,8 @@ function FotoThumbs({ fotos, groupLabel }: { fotos: ProgramaHitoFotoPublic[]; gr
               rel="noopener noreferrer"
               className="relative block overflow-hidden rounded-lg border border-white/10 bg-black/20 ring-0 transition hover:border-teal-400/40 hover:ring-1 hover:ring-teal-400/20"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element — URLs públicas de Storage, sin dominar con Image remoto en panel */}
+              {/* Miniaturas: URLs públicas de Supabase; <img> ad-hoc (origen dinámico). */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={href}
                 alt=""
