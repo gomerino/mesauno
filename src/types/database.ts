@@ -13,7 +13,7 @@ export type Evento = {
   /** Asiento por defecto en el pase (mismo para todos los invitados). */
   asiento_default: string | null;
   motivo_viaje: string | null;
-  /** Línea corta bajo el encabezado del boarding pass (lugar). */
+  /** Nombre comercial del centro o venue (panel, contexto; no se pinta en el pase aviación). */
   lugar_evento_linea: string | null;
   /** Plan de producto contratado en checkout (esencial / experiencia). */
   plan?: "esencial" | "experiencia" | null;
@@ -36,6 +36,19 @@ export type Evento = {
   objetivo_invitaciones_enviar?: number | null;
   /** Meta opcional: personas totales (incluye acompañantes) a alcanzar. */
   objetivo_personas_total?: number | null;
+  /** Cabecera del boarding pass (marca + ruta). */
+  boarding_linea_aerea?: string | null;
+  boarding_tagline?: string | null;
+  boarding_logo_url?: string | null;
+  boarding_emblema_url?: string | null;
+  /** Texto de ruta (origen, antes del avión). El nombre de columna en BD es histórico. */
+  boarding_origen_iata?: string | null;
+  /** Texto de ruta (destino, después del avión). */
+  boarding_destino_iata?: string | null;
+  dress_code?: string | null;
+  /** Dirección completa del lugar (mapa / QR; no se usa el campo corto `destino` en el mapa). */
+  direccion_evento_completa?: string | null;
+  grupo_embarque_default?: string | null;
   created_at?: string | null;
 };
 

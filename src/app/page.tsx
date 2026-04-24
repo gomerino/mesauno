@@ -1,8 +1,8 @@
 import { CTA } from "@/components/marketing/CTA";
-import { DemoPreview } from "@/components/marketing/DemoPreview";
 import { Features } from "@/components/marketing/Features";
 import { Hero } from "@/components/marketing/Hero";
 import { HowItWorks } from "@/components/marketing/HowItWorks";
+import { InvitacionShowcase } from "@/components/marketing/InvitacionShowcase";
 import { LandingMidCta } from "@/components/marketing/LandingMidCta";
 import { LandingSocialProof } from "@/components/marketing/LandingSocialProof";
 import { LandingStickyCta } from "@/components/marketing/LandingStickyCta";
@@ -12,9 +12,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Jurnex — Invitaciones boarding pass para tu evento",
+  title: "Jurnex — Crea tu viaje de bodas",
   description:
-    "Invita, organiza y comparte bodas, cumpleaños y eventos corporativos. Invitación digital, RSVP, mesas y check-in QR en un solo lugar.",
+    "Panel de novios, invitación estilo pase de abordaje, invitados, programa, recuerdos, marketplace de proveedores y pago con Mercado Pago. Tu boda, en un solo lugar.",
 };
 
 export default function HomePage() {
@@ -26,7 +26,7 @@ export default function HomePage() {
         <LandingSocialProof />
       </div>
       <Features />
-      <DemoPreview />
+      <InvitacionShowcase />
       <LandingMidCta />
       <HowItWorks />
       <CTA />
@@ -40,12 +40,8 @@ export default function HomePage() {
             Panel novios
           </Link>
           <span className="text-slate-700">·</span>
-          <Link href="/invitacion/demo" className="hover:text-slate-300">
-            Demo local
-          </Link>
-          <span className="text-slate-700">·</span>
           <a href={DEMO_URL} target="_blank" rel="noopener noreferrer" className="hover:text-slate-300">
-            Invitación real
+            Ejemplo de invitación
           </a>
         </div>
         <p className="mt-4">© {new Date().getFullYear()} Jurnex</p>

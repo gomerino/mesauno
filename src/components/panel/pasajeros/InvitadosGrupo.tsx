@@ -3,19 +3,10 @@
 import { InvitadoRow } from "@/components/panel/pasajeros/InvitadoRow";
 import type { Invitado } from "@/types/database";
 import type { CanalEnvioInvitacion } from "@/types/database";
+import { resumenMesaRsvp } from "@/lib/invitado-mesa-rsvp";
 import { deriveEstadoEnvio } from "@/lib/invitado-estado-envio";
 import { ChevronDown, Loader2, RefreshCw, Send } from "lucide-react";
 import { useMemo } from "react";
-
-function mesaRsvpLine(invitados: Invitado[]) {
-  let confirmados = 0;
-  let pendientes = 0;
-  for (const r of invitados) {
-    if (r.rsvp_estado === "confirmado") confirmados++;
-    else if (r.rsvp_estado === "pendiente") pendientes++;
-  }
-  return { confirmados, pendientes, total: invitados.length };
-}
 
 type Props = {
   mesaKey: string;
@@ -50,8 +41,13 @@ export function InvitadosGrupo({
   onDelete,
   deletingId,
 }: Props) {
-  const { confirmados, pendientes, total } = useMemo(() => mesaRsvpLine(invitados), [invitados]);
-  const progressPct = total > 0 ? Math.round((confirmados / total) * 1000) / 10 : 0;
+  const { confirmados, noAsistire, pendienteRespuesta, total } = useMemo(
+    () => resumenMesaRsvp(invitados),
+    [invitados]
+  );
+  /** Respuestas de asistencia cerradas (sí o no) respecto al total. */
+  const rsvpCerrados = confirmados + noAsistire;
+  const progressPct = total > 0 ? Math.min(100, Math.round((rsvpCerrados / total) * 1000) / 10) : 0;
 
   const idsPendienteEnvio = useMemo(
     () => invitados.filter((r) => deriveEstadoEnvio(r) === "pendiente").map((r) => r.id),
@@ -88,9 +84,11 @@ export function InvitadosGrupo({
           <div className="min-w-0">
             <p className="text-sm font-medium text-white/90 sm:text-base">{label}</p>
             <p className="mt-0.5 hidden text-xs text-white/55 sm:block">
-              {confirmados} confirmados · {pendientes} pendientes
+              {confirmados} sí · {noAsistire} no asistiré · {pendienteRespuesta} asist. pend.
             </p>
-            <p className="mt-0.5 text-[11px] text-white/50 sm:hidden">{confirmados} confirmados</p>
+            <p className="mt-0.5 text-[11px] text-white/50 sm:hidden">
+              {confirmados} sí · {noAsistire} no
+            </p>
             <div
               className="mt-2 hidden h-1.5 max-w-md overflow-hidden rounded-full bg-white/10 sm:block"
               aria-hidden
@@ -146,7 +144,7 @@ export function InvitadosGrupo({
             <span>Nombre</span>
             <span>Correo</span>
             <span>Teléfono</span>
-            <span className="text-center">Estado</span>
+            <span className="text-center">Invit. / asist.</span>
             <span className="text-center">Canal</span>
             <span className="text-right pr-2">Acciones</span>
           </div>

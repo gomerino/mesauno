@@ -21,10 +21,7 @@ export function SiteHeader({ compact = false }: Props) {
         </Link>
         <nav className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-xs text-teal-100/90 sm:gap-x-6 sm:text-sm">
           <Link href="/onboarding" className="hover:text-white">
-            Demo gratis
-          </Link>
-          <Link href="/pricing" className="font-medium text-jurnex-secondary/95 hover:text-jurnex-secondary">
-            Planes y precios
+            Crea tu viaje
           </Link>
           <Link href="/marketplace" className="hover:text-white">
             Marketplace

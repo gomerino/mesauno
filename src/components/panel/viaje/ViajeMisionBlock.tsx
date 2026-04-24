@@ -26,7 +26,7 @@ export function ViajeMisionBlock({ micro, journeySteps }: Props) {
           hideMisionesLabel
           compact
           {...viajeStrip}
-          ariaLabel="Misiones de viaje: datos, lugar, programa, música"
+          ariaLabel="Progreso de viaje: tripulación, invitación, experiencia"
         />
       }
     />

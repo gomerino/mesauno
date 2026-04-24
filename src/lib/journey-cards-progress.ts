@@ -22,14 +22,12 @@ export function getJourneyPhasesProgressLines(
   let hint: string | null = null;
   if (done < TOTAL) {
     const next = JOURNEY_STEP_ORDER.find((id) => !bundle.steps[id]);
-    if (next === "evento_datos") {
-      hint = "Completa nombres y fecha del evento.";
-    } else if (next === "evento_ubicacion") {
-      hint = "Indica lugar o destino y hora del evento.";
-    } else if (next === "evento_programa") {
-      hint = "Añade momentos al programa del día.";
-    } else if (next === "evento_musica") {
-      hint = "Conecta Spotify para la playlist del viaje.";
+    if (next === "tab_tripulacion") {
+      hint = "Completá tripulación: nombres, fechas, lugar y hora.";
+    } else if (next === "tab_invitacion") {
+      hint = "Escribí el mensaje a invitados (pestaña Invitación).";
+    } else if (next === "tab_experiencia") {
+      hint = "Añadí al menos un momento al programa y conectá Spotify.";
     }
   }
 

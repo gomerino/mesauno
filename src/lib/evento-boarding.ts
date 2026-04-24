@@ -51,10 +51,11 @@ export function mergeEventoParaPase(invitado: Invitado, evento: Evento | null) {
     ? [evento.nombre_novio_1, evento.nombre_novio_2].filter(Boolean).join(" · ")
     : "";
 
+  const dirCompleta = evento?.direccion_evento_completa?.trim() || null;
+
   return {
     codigo_vuelo: pick(evento?.codigo_vuelo, invitado.codigo_vuelo, "DM7726"),
     hora_embarque: pick(evento?.hora_embarque, invitado.hora_embarque, "17:30"),
-    puerta: pick(evento?.puerta, invitado.puerta, "B"),
     asiento: pickInvitadoPrimero(invitado.asiento, evento?.asiento_default, "12A"),
     destino: pick(evento?.destino, invitado.destino, "Forever Island"),
     nombre_evento: pick(evento?.nombre_evento, invitado.nombre_evento, "Boda Dreams"),
@@ -62,6 +63,17 @@ export function mergeEventoParaPase(invitado: Invitado, evento: Evento | null) {
     lugar_evento_linea: lugarLinea,
     motivo_viaje: motivo.length > 0 ? motivo : null,
     footerNovios,
+    /** Dirección larga para mapa / detalle (sino cae a `destino`). */
+    direccion_completa: dirCompleta,
+    dress_code: evento?.dress_code?.trim() || null,
+    boarding_linea_aerea: evento?.boarding_linea_aerea?.trim() || null,
+    boarding_tagline: evento?.boarding_tagline?.trim() || null,
+    boarding_logo_url: evento?.boarding_logo_url?.trim() || null,
+    boarding_emblema_url: evento?.boarding_emblema_url?.trim() || null,
+    /** Texto de ruta; columnas en BD aún se llaman *_iata. */
+    boarding_origen_iata: evento?.boarding_origen_iata?.trim() || null,
+    boarding_destino_iata: evento?.boarding_destino_iata?.trim() || null,
+    grupo_embarque_default: evento?.grupo_embarque_default?.trim() || null,
   };
 }
 
@@ -77,9 +89,20 @@ export function resolveDestinoParaMapa(mergedDestino: string): string {
   return raw;
 }
 
+/**
+ * Solo dirección “larga” (evento) + fallback global/venue. No se usa el campo corto `destino` del pase.
+ */
+export function addressForMapFromPass(invitado: Invitado, evento: Evento | null): string {
+  const m = mergeEventoParaPase(invitado, evento);
+  const full = m.direccion_completa?.trim();
+  if (full) return full;
+  const globalAddr = process.env.NEXT_PUBLIC_EVENT_ADDRESS?.trim();
+  if (globalAddr) return globalAddr;
+  return EVENT_VENUE_FALLBACK;
+}
+
 export function boardingPassQrMapUrlMerged(invitado: Invitado, evento: Evento | null): string {
-  const { destino } = mergeEventoParaPase(invitado, evento);
-  return googleMapsSearchUrl(resolveDestinoParaMapa(destino));
+  return googleMapsSearchUrl(addressForMapFromPass(invitado, evento));
 }
 
 async function eventoDesdeRpcInvitacionPublica(

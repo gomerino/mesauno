@@ -21,12 +21,15 @@ export type PanelProgressBundle = {
     | "id"
     | "nombre_novio_1"
     | "nombre_novio_2"
+    | "nombre_evento"
     | "fecha_boda"
     | "fecha_evento"
     | "hora_embarque"
     | "plan_status"
     | "destino"
+    | "direccion_evento_completa"
     | "lugar_evento_linea"
+    | "motivo_viaje"
     | "payment_id"
     | "objetivo_invitaciones_enviar"
     | "objetivo_personas_total"
@@ -47,7 +50,7 @@ async function loadPanelProgressBundleInner(
   const { data: evento } = await selectEventoForMember(
     supabase,
     userId,
-    "id, nombre_novio_1, nombre_novio_2, fecha_boda, fecha_evento, hora_embarque, plan_status, destino, lugar_evento_linea, payment_id, objetivo_invitaciones_enviar, objetivo_personas_total"
+    "id, nombre_novio_1, nombre_novio_2, nombre_evento, fecha_boda, fecha_evento, hora_embarque, plan_status, destino, direccion_evento_completa, lugar_evento_linea, motivo_viaje, payment_id, objetivo_invitaciones_enviar, objetivo_personas_total"
   );
 
   let programaHitosCount = 0;
@@ -105,10 +108,9 @@ export const loadPanelProgressBundle = cache(async (userId: string): Promise<Pan
 });
 
 const STEP_DETAIL: Record<JourneyStepId, string> = {
-  evento_datos: "completar datos de pareja y fechas del evento",
-  evento_ubicacion: "definir lugar o destino y hora",
-  evento_programa: "añadir al menos un momento al programa del día",
-  evento_musica: "conectar Spotify y tu playlist",
+  tab_tripulacion: "completar tripulación: pareja, fechas, lugar y hora",
+  tab_invitacion: "definir el mensaje a invitados en la invitación",
+  tab_experiencia: "tener al menos un hito en el programa y Spotify conectado",
 };
 
 /** Mensaje principal del journey (home y barra slim). */
@@ -127,13 +129,12 @@ export function panelNextActionHref(nextStep: JourneyStepId | null): string {
     return "/panel/pasajeros";
   }
   switch (nextStep) {
-    case "evento_datos":
-    case "evento_ubicacion":
-      return "/panel/viaje";
-    case "evento_programa":
-      return "/panel/viaje/programa";
-    case "evento_musica":
-      return "/panel/experiencia";
+    case "tab_tripulacion":
+      return "/panel/viaje?tab=tripulacion";
+    case "tab_invitacion":
+      return "/panel/viaje?tab=invitacion";
+    case "tab_experiencia":
+      return "/panel/viaje?tab=experiencia";
     default:
       return "/panel/viaje";
   }
@@ -144,13 +145,12 @@ export function panelNextActionLabel(nextStep: JourneyStepId | null): string {
     return "Gestionar invitados";
   }
   switch (nextStep) {
-    case "evento_datos":
-    case "evento_ubicacion":
-      return "Completar tu viaje";
-    case "evento_programa":
-      return "Armar programa";
-    case "evento_musica":
-      return "Conectar música";
+    case "tab_tripulacion":
+      return "Completar tripulación";
+    case "tab_invitacion":
+      return "Completar invitación";
+    case "tab_experiencia":
+      return "Completar experiencia";
     default:
       return "Continuar";
   }

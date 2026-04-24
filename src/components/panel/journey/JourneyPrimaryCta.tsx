@@ -59,7 +59,7 @@ export function JourneyPrimaryCta({
         : "Tu plan está activo: invita y completa los detalles cuando quieras.";
     } else if (phase === "despegue") {
       ctaLabel = "Ver programa";
-      href = "/panel/viaje/programa";
+      href = "/panel/viaje?tab=experiencia";
       text = "Coordina los últimos detalles y ten el día a mano, sin apuros.";
     } else {
       ctaLabel = "Ver experiencia";
@@ -93,13 +93,13 @@ export function JourneyPrimaryCta({
   } else if (phase === "check-in") {
     title = "Tu viaje comienza pronto ✈️";
     text = "Completa la información clave e invita cuando te sientas listo.";
-    ctaLabel = "Completar datos";
-    href = "/panel/viaje";
+    ctaLabel = "Completar viaje";
+    href = "/panel/viaje?tab=tripulacion";
   } else if (phase === "despegue") {
     title = "Todo listo para el gran día";
     text = "Revisa el programa y coordina con tus pasajeros sin perder el ritmo.";
     ctaLabel = "Ver programa";
-    href = "/panel/viaje/programa";
+    href = "/panel/viaje?tab=experiencia";
   } else {
     title = "Disfruta la experiencia";
     text = "Explora lo que preparaste y compártelo con quienes vuelan contigo.";

@@ -32,3 +32,49 @@ body {
     @apply w-full rounded-jurnex-sm border border-jurnex-border bg-jurnex-surface px-4 py-3 text-sm text-jurnex-text-primary placeholder:text-jurnex-text-muted focus:border-jurnex-primary focus:outline-none focus:ring-2 focus:ring-jurnex-primary/25;
   }
 }
+
+/** Resalte suave (panel) cuando el contador de «pendiente de confirmar» llega a 0. */
+@keyframes jurnex-metric-celebration-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.08);
+    border-color: rgba(45, 212, 191, 0.22);
+  }
+  50% {
+    box-shadow: 0 0 22px 2px rgba(45, 212, 191, 0.18);
+    border-color: rgba(45, 212, 191, 0.42);
+  }
+}
+
+@layer utilities {
+  .jurnex-metric-pendiente-celebracion {
+    animation: jurnex-metric-celebration-glow 2.6s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jurnex-metric-pendiente-celebracion {
+      animation: none;
+    }
+  }
+
+  /** Home panel: misión «Invitados» prioritaria — resplandor teal suave, siempre encendido. */
+  @keyframes jurnex-primary-card-breathe {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.1), inset 0 0 0 1px rgba(45, 212, 191, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 20px 1px rgba(45, 212, 191, 0.14), inset 0 0 0 1px rgba(45, 212, 191, 0.32);
+    }
+  }
+  .jurnex-card-primary-intent {
+    border-color: rgba(45, 212, 191, 0.4);
+    animation: jurnex-primary-card-breathe 4.5s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .jurnex-card-primary-intent {
+      animation: none;
+      box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.1);
+    }
+  }
+}

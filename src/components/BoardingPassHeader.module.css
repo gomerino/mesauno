@@ -157,6 +157,23 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Ruta con texto largo (ciudad o frase, no solo 3 letras) */
+.bpRouteText {
+  max-width: 42%;
+  font-size: clamp(0.6rem, 2.8vw, 0.9rem);
+  line-height: 1.1;
+  letter-spacing: 0.05em;
+  text-transform: none;
+  font-variant-numeric: normal;
+  font-weight: 700;
+  word-break: break-word;
+  text-align: center;
+}
+
+.bpHeader[data-palette="invite"] .bpRouteText {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
 .bpRoutePlane {
   display: inline-flex;
   align-items: center;

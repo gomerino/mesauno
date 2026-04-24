@@ -33,7 +33,7 @@ export function JourneyMissionStrip({
             c({ normal: "mb-2", small: "mb-1" }) + " flex items-center justify-between gap-2"
           }
         >
-          <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-slate-500">Misiones</span>
+          <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-slate-500">Progreso</span>
           <span className="tabular-nums text-[10px] font-medium text-teal-200/85">
             {doneCount}/{totalCount}
           </span>
@@ -55,7 +55,7 @@ export function JourneyMissionStrip({
       <div
         className="flex justify-between gap-0.5 sm:gap-1"
         role="list"
-        aria-label={ariaLabel ?? "Misiones del journey"}
+        aria-label={ariaLabel ?? "Progreso del viaje"}
       >
         {steps.map((s, i) => (
           <div
@@ -99,6 +99,28 @@ export function JourneyMissionStrip({
             >
               {s.label}
             </span>
+            {s.micro ? (
+              <span
+                className={c({
+                  normal: `line-clamp-2 max-w-full text-center text-[6px] font-normal leading-tight sm:text-[7px] ${
+                    s.state === "done"
+                      ? "text-emerald-400/95"
+                      : s.state === "active"
+                        ? "text-amber-100/85"
+                        : "text-slate-500/80"
+                  }`,
+                  small: `line-clamp-2 max-w-full text-center text-[5.5px] font-normal leading-tight sm:text-[6.5px] ${
+                    s.state === "done"
+                      ? "text-emerald-400/95"
+                      : s.state === "active"
+                        ? "text-amber-100/85"
+                        : "text-slate-500/80"
+                  }`,
+                })}
+              >
+                {s.micro}
+              </span>
+            ) : null}
           </div>
         ))}
       </div>

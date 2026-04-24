@@ -31,6 +31,7 @@ async function requireEditor(eventoId: string) {
 
 function revalidatePrograma() {
   revalidatePath("/panel/viaje/programa");
+  revalidatePath("/panel/viaje");
   revalidatePath("/panel");
 }
 

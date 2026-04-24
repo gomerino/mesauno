@@ -25,11 +25,11 @@ export function getEventoConfigCTA(params: EventoConfigCTAInput): EventoConfigCT
   const { evento, bundle, hasAccess, isAdmin, spotifyConnected, spotifySectionAvailable } = params;
 
   if (!isEventBasicsComplete(evento)) {
-    return { status: "pending", label: "Completar información", action: "tab", tab: "datos" };
+    return { status: "pending", label: "Completar información", action: "tab", tab: "tripulacion" };
   }
 
   if (!isEventUbicacionHoraComplete(evento)) {
-    return { status: "pending", label: "Definir ubicación", action: "tab", tab: "datos" };
+    return { status: "pending", label: "Definir ubicación", action: "tab", tab: "tripulacion" };
   }
 
   if (bundle.programaHitosCount === 0) {

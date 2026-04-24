@@ -9,7 +9,7 @@ export type EventoStep =
   | "spotify"
   | "ready";
 
-export type EventoCentroTabForCta = "datos" | "invitacion" | "experiencia";
+export type EventoCentroTabForCta = "tripulacion" | "invitacion" | "experiencia";
 
 export type EventoCTAResult = {
   label: string;
@@ -58,7 +58,7 @@ export function getEventoCTA(params: EventoConfigCTAInput): EventoCTAResult {
       label: r.label,
       action: "programa",
       variant: "primary",
-      href: "/panel/viaje/programa",
+      href: "/panel/viaje?tab=experiencia",
     };
   }
   const variant: "primary" | "secondary" = r.label === "Agregar música" ? "secondary" : "primary";

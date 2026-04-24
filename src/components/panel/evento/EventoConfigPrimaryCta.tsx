@@ -21,7 +21,7 @@ export function EventoConfigPrimaryCta({ result, className = "" }: Props) {
       className={`${panelBtnPrimary} flex h-12 w-full items-center justify-center rounded-xl text-center text-sm font-semibold text-black ${className}`.trim()}
       onClick={() => {
         if (result.action === "programa") {
-          router.push("/panel/viaje/programa");
+          router.push("/panel/viaje?tab=experiencia");
           return;
         }
         if (result.action === "tab" && ctx) {

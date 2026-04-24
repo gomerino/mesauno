@@ -10,7 +10,7 @@ function subtitleForPath(pathname: string): string {
     return "Tu centro de control · cada detalle del viaje";
   }
   if (pathname.startsWith("/panel/viaje/programa")) return "Itinerario del gran día";
-  if (pathname.startsWith("/panel/viaje")) return "Datos, invitación y experiencia del viaje";
+  if (pathname.startsWith("/panel/viaje")) return "Tripulación, invitación y experiencia del viaje";
   if (pathname.startsWith("/panel/pasajeros/confirmaciones")) return "Confirmaciones · quién viene y quién no";
   if (pathname.startsWith("/panel/pasajeros/vista")) return "Vista previa del pase y la invitación";
   if (pathname.startsWith("/panel/pasajeros/envios")) return "Canales y mensaje de la invitación";

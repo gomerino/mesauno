@@ -17,6 +17,20 @@ export function hasCompletedRsvp(rsvp_estado: string | null | undefined): boolea
   return s === "confirmado" || s === "declinado";
 }
 
+export type RsvpAsistenciaCerradaFields = {
+  rsvp_estado: "pendiente" | "confirmado" | "declinado" | null;
+  asistencia_confirmada?: boolean | null;
+};
+
+/**
+ * Asistencia «cerrada» para el panel: RSVP sí/no o check-in vía asistencia_confirmada.
+ * Si es true, no mostramos en paralelo el flujo de envío para no duplicar lectura.
+ */
+export function isAsistenciaRespuestaCerrada(row: RsvpAsistenciaCerradaFields): boolean {
+  if (row.asistencia_confirmada === true) return true;
+  return hasCompletedRsvp(row.rsvp_estado);
+}
+
 export function dbEstadoFromUi(ui: RsvpUiState): RsvpDbEstado {
   if (ui === "confirmed") return "confirmado";
   if (ui === "declined") return "declinado";

@@ -32,7 +32,7 @@ export function resolveEventoNextStep(params: {
     return {
       description: "Añade momentos al programa del día para guiar a tus invitados.",
       action: "Ir al programa",
-      href: "/panel/viaje/programa",
+      href: "/panel/viaje?tab=experiencia",
     };
   }
 
@@ -40,7 +40,7 @@ export function resolveEventoNextStep(params: {
     return {
       description: "Escribe un mensaje corto que verán en la invitación.",
       action: "Completar mensaje",
-      href: "/panel/viaje",
+      href: "/panel/viaje?tab=invitacion",
     };
   }
 
@@ -48,7 +48,7 @@ export function resolveEventoNextStep(params: {
     return {
       description: "Conecta música colaborativa y ajusta cómo vive la experiencia tu tripulación.",
       action: "Definir experiencia",
-      href: "/panel/experiencia",
+      href: "/panel/viaje?tab=experiencia",
     };
   }
 

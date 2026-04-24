@@ -1,0 +1,12 @@
+---
+description: Idioma del agente y de todo texto visible o colaboración del repo. Español LATAM neutro (tuteo).
+alwaysApply: true
+---
+
+# Idioma: español LATAM neutro
+
+- **Lenguaje del agente:** responde y razona en **español LATAM neutro** con **tuteo** (tú, tienes, puedes, quieres, completa, activa, comparte).
+- **Mismo criterio** para comentarios de PR, descripciones de commit, copy de UI, Linear, documentación y workflows, salvo que el usuario pida otra cosa.
+- **No voseo argentino** ni modismos chilenos fuertes; detalle y términos técnicos permitidos (nombres de clases, `snake_case`, `camelCase`).
+
+Criterio completo y excepciones: `AGENTS.md` (regla 1) y `jurnex-roles.mdc`.

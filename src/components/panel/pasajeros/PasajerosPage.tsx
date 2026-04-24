@@ -18,6 +18,7 @@ import {
   guestMissionStripProps,
   totalPersonasEnLista,
 } from "@/lib/guest-mission";
+import type { InvitadoMetricaFiltro } from "@/lib/invitaciones-metricas";
 import type { CanalEnvioInvitacion, Evento, Invitado } from "@/types/database";
 import Link from "next/link";
 import { ChevronDown, Loader2 } from "lucide-react";
@@ -30,11 +31,20 @@ type Props = {
   eventoId: string | null;
   initialInvitados: Invitado[];
   fromMission: boolean;
+  /** Filtro desde métricas del home (`?metrica=`). `null` = todos. */
+  metricaFiltro: InvitadoMetricaFiltro | null;
   /** Metas en `eventos` para la misión «Meta». */
   eventoMeta: Pick<Evento, "objetivo_invitaciones_enviar" | "objetivo_personas_total"> | null;
 };
 
-export function PasajerosPage({ eventoId, initialInvitados, fromMission, eventoMeta }: Props) {
+const filtroLabel: Record<InvitadoMetricaFiltro, string> = {
+  todos: "Todos",
+  confirmados: "Confirmados",
+  no_asistir: "No podrán asistir",
+  pendientes: "Pendientes",
+};
+
+export function PasajerosPage({ eventoId, initialInvitados, fromMission, metricaFiltro, eventoMeta }: Props) {
   const [rows, setRows] = useState<Invitado[]>(initialInvitados);
   const [canal, setCanal] = useState<CanalEnvioInvitacion>("ambos");
   const [canalMenuOpen, setCanalMenuOpen] = useState(false);
@@ -112,6 +122,23 @@ export function PasajerosPage({ eventoId, initialInvitados, fromMission, eventoM
             <p className={panelSectionSubtitleClass}>{PANEL_INVITADOS_SUBTITLE}</p>
           </div>
 
+          {metricaFiltro ? (
+            <div
+              className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-teal-500/25 bg-teal-500/[0.05] px-3 py-2"
+              role="status"
+            >
+              <p className="min-w-0 text-xs text-white/75">
+                Viendo: <span className="font-medium text-teal-100/95">{filtroLabel[metricaFiltro]}</span>
+              </p>
+              <Link
+                href="/panel/pasajeros?from=panel"
+                className="shrink-0 text-xs font-semibold text-teal-200/95 underline decoration-teal-500/40 underline-offset-2 hover:text-teal-100"
+              >
+                Quitar filtro
+              </Link>
+            </div>
+          ) : null}
+
           {eventoId ? (
             <PanelMissionCard
               micro={misionHint}
@@ -121,7 +148,7 @@ export function PasajerosPage({ eventoId, initialInvitados, fromMission, eventoM
                   hideMisionesLabel
                   compact
                   {...pasajerosStrip}
-                  ariaLabel="Misiones de invitados"
+                  ariaLabel="Progreso de invitados"
                 />
               }
               footer={
@@ -223,6 +250,7 @@ export function PasajerosPage({ eventoId, initialInvitados, fromMission, eventoM
           envio={envio}
           addInvitadoRef={addInvitadoRef}
           importListRef={importListRef}
+          metricaFiltro={metricaFiltro}
         />
       </div>
 

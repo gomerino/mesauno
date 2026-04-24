@@ -128,7 +128,7 @@ export function guestMissionCtaLabelFromSteps(steps: GuestMissionSteps): string 
   const next = GUEST_MISSION_ORDER.find((id) => !steps[id]);
   switch (next) {
     case undefined:
-      return "Revisar invitados";
+      return "Ver la lista";
     case "invitados_lista":
       return "Completar lista";
     case "invitados_mesas":
@@ -136,9 +136,9 @@ export function guestMissionCtaLabelFromSteps(steps: GuestMissionSteps): string 
     case "invitados_envio":
       return "Enviar invitaciones";
     case "invitados_meta":
-      return "Definir meta";
+      return "Gestionar invitados →";
     default:
-      return "Revisar invitados";
+      return "Ver la lista";
   }
 }
 
@@ -146,7 +146,7 @@ export function guestMissionDescriptionFromSteps(steps: GuestMissionSteps): stri
   const next = GUEST_MISSION_ORDER.find((id) => !steps[id]);
   switch (next) {
     case undefined:
-      return "Lista, mesas, envío y meta ✓";
+      return "Invitados y asistencia al día ✓";
     case "invitados_lista":
       return "Añade personas a tu lista";
     case "invitados_mesas":
@@ -154,9 +154,9 @@ export function guestMissionDescriptionFromSteps(steps: GuestMissionSteps): stri
     case "invitados_envio":
       return "Comparte o envía invitaciones";
     case "invitados_meta":
-      return "Ajustá la meta en tu viaje o completá la lista";
+      return "Completa tu lista y confirma asistencia";
     default:
-      return "Gestioná tu lista";
+      return "Seguí con tu lista";
   }
 }
 
@@ -166,10 +166,10 @@ export function guestMissionCtaLabel(state: GuestMissionState): string {
     case "empty":
       return "Completar lista";
     case "in_progress":
-      return "Seguir invitados";
+      return "Seguir con la lista";
     case "completed":
-      return "Revisar invitados";
+      return "Ver la lista";
     default:
-      return "Revisar invitados";
+      return "Ver la lista";
   }
 }

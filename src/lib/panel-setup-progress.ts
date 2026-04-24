@@ -1,33 +1,27 @@
 import type { Evento } from "@/types/database";
 
 /**
- * Misiones de configuración del viaje/evento (coherentes en tarjeta Viaje, % panel y CTAs).
- * Cada paso pesa 25% hacia el 100%.
+ * Misiones alineadas con las 3 pestañas del centro de viaje: Tripulación, Invitación, Experiencia.
+ * Cada paso aporta ~1/3 del 100% (34 + 33 + 33).
  */
-export type JourneyStepId =
-  | "evento_datos"
-  | "evento_ubicacion"
-  | "evento_programa"
-  | "evento_musica";
+export type JourneyStepId = "tab_tripulacion" | "tab_invitacion" | "tab_experiencia";
 
 /** @deprecated Usa `JourneyStepId`. */
 export type PanelStepId = JourneyStepId;
 
-/** Orden fijo: mismo criterio en `getJourneyProgress`, `bundle.steps` y franja de la tarjeta Viaje. */
+/** Orden fijo: coincide con las pestañas de `/panel/viaje`. */
 export const JOURNEY_STEP_ORDER: JourneyStepId[] = [
-  "evento_datos",
-  "evento_ubicacion",
-  "evento_programa",
-  "evento_musica",
+  "tab_tripulacion",
+  "tab_invitacion",
+  "tab_experiencia",
 ];
 
 const ORDER = JOURNEY_STEP_ORDER;
 
 const WEIGHT: Record<JourneyStepId, number> = {
-  evento_datos: 25,
-  evento_ubicacion: 25,
-  evento_programa: 25,
-  evento_musica: 25,
+  tab_tripulacion: 34,
+  tab_invitacion: 33,
+  tab_experiencia: 33,
 };
 
 /** Resumen de invitados (métricas; no forma parte del % de configuración del evento). */
@@ -54,14 +48,21 @@ export function isEventBasicsComplete(
   return Boolean(n1 && n2 && hasDate);
 }
 
-type EventoUbicacion = Pick<Evento, "destino" | "lugar_evento_linea" | "hora_embarque"> | null;
+type EventoUbicacion = Pick<
+  Evento,
+  "destino" | "direccion_evento_completa" | "lugar_evento_linea" | "hora_embarque"
+> | null;
 
 /**
- * Lugar o destino definido + hora de embarque (invitación coherente en tiempo y sitio).
+ * Lugar o dirección definida + hora de embarque (invitación coherente en tiempo y sitio).
  */
 export function isEventUbicacionHoraComplete(evento: EventoUbicacion): boolean {
   if (!evento) return false;
-  const lugar = Boolean(evento.destino?.trim() || evento.lugar_evento_linea?.trim());
+  const lugar = Boolean(
+    evento.direccion_evento_completa?.trim() ||
+      evento.destino?.trim() ||
+      evento.lugar_evento_linea?.trim()
+  );
   const hora = Boolean(evento.hora_embarque?.trim());
   return lugar && hora;
 }
@@ -92,17 +93,22 @@ export function getJourneyProgress(
     | "fecha_boda"
     | "fecha_evento"
     | "destino"
+    | "direccion_evento_completa"
     | "lugar_evento_linea"
     | "hora_embarque"
+    | "motivo_viaje"
   > | null,
   programaHitosCount: number,
   spotifyConnected: boolean
 ): JourneyProgress {
+  const tripulacionOk = isEventBasicsComplete(evento) && isEventUbicacionHoraComplete(evento);
+  const invitacionOk = Boolean(evento?.motivo_viaje?.trim());
+  const experienciaOk = programaHitosCount > 0 && spotifyConnected;
+
   const steps: Record<JourneyStepId, boolean> = {
-    evento_datos: isEventBasicsComplete(evento),
-    evento_ubicacion: isEventUbicacionHoraComplete(evento),
-    evento_programa: programaHitosCount > 0,
-    evento_musica: spotifyConnected,
+    tab_tripulacion: tripulacionOk,
+    tab_invitacion: invitacionOk,
+    tab_experiencia: experienciaOk,
   };
 
   let pct = 0;

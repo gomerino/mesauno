@@ -5,6 +5,7 @@ import type { JourneyMissionStep, MissionStripProps } from "@/components/panel/j
 import { ArrowRight, Lock } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import clsx from "clsx";
 
 export type JourneyCardStatus = "active" | "locked" | "completed";
 
@@ -22,10 +23,14 @@ type Props = {
   ctaLabel?: string;
   /** Pulso de atención (ej. al volver desde sub-pantalla con `focus=...`). */
   pulse?: boolean;
+  /** CTA principal: borde + brillo/teal leve permanente (misión invitados prioritaria). */
+  primaryIntent?: boolean;
   /** Callback opcional al navegar (analytics). No bloquea la navegación. */
   onNavigate?: () => void;
   /** Resumen de misiones del viaje o invitados. */
   missionStrip?: MissionStripProps;
+  /** Primera misión con trabajo pendiente: card más legible (home del panel). */
+  spotlight?: boolean;
 };
 
 export function JourneyCard({
@@ -39,8 +44,10 @@ export function JourneyCard({
   pulse,
   onNavigate,
   missionStrip,
+  spotlight = false,
+  primaryIntent = false,
 }: Props) {
-  const base = `group relative flex h-full min-h-[10.75rem] w-full flex-col overflow-hidden rounded-2xl border p-4 transition-[opacity,transform,border-color] duration-300 ease-out sm:min-h-[10.25rem] ${
+  const base = `group relative flex h-full min-h-[10.75rem] w-full min-w-0 flex-col overflow-hidden rounded-2xl border p-4 transition-[opacity,transform,border-color,box-shadow] duration-300 ease-out sm:min-h-[10.25rem] ${
     missionStrip ? "md:min-h-[15rem]" : "md:min-h-[11rem]"
   }`;
 
@@ -56,9 +63,24 @@ export function JourneyCard({
   const phaseFocus =
     "border-teal-400/40 bg-gradient-to-b from-transparent to-teal-400/5 hover:border-teal-400/55";
 
-  const surface = phaseHighlight ? `${glass} ${phaseFocus}` : `${glass} ${glow}`;
+  const spotlightActive =
+    spotlight && status !== "locked" && status !== "completed"
+      ? "border-teal-300/50 bg-gradient-to-b from-white/[0.12] to-white/[0.05] shadow-[0_0_32px_rgba(232,154,30,0.2),0_0_0_1px_rgba(255,255,255,0.1)]"
+      : "";
 
-  const hierarchy = phaseHighlight === true ? "" : "opacity-70 hover:opacity-100";
+  const surface =
+    spotlight && status !== "locked" && status !== "completed"
+      ? clsx(glass, spotlightActive)
+      : phaseHighlight
+        ? `${glass} ${phaseFocus}`
+        : `${glass} ${glow}`;
+
+  const hierarchy =
+    spotlight && status !== "locked" && status !== "completed"
+      ? "opacity-100"
+      : phaseHighlight === true
+        ? ""
+        : "opacity-70 hover:opacity-100";
 
   const pulseRing = pulse
     ? "ring-2 ring-teal-400/50 shadow-[0_0_30px_rgba(232,154,30,0.28)] animate-pulse"
@@ -111,7 +133,10 @@ export function JourneyCard({
             className={`flex h-6 w-6 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] transition-all duration-300 group-hover:translate-x-0.5 group-hover:border-white/25 group-hover:bg-white/[0.12] ${ctaTone.arrow}`}
             aria-hidden
           >
-            <ArrowRight className="h-3 w-3" strokeWidth={2.25} />
+            <ArrowRight
+              className={primaryIntent ? "h-3.5 w-3.5" : "h-3 w-3"}
+              strokeWidth={2.25}
+            />
           </span>
         </div>
         ) : null}
@@ -138,7 +163,9 @@ export function JourneyCard({
     </>
   );
 
-  const shellClass = `${base} ${surface} ${hierarchy} ${pulseRing}`.trim();
+  const primaryGlow = primaryIntent && status === "active" ? "jurnex-card-primary-intent" : "";
+
+  const shellClass = `${base} ${surface} ${hierarchy} ${pulseRing} ${primaryGlow}`.trim();
 
   if (status === "locked" || !href) {
     return <div className={shellClass}>{inner}</div>;

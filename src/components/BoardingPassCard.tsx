@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Invitado, Evento } from "@/types/database";
-import { mergeEventoParaPase, resolveDestinoParaMapa } from "@/lib/evento-boarding";
+import { addressForMapFromPass, mergeEventoParaPase } from "@/lib/evento-boarding";
 import { BoardingPassHeader } from "@/components/BoardingPassHeader";
 import { BoardingPassQR } from "@/components/BoardingPassQR";
 import { EventPlaylistSection } from "@/components/EventPlaylistSection";
@@ -12,18 +12,8 @@ import { nombresAcompanantes } from "@/lib/invitado-acompanantes";
 
 const NAVY = "#001d66";
 
-/** Ancho típico de boarding pass térmico / móvil (~82 mm a escala UI). */
-const BP_WIDTH = "min(100vw - 1.5rem, 20rem)";
-
 function isHttpUrl(s: string): boolean {
   return s.startsWith("https://") || s.startsWith("http://");
-}
-
-function airportCodeFromLine(line: string, fallback: string): string {
-  const w = line.trim().split(/\s+/)[0] ?? "";
-  const letters = w.replace(/[^a-zA-Z]/g, "").toUpperCase();
-  if (letters.length >= 3) return letters.slice(0, 3);
-  return fallback.slice(0, 3).toUpperCase();
 }
 
 type Props = {
@@ -71,18 +61,29 @@ export function BoardingPassCard({ invitado, evento, qrValue, playlists = null }
   const vuelo = ev.codigo_vuelo.trim() || "DM7726";
   const embarque = ev.hora_embarque.trim() || "17:30";
   const fecha = formatFechaDDMMMYY(ev.fecha_evento, "20 FEB 27");
-  const destinoLinea = resolveDestinoParaMapa(ev.destino);
-  const destCode = airportCodeFromLine(destinoLinea, "LOV");
-  const originCode = process.env.NEXT_PUBLIC_BOARDING_ORIGIN_CODE?.trim() || "SCL";
+  const useRouteHeader = Boolean(
+    (evento?.boarding_origen_iata?.trim() || "").length > 0 && (evento?.boarding_destino_iata?.trim() || "").length > 0
+  );
+  const addressLine = addressForMapFromPass(invitado, evento);
   const asiento = ev.asiento.trim() || "—";
   const acompanantes = nombresAcompanantes(invitado);
+  const dress = ev.dress_code?.trim() || "Elegante";
+  const linea = evento?.boarding_linea_aerea?.trim() || "DREAMS AIRLINES";
+  const sub = evento?.boarding_tagline?.trim() || "together, forever";
+  const logo = evento?.boarding_logo_url?.trim() || "/dreams-airlines-logo.png";
+  const emblema = evento?.boarding_emblema_url?.trim();
 
   return (
-    <div
-      className="mx-auto overflow-hidden rounded-sm border border-gray-300 bg-white shadow-[0_6px_24px_rgba(0,0,0,0.18)]"
-      style={{ width: BP_WIDTH, maxWidth: "20rem" }}
-    >
-      <BoardingPassHeader originCode={originCode} destCode={destCode} />
+    <div className="mx-auto w-full min-w-0 max-w-[20rem] overflow-hidden rounded-sm border border-gray-300 bg-white shadow-[0_6px_24px_rgba(0,0,0,0.18)]">
+      <BoardingPassHeader
+        originCode={useRouteHeader ? (evento?.boarding_origen_iata ?? "") : ""}
+        destCode={useRouteHeader ? (evento?.boarding_destino_iata ?? "") : ""}
+        routeDisplay={useRouteHeader ? "airports" : "branded"}
+        airlineName={linea}
+        tagline={sub}
+        logoSrc={logo}
+        emblemSrc={emblema}
+      />
 
       {/* Perforación tipo talón de aerolínea */}
       <div className="border-t-2 border-dashed border-gray-300 bg-[linear-gradient(to_bottom,#ebebeb_0%,#fafafa_100%)]" />
@@ -92,7 +93,7 @@ export function BoardingPassCard({ invitado, evento, qrValue, playlists = null }
           <span aria-hidden className="mr-0.5">
             📍
           </span>
-          {ev.lugar_evento_linea}
+          {addressLine}
         </p>
 
         {/* Pasajero */}
@@ -113,7 +114,7 @@ export function BoardingPassCard({ invitado, evento, qrValue, playlists = null }
           ))}
           <p className="mt-1.5 text-center text-[10px] font-semibold leading-snug sm:text-[11px]">
             <span className="text-gray-600">Dress code:</span>{" "}
-            <span className="text-amber-700">Elegante</span>
+            <span className="text-amber-700">{dress}</span>
           </p>
         </div>
 

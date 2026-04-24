@@ -28,8 +28,9 @@ function buildPassJson(invitado: Invitado, evento: Evento | null): Record<string
   const teamId = process.env.WALLET_TEAM_IDENTIFIER ?? "TEAMPLACEHLDR";
   const serial = invitado.id;
   const flight = ev.codigo_vuelo;
-  const dest = ev.destino;
-  const eventName = ev.nombre_evento;
+  const mapAddress = (ev.direccion_completa || "").trim();
+  const origRuta = (evento?.boarding_origen_iata || "").trim();
+  const destRuta = (evento?.boarding_destino_iata || "").trim();
   const extras = nombresAcompanantes(invitado);
 
   return {
@@ -49,17 +50,17 @@ function buildPassJson(invitado: Invitado, evento: Evento | null): Record<string
     boardingPass: {
       transitType: "PKTransitTypeAir",
       primaryFields: [
-        { key: "origin", label: "EVENTO", value: eventName },
-        { key: "destination", label: "DESTINO", value: dest },
+        { key: "origin", label: "ORIGEN", value: origRuta || "—" },
+        { key: "destination", label: "DESTINO", value: destRuta || "—" },
       ],
       secondaryFields: [
         { key: "passenger", label: "PASAJERO", value: invitado.nombre_pasajero },
         { key: "flight", label: "VUELO", value: flight },
       ],
       auxiliaryFields: [
-        { key: "gate", label: "PUERTA", value: ev.puerta },
         { key: "seat", label: "ASIENTO", value: ev.asiento },
         { key: "board", label: "EMBARQUE", value: ev.hora_embarque },
+        { key: "address", label: "MAPA", value: mapAddress || "—" },
       ],
       backFields: [
         {

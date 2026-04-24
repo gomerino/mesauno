@@ -103,6 +103,6 @@ export function resolveJourneyPhase(
 
 export const JOURNEY_PHASES_UI: { id: JourneyPhaseId; label: string; href: string }[] = [
   { id: "check-in", label: "Check-in", href: "/panel/viaje" },
-  { id: "despegue", label: "Despegue", href: "/panel/viaje/programa" },
+  { id: "despegue", label: "Despegue", href: "/panel/viaje?tab=experiencia" },
   { id: "en-vuelo", label: "En vuelo", href: "/panel/viaje" },
 ];

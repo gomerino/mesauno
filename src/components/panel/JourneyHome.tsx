@@ -1,14 +1,18 @@
 import { PanelLayout } from "@/components/panel/ds";
+import { JourneyPanelMetricsBlock } from "@/components/panel/journey/JourneyPanelMetricsBlock";
 import { JourneyViajeClient } from "@/components/panel/JourneyViajeClient";
 import { PanelInviteHero } from "@/components/panel/PanelInviteHero";
 import { PanelSlimProgress } from "@/components/panel/PanelSlimProgress";
 import { formatFechaEventoLarga } from "@/lib/format-fecha-evento";
 import { getGuestMissionSteps } from "@/lib/guest-mission";
+import { getInvitacionesRsvpResumen } from "@/lib/invitaciones-metricas";
 import { journeyHeadline, loadPanelProgressBundle } from "@/lib/panel-progress-load";
+import { panelJourneyContentWidthClass } from "@/lib/panel-section-copy";
 import { JOURNEY_STEP_ORDER } from "@/lib/panel-setup-progress";
 import { resolveJourneyPhase } from "@/lib/journey-phases";
 import { createClient } from "@/lib/supabase/server";
 import { unstable_noStore as noStore } from "next/cache";
+import { Suspense } from "react";
 
 type JourneyHomeProps = {
   focusTarget?: string | null;
@@ -38,16 +42,33 @@ export async function JourneyHome({ focusTarget = null }: JourneyHomeProps) {
   const tituloNoviosHero =
     [ev?.nombre_novio_1, ev?.nombre_novio_2].filter((n) => n?.trim()).join(" & ") || "Nuestra boda";
 
+  const metrics = getInvitacionesRsvpResumen(bundle.invitados);
+
   return (
-    <PanelLayout narrow>
+    <PanelLayout>
       {bundle.evento ? (
-        <div className="flex flex-col gap-2.5 md:gap-3">
+        <div className={`${panelJourneyContentWidthClass} flex flex-col gap-2.5 md:gap-3`}>
           <PanelInviteHero
             tituloNovios={tituloNoviosHero}
             fechaEvento={fechaEventoParaHero}
             horaEmbarque={horaEmbarqueHero}
             fechaLegible={fechaLegibleHero}
           />
+          <Suspense
+            fallback={
+              <div
+                className="h-[7.5rem] w-full animate-pulse rounded-2xl border border-white/10 bg-white/[0.03] md:h-[5.5rem]"
+                aria-hidden
+              />
+            }
+          >
+            <JourneyPanelMetricsBlock
+              totalInvitados={metrics.totalInvitados}
+              confirmadas={metrics.confirmadas}
+              noAsistire={metrics.noAsistire}
+              pendienteConfirmar={metrics.pendienteConfirmar}
+            />
+          </Suspense>
           {bundle.pct < 100 ? (
             <div className="md:hidden">
               <PanelSlimProgress
@@ -68,7 +89,7 @@ export async function JourneyHome({ focusTarget = null }: JourneyHomeProps) {
           />
         </div>
       ) : (
-        <div className="flex flex-col gap-2.5 md:gap-3">
+        <div className={`${panelJourneyContentWidthClass} flex flex-col gap-2.5 md:gap-3`}>
           <JourneyViajeClient
             evento={bundle.evento}
             phase={journeyPhase}

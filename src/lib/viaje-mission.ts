@@ -4,10 +4,16 @@ import { JOURNEY_STEP_ORDER, type JourneyStepId } from "@/lib/panel-setup-progre
 import { getJourneyPhasesProgressLines } from "@/lib/journey-cards-progress";
 
 const VIAJE_MISSION_LABELS: Record<JourneyStepId, string> = {
-  evento_datos: "Datos",
-  evento_ubicacion: "Lugar",
-  evento_programa: "Programa",
-  evento_musica: "Música",
+  tab_tripulacion: "Tripulación",
+  tab_invitacion: "Invitación",
+  tab_experiencia: "Experiencia",
+};
+
+/** Micro por bloque: qué implica completar cada pestaña del viaje. */
+const VIAJE_STEP_MICROS_PENDING: Record<JourneyStepId, string> = {
+  tab_tripulacion: "Nombres, fechas, lugar y hora",
+  tab_invitacion: "Mensaje a invitados en la invitación",
+  tab_experiencia: "Al menos un hito en el programa y Spotify conectado",
 };
 
 /** Misma lógica que la tarjeta «Viaje» en el home (`JourneyViajeClient`) y el bloque de `/panel/viaje`. */
@@ -25,17 +31,30 @@ export function getViajeMissionStripFromSteps(
       };
     }
     const state: JourneyMissionStep["state"] = i === firstIncomplete ? "active" : "pending";
-    return { id, label: VIAJE_MISSION_LABELS[id], state };
+    return {
+      id,
+      label: VIAJE_MISSION_LABELS[id],
+      state,
+      micro: VIAJE_STEP_MICROS_PENDING[id],
+    };
   });
 
   const doneCount = JOURNEY_STEP_ORDER.filter((id) => journeySteps[id]).length;
   return { steps, doneCount, totalCount: JOURNEY_STEP_ORDER.length };
 }
 
-/** Texto del micro bajo el mismo criterio que `getJourneyPhasesProgressLines` (barra del panel). */
+/**
+ * Párrafo superior de la caja de misión (bajo el título implícito).
+ * Encaja con el siguiente paso y con los micros de cada franja.
+ */
 export function getViajeMisionMicroFromBundle(bundle: PanelProgressBundle): string {
   const all = JOURNEY_STEP_ORDER.every((id) => bundle.steps[id]);
-  if (all) return "Nombres, lugar, programa y música: ficha de viaje al día.";
-  const { hint } = getJourneyPhasesProgressLines(bundle);
-  return hint ?? "Completá la ficha de tu viaje.";
+  if (all) {
+    return "Tres bloques listos. Podés seguir afinando o ir a invitar pasajeros cuando quieras.";
+  }
+  const { primary, hint } = getJourneyPhasesProgressLines(bundle);
+  if (hint) {
+    return `${primary}. ${hint}`;
+  }
+  return `${primary}. Completá en orden tripulación → invitación → experiencia.`;
 }

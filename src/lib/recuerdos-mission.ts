@@ -51,16 +51,16 @@ export function getRecuerdosFotosMissionStrip(
     ],
     doneCount: descargaHecha ? 1 : 0,
     totalCount: 1,
-    ariaLabel: "Misión: descargar recuerdos",
+    ariaLabel: "Progreso: recuerdos en Aterrizaje",
   };
 }
 
 export function recuerdosMisionCtaLabel(descargaHecha: boolean): string {
-  return descargaHecha ? "Revisar recuerdos" : "Descargar fotos";
+  return descargaHecha ? "Ver recuerdos" : "Ver recuerdos →";
 }
 
 export function recuerdosMisionDescription(descargaHecha: boolean): string {
   return descargaHecha
-    ? "Recuerdos listos: ya descargaste al menos un ZIP de fotos"
-    : "Bajá las imágenes del evento en un ZIP (todas o por momento)";
+    ? "Tus recuerdos ya están contigo"
+    : "Tus recuerdos estarán disponibles después del evento";
 }

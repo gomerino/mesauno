@@ -24,7 +24,7 @@ import {
 } from "@/lib/recuerdos-mission";
 import { Plane, Users } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import React, { useEffect, useState, type ReactNode } from "react";
 
 type EventoViaje = NonNullable<PanelProgressBundle["evento"]>;
 
@@ -35,9 +35,9 @@ type Props = {
   guestMissionSteps: GuestMissionSteps;
   /** `"invitados"` / `"pasajeros"` / `"evento"` / `"experiencia"` / `"aterrizaje"` / `"recuerdos"` (Aterrizaje). */
   focusTarget?: string | null;
-  /** Las 4 misiones de configuración del viaje completas (misma fuente que `bundle.steps`). */
+  /** Las 3 misiones de pestañas (tripulación, invitación, experiencia) completas; misma fuente que `bundle.steps`. */
   eventoComplete: boolean;
-  /** Pasos `evento_datos` … `evento_musica`; misma fuente que el % del panel. */
+  /** `tab_tripulacion` · `tab_invitacion` · `tab_experiencia`; misma fuente que el % del panel. */
   journeySteps: Record<JourneyStepId, boolean>;
 };
 
@@ -111,12 +111,12 @@ export function JourneyViajeClient({
     (id === "invitados" && focusTarget === "pasajeros") ||
     (id === "experiencia" && (focusTarget === "aterrizaje" || focusTarget === "recuerdos"));
 
-  // Viaje (franja = 4 pasos de configuración)
+  // Viaje (franja = 3 pestañas de configuración)
   const eventoDescription = eventoComplete
-    ? "Viaje configurado ✓"
-    : "Datos, lugar, programa y música";
+    ? "Todo listo para despegar"
+    : "Tripulación, invitación y experiencia";
   const eventoCardStatus = eventoComplete ? "completed" : "active";
-  const eventoCta = eventoComplete ? "Revisar viaje" : "Completar viaje";
+  const eventoCta = eventoComplete ? "Ver detalles del viaje" : "Completar viaje";
 
   // Pasajeros
   const pasajerosCardStatus = invitadosMissionDone ? "completed" : "active";
@@ -130,7 +130,7 @@ export function JourneyViajeClient({
   const recuerdosStripProps = isPaid
     ? {
         ...getRecuerdosFotosMissionStrip(recuerdosDescargaHecha),
-        ariaLabel: "Misión de recuerdos: descargar fotos",
+        ariaLabel: "Progreso de recuerdos en Aterrizaje",
       }
     : undefined;
   const experienciaDescription = isPaid
@@ -162,7 +162,7 @@ export function JourneyViajeClient({
     steps: pasajerosStrip.steps,
     doneCount: pasajerosStrip.doneCount,
     totalCount: pasajerosStrip.totalCount,
-    ariaLabel: "Misiones de invitados",
+    ariaLabel: "Progreso de invitados",
   };
 
   type CardSpec = {
@@ -210,6 +210,7 @@ export function JourneyViajeClient({
           phaseHighlight={phaseFocusPasajeros || pasajerosFocused}
           ctaLabel={pasajerosCta}
           pulse={pasajerosFocused}
+          primaryIntent={!invitadosMissionDone}
           missionStrip={pasajerosStripProps}
           onNavigate={() =>
             trackEvent("panel_mission_cta_clicked", {
@@ -252,6 +253,12 @@ export function JourneyViajeClient({
   const ordered = [...cards].sort((a, b) => phaseBase[a.key] - phaseBase[b.key]);
   const topActionable = ordered.find((c) => c.status === "empty" || c.status === "in_progress");
 
+  const spotlightFor = (key: JourneyCardKey) => {
+    if (key === "pasajeros") return !invitadosMissionDone;
+    if (!invitadosMissionDone) return false;
+    return topActionable != null && topActionable.key === key;
+  };
+
   const orderKeys = ordered.map((c) => c.key).join("|");
 
   useEffect(() => {
@@ -293,8 +300,26 @@ export function JourneyViajeClient({
             </span>
           ) : null}
         </div>
-        <div className="mt-2 grid grid-cols-1 items-stretch gap-2 sm:grid-cols-2 sm:gap-3 md:mt-4 md:gap-4">
-          {ordered.map((c) => c.node)}
+        <div className="mt-2 grid grid-cols-1 items-stretch gap-2.5 sm:gap-3 md:mt-4 md:grid-cols-3 md:gap-3">
+          {ordered.map((c) => {
+            const spotlight = spotlightFor(c.key);
+            const el = c.node;
+            if (React.isValidElement(el) && el.type === JourneyCard) {
+              return (
+                <div key={c.key} className="min-w-0">
+                  {React.cloneElement(
+                    el as React.ReactElement<{ spotlight?: boolean }>,
+                    { spotlight }
+                  )}
+                </div>
+              );
+            }
+            return (
+              <div key={c.key} className="min-w-0">
+                {el}
+              </div>
+            );
+          })}
         </div>
       </section>
     </div>

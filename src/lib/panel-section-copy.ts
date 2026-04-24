@@ -3,7 +3,7 @@
  * para que el cambio de pantalla no rompa el ritmo visual.
  */
 export const PANEL_VIAJE_TITLE = "Tu viaje";
-export const PANEL_VIAJE_SUBTITLE = "Prepara datos, invitación y experiencia.";
+export const PANEL_VIAJE_SUBTITLE = "Tripulación, invitación y experiencia en tres pasos claros.";
 
 export const PANEL_INVITADOS_TITLE = "Tus Pasajeros";
 export const PANEL_INVITADOS_SUBTITLE = "Lista, envíos y confirmaciones.";
@@ -16,6 +16,9 @@ export const PANEL_RECUERDOS_SUBTITLE =
 /** Mismo contenedor que en la ficha Viaje (sincroniza bordes y márgenes). */
 export const panelJourneyPageWrapClass = "mx-auto w-full max-w-5xl space-y-4 md:space-y-5";
 
+/** Ancho alineado a viaje/pasajeros sin forzar `space-y` (p. ej. home con hero + franjas). */
+export const panelJourneyContentWidthClass = "mx-auto w-full max-w-5xl";
+
 /** Línea fina bajo título (solo si hace falta; Viaje/Invitados sin franja fija en header). */
 export const panelSectionEyebrowClass =
   "text-[10px] font-semibold uppercase tracking-[0.22em] text-teal-400/80";
@@ -24,3 +27,6 @@ export const panelSectionEyebrowClass =
 export const panelSectionTitleClass =
   "font-display text-2xl font-bold tracking-tight text-white md:text-3xl";
 export const panelSectionSubtitleClass = "text-sm text-white/60";
+
+/** Métrica «Pendientes» = 0 (home). */
+export const PANEL_VIAJE_PENDIENTE_CERO_MICRO = "¡Todo listo para el viaje ✨";

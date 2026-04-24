@@ -6,6 +6,11 @@ function pad2(n: number) {
   return String(Math.max(0, n)).padStart(2, "0");
 }
 
+function localDayKey(ms: number): string {
+  const d = new Date(ms);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 function parseTargetMs(fechaIso: string | null, hora: string): number | null {
   if (!fechaIso) return null;
   const day = fechaIso.slice(0, 10);
@@ -70,7 +75,71 @@ export function SoftAviationCountdown({
     );
   }
 
-  const diff = Math.max(0, target - now);
+  const rawDiff = target - now;
+
+  if (variant === "jurnexPanel") {
+    const marginClass = prominent ? "mt-6" : dense ? "mt-1" : "mt-1.5";
+    const titleSizeClass = prominent
+      ? "text-base font-medium leading-snug text-white md:text-lg"
+      : dense
+        ? "text-[10px] font-medium leading-snug text-white sm:text-[11px]"
+        : "text-xs font-medium leading-snug text-white sm:text-sm";
+    const subSizeClass = prominent
+      ? "mt-1.5 text-xs text-teal-200/80 md:text-sm"
+      : dense
+        ? "mt-0.5 text-[9px] leading-relaxed text-teal-200/75 sm:text-[10px]"
+        : "mt-1 text-[10px] leading-relaxed text-teal-200/75 sm:text-[11px]";
+
+    if (rawDiff > 0) {
+      const totalSec = Math.floor(rawDiff / 1000);
+      const cd = Math.floor(totalSec / 86400);
+      const ch = Math.floor((totalSec % 86400) / 3600);
+      const cm = Math.floor((totalSec % 3600) / 60);
+      const cs = totalSec % 60;
+      return (
+        <p
+          className={`max-w-full whitespace-normal break-words font-mono tabular-nums tracking-tight text-teal-100/90 ${
+            prominent
+              ? "mt-6 text-sm md:text-base"
+              : dense
+                ? "mt-1 text-[9px] sm:text-[10px]"
+                : "mt-1.5 text-[10px] sm:text-[11px]"
+          }`}
+          aria-live="polite"
+        >
+          <span className="text-teal-200/65">Faltan</span>{" "}
+          <span className="font-semibold text-white">{pad2(cd)}</span>
+          <span className="text-teal-400/55">d</span>
+          <span className="text-white/25"> : </span>
+          <span className="font-semibold text-white">{pad2(ch)}</span>
+          <span className="text-teal-400/55">h</span>
+          <span className="text-white/25"> : </span>
+          <span className="font-semibold text-white">{pad2(cm)}</span>
+          <span className="text-teal-400/55">m</span>
+          <span className="text-white/25"> : </span>
+          <span className="font-semibold text-white">{pad2(cs)}</span>
+          <span className="text-teal-400/55">s</span>
+        </p>
+      );
+    }
+
+    if (localDayKey(now) === localDayKey(target)) {
+      return (
+        <div className={`max-w-full ${marginClass}`} aria-live="polite">
+          <p className={titleSizeClass}>Hoy es el gran día ✨</p>
+          <p className={subSizeClass}>Disfruta cada momento del viaje</p>
+        </div>
+      );
+    }
+    return (
+      <div className={`max-w-full ${marginClass}`} aria-live="polite">
+        <p className={titleSizeClass}>El viaje ya comenzó ✨</p>
+        <p className={subSizeClass}>Revisa tus recuerdos en Aterrizaje</p>
+      </div>
+    );
+  }
+
+  const diff = Math.max(0, rawDiff);
   const totalSec = Math.floor(diff / 1000);
   const d = Math.floor(totalSec / 86400);
   const h = Math.floor((totalSec % 86400) / 3600);
@@ -95,34 +164,6 @@ export function SoftAviationCountdown({
         <span className="text-[#1A2B48]/40"> : </span>
         <span className="font-semibold">{pad2(s)}</span>
         <span className="text-[#1A2B48]/45">s</span>
-      </p>
-    );
-  }
-
-  if (variant === "jurnexPanel") {
-    return (
-      <p
-        className={`max-w-full whitespace-normal break-words font-mono tabular-nums tracking-tight text-teal-100/90 ${
-          prominent
-            ? "mt-6 text-sm md:text-base"
-            : dense
-              ? "mt-1 text-[9px] sm:text-[10px]"
-              : "mt-1.5 text-[10px] sm:text-[11px]"
-        }`}
-        aria-live="polite"
-      >
-        <span className="text-teal-200/65">Faltan</span>{" "}
-        <span className="font-semibold text-white">{pad2(d)}</span>
-        <span className="text-teal-400/55">d</span>
-        <span className="text-white/25"> : </span>
-        <span className="font-semibold text-white">{pad2(h)}</span>
-        <span className="text-teal-400/55">h</span>
-        <span className="text-white/25"> : </span>
-        <span className="font-semibold text-white">{pad2(m)}</span>
-        <span className="text-teal-400/55">m</span>
-        <span className="text-white/25"> : </span>
-        <span className="font-semibold text-white">{pad2(s)}</span>
-        <span className="text-teal-400/55">s</span>
       </p>
     );
   }

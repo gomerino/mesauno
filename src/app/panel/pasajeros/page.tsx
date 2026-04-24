@@ -7,6 +7,7 @@ import { panelJourneyPageWrapClass } from "@/lib/panel-section-copy";
 import { fetchInvitadosPanelRowsWithAcompanantes } from "@/lib/panel-invitados";
 import { resolveJourneyPhase } from "@/lib/journey-phases";
 import { loadPanelProgressBundle } from "@/lib/panel-progress-load";
+import { parseMetricaFiltroFromSearch } from "@/lib/invitado-metrica-url";
 import type { Invitado } from "@/types/database";
 
 export const dynamic = "force-dynamic";
@@ -39,6 +40,10 @@ export default async function PanelInvitadosPage({
   const fromMission =
     fromMissionRaw === "mission" ||
     (Array.isArray(fromMissionRaw) && fromMissionRaw.includes("mission"));
+  const metricaRaw = searchParams?.metrica;
+  const metricaFiltro = parseMetricaFiltroFromSearch(
+    typeof metricaRaw === "string" ? metricaRaw : Array.isArray(metricaRaw) ? metricaRaw[0] : undefined
+  );
   const journeyPhase = resolveJourneyPhase(evento?.fecha_boda, evento?.fecha_evento);
   const planStatus = evento?.plan_status ?? null;
   const hasAccess = planStatus === "paid";
@@ -104,6 +109,7 @@ export default async function PanelInvitadosPage({
             eventoId={evento?.id ?? null}
             initialInvitados={invitados}
             fromMission={fromMission}
+            metricaFiltro={metricaFiltro}
             eventoMeta={
               evento
                 ? {

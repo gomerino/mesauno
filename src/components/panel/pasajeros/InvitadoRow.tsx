@@ -3,6 +3,7 @@
 import type { CanalEnvioInvitacion, Invitado } from "@/types/database";
 import { deriveEstadoEnvio } from "@/lib/invitado-estado-envio";
 import { nombresAcompanantes } from "@/lib/invitado-acompanantes";
+import { hasCompletedRsvp, isAsistenciaRespuestaCerrada } from "@/lib/rsvp-ui-state";
 import { Loader2, Mail, MessageCircle, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -19,8 +20,77 @@ function estadoBadge(estado: ReturnType<typeof deriveEstadoEnvio>, compact?: boo
   const m = map[estado];
   const size = compact ? "px-1.5 py-0 text-[10px] ring-1" : "px-2 py-0.5 text-[11px] font-medium ring-1";
   return (
-    <span className={`inline-flex items-center rounded-full ${size} ${m.className}`}>{m.label}</span>
+    <span className={`inline-flex max-w-full items-center rounded-full ${size} ${m.className}`}>{m.label}</span>
   );
+}
+
+/** Segunda pastilla: respuesta a la asistencia (independiente del flujo de envío). */
+function rsvpAsistenciaBadge(row: Pick<Invitado, "rsvp_estado" | "asistencia_confirmada">, compact?: boolean) {
+  const size = compact ? "px-1.5 py-0 text-[9px] ring-1" : "px-2 py-0.5 text-[10px] font-medium ring-1";
+  if (row.rsvp_estado === "declinado") {
+    return (
+      <span
+        className={`inline-flex max-w-full items-center rounded-full ${size} bg-rose-500/25 text-rose-100/95 ring-rose-400/30`}
+        title="No asistirá (RSVP)"
+      >
+        {compact ? "No" : "No asistiré"}
+      </span>
+    );
+  }
+  if (row.rsvp_estado === "confirmado" || row.asistencia_confirmada) {
+    return (
+      <span
+        className={`inline-flex max-w-full items-center rounded-full ${size} bg-emerald-500/20 text-emerald-100 ring-emerald-400/30`}
+        title="Confirmó asistencia (RSVP)"
+      >
+        {compact ? "Sí" : "Sí, asistiré"}
+      </span>
+    );
+  }
+  if (!hasCompletedRsvp(row.rsvp_estado)) {
+    return (
+      <span
+        className={`inline-flex max-w-full items-center rounded-full ${size} bg-white/[0.08] text-white/60 ring-white/10`}
+        title="Sin respuesta o pendiente (RSVP)"
+      >
+        {compact ? "Asist.?" : "Asist. pend."}
+      </span>
+    );
+  }
+  return null;
+}
+
+type EstadoEnv = ReturnType<typeof deriveEstadoEnvio>;
+
+/** Un solo foco: si asist. cerrada, solo RSVP; si envío aún no sale, no sumamos “Asist. pend.”. */
+function InvitadoEstadoCelda({
+  row,
+  estado,
+  compact,
+  align = "end",
+}: {
+  row: Invitado;
+  estado: EstadoEnv;
+  compact: boolean;
+  align?: "end" | "center";
+}) {
+  if (isAsistenciaRespuestaCerrada(row)) {
+    return rsvpAsistenciaBadge(row, compact);
+  }
+  if (estado === "pendiente") {
+    return estadoBadge(estado, compact);
+  }
+  const pack = (
+    <div
+      className={
+        align === "end" ? "flex flex-col items-end gap-0.5" : "flex flex-col items-center gap-0.5"
+      }
+    >
+      {estadoBadge(estado, compact)}
+      {rsvpAsistenciaBadge(row, compact)}
+    </div>
+  );
+  return pack;
 }
 
 function CanalIcons({ canal, compact }: { canal: CanalEnvioInvitacion; compact?: boolean }) {
@@ -87,7 +157,9 @@ export function InvitadoRow({
               <p className="truncate text-[10px] leading-tight text-white/35">+{acompanantes.length} en la invitación</p>
             ) : null}
           </div>
-          <div className="shrink-0">{estadoBadge(estado, true)}</div>
+          <div className="flex shrink-0 flex-col items-end gap-0.5" title="Invitación / RSVP">
+            <InvitadoEstadoCelda row={row} estado={estado} compact align="end" />
+          </div>
           <div className="shrink-0" title="Canal">
             <CanalIcons canal={canalMostrado} compact />
           </div>
@@ -185,7 +257,9 @@ export function InvitadoRow({
         <div className="flex items-center truncate py-2 text-sm text-white/70" title={row.telefono ?? undefined}>
           {row.telefono ?? "—"}
         </div>
-        <div className="flex items-center justify-center py-2">{estadoBadge(estado)}</div>
+        <div className="flex flex-col items-center justify-center py-2" title="Invitación / RSVP de asistencia">
+          <InvitadoEstadoCelda row={row} estado={estado} compact={false} align="center" />
+        </div>
         <div className="flex items-center justify-center py-2">
           <CanalIcons canal={canalMostrado} />
         </div>

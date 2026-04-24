@@ -9,6 +9,8 @@ export type JourneyMissionStep = {
   /** Etiqueta corta (una palabra ideal). */
   label: string;
   state: JourneyMissionStepState;
+  /** Línea breve bajo la etiqueta: qué falta o «Listo». */
+  micro?: string;
 };
 
 export type MissionStripProps = {

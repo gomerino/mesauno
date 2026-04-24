@@ -1,14 +1,12 @@
 import { BoardingPassHeader } from "@/components/BoardingPassHeader";
 import type { MergedEventoParaPase } from "@/lib/evento-boarding";
-import { resolveDestinoParaMapa } from "@/lib/evento-boarding";
+import { addressForMapFromPass } from "@/lib/evento-boarding";
 import { formatFechaDDMMMYY } from "@/lib/format-fecha-evento";
-import { guestSeatLines, inferGuestGrupo } from "@/lib/guest-boarding-meta";
+import { guestSeatLines, guestSeatRaw, inferGuestGrupo } from "@/lib/guest-boarding-meta";
 import { nombresAcompanantes } from "@/lib/invitado-acompanantes";
 import type { Evento, EventoProgramaHito, Invitado } from "@/types/database";
 import { MapPin, Navigation } from "lucide-react";
 import type { ReactNode } from "react";
-
-const BP_WIDTH = "min(100vw - 1.5rem, 20rem)";
 
 function formatHoraEmbarqueCell(hora: string | null | undefined) {
   const raw = String(hora ?? "")
@@ -102,49 +100,60 @@ export function SoftAviationTicket({
   dressCodeLabel = "Elegante",
   isEventDay = false,
 }: Props) {
-  const address = resolveDestinoParaMapa(merged.destino);
-  const wazeUrl = `https://waze.com/ul?q=${encodeURIComponent(address)}&navigate=yes`;
+  const addressForNav = addressForMapFromPass(invitado, evento);
+  const wazeUrl = `https://waze.com/ul?q=${encodeURIComponent(addressForNav)}&navigate=yes`;
+  const dressEffective = merged.dress_code?.trim() || dressCodeLabel;
 
   const vuelo = merged.codigo_vuelo.trim() || "DM7726";
   const embarquePrograma = horaInicioDesdePrograma(programaHitos);
   const embarque = formatHoraEmbarqueCell(embarquePrograma ?? merged.hora_embarque ?? "");
   const fecha = formatFechaDDMMMYY(merged.fecha_evento, "— — —");
+  const seatRaw = guestSeatRaw(invitado, evento);
   const seatLines = guestSeatLines(invitado, evento);
-  const seatRaw = seatLines.join("\n");
-  const grupo = inferGuestGrupo(seatRaw);
-  const destinoDisplay =
-    seatLines.length > 0 ? (
-      <span className="whitespace-normal break-words text-[9px] font-semibold leading-[1.3] text-invite-navy sm:text-[10px]">
-        {seatLines.map((line, i) => (
-          <span key={`${i}-${line}`}>
-            {i > 0 ? <br /> : null}
-            {line}
-          </span>
-        ))}
-      </span>
-    ) : (
-      <span className="text-[9px] font-medium leading-[1.3] text-invite-navy/65 sm:text-[10px]">
-        Por asignar <span aria-hidden>✈️</span>
-      </span>
-    );
+  /** En el detalle del pase, «DESTINO» = asiento (defecto evento o fila del invitado). */
+  const destinoDetalle = seatLines.length > 0 ? (
+    <span className="whitespace-normal break-words text-[8px] font-semibold leading-[1.3] text-invite-navy sm:text-[9px]">
+      {seatLines.map((line, i) => (
+        <span key={`${i}-${line}`}>
+          {i > 0 ? <br /> : null}
+          {line}
+        </span>
+      ))}
+    </span>
+  ) : (
+    <span className="text-[9px] font-medium leading-[1.3] text-invite-navy/65 sm:text-[10px]">
+      Por asignar <span aria-hidden>✈️</span>
+    </span>
+  );
 
   const acompanantes = nombresAcompanantes(invitado);
-  const lugarNombre = merged.lugar_evento_linea.trim();
-  const showAddressLine = address.trim() && address.trim() !== lugarNombre;
+  const grupoLabel =
+    evento?.grupo_embarque_default?.trim() ||
+    (() => {
+      const raw = guestSeatRaw(invitado, evento);
+      return inferGuestGrupo(raw);
+    })();
+
+  const useRouteHeader = Boolean(
+    (evento?.boarding_origen_iata?.trim() || "").length > 0 && (evento?.boarding_destino_iata?.trim() || "").length > 0
+  );
+  const headerLinea = evento?.boarding_linea_aerea?.trim() || "DREAMS AIRLINES";
+  const headerTag = evento?.boarding_tagline?.trim() || "together, forever";
+  const headerLogo = evento?.boarding_logo_url?.trim() || "/dreams-airlines-logo.png";
+  const headerEmblem = evento?.boarding_emblema_url?.trim() || undefined;
   return (
-    <section className="mx-auto flex w-full max-w-md flex-col items-center px-0 text-invite-navy">
-      <div
-        className="animate-ticketPrintIn mx-auto w-full overflow-hidden rounded-sm border border-invite-navy/20 bg-white shadow-[0_6px_24px_rgba(0,0,0,0.18)]"
-        style={{ maxWidth: "20rem", width: BP_WIDTH }}
-      >
+    <section className="mx-auto flex w-full min-w-0 max-w-[20.5rem] flex-col items-stretch px-0 text-invite-navy">
+      <div className="animate-ticketPrintIn mx-auto w-full min-w-0 max-w-[20rem] overflow-hidden rounded-sm border border-invite-navy/20 bg-white shadow-[0_6px_24px_rgba(0,0,0,0.18)]">
         {/* Marca aerolínea */}
         <BoardingPassHeader
-          originCode="SCL"
-          destCode="DAY"
+          originCode={useRouteHeader ? (evento?.boarding_origen_iata ?? "") : ""}
+          destCode={useRouteHeader ? (evento?.boarding_destino_iata ?? "") : ""}
           palette="invite"
-          routeDisplay="branded"
-          airlineName="DREAMS AIRLINES"
-          tagline="Together, forever"
+          routeDisplay={useRouteHeader ? "airports" : "branded"}
+          airlineName={headerLinea}
+          tagline={headerTag}
+          logoSrc={headerLogo}
+          emblemSrc={headerEmblem}
         />
 
         {/* Zona 1 — contexto + pasajeros (datos dinámicos desde invitado / acompañantes) */}
@@ -170,7 +179,7 @@ export function SoftAviationTicket({
 
           <p className="mb-1 text-center text-[10px] font-medium leading-snug text-invite-navy/70 sm:mb-2 sm:text-[11px]">
             <span className="text-invite-navy/55">Dress code:</span>{" "}
-            <span className="font-semibold text-invite-gold">{dressCodeLabel}</span>
+            <span className="font-semibold text-invite-gold">{dressEffective}</span>
           </p>
         </div>
 
@@ -190,11 +199,11 @@ export function SoftAviationTicket({
             <DashCell label="Fecha" value={fecha} mono nowrap />
             <DashCell label="DESTINO" labelClassName="tracking-tighter">
               <div className="flex max-h-[4rem] min-h-[2.25rem] w-full items-center justify-center overflow-y-auto px-0.5 py-1.5 text-center">
-                {destinoDisplay}
+                {destinoDetalle}
               </div>
             </DashCell>
             <DashCell label="GRUPO" nowrap>
-              <p className="w-full break-words text-[8px] font-semibold leading-tight text-invite-navy/75 sm:text-[9px]">{grupo}</p>
+              <p className="w-full break-words text-[8px] font-semibold leading-tight text-invite-navy/75 sm:text-[9px]">{grupoLabel}</p>
             </DashCell>
           </div>
         </div>
@@ -206,13 +215,7 @@ export function SoftAviationTicket({
             <span aria-hidden className="mr-0.5">
               📍
             </span>
-            {lugarNombre}
-            {showAddressLine ? (
-              <>
-                <span className="text-invite-navy/35"> · </span>
-                <span className="font-medium text-invite-navy/80">{address}</span>
-              </>
-            ) : null}
+            {addressForNav}
           </p>
           <p className="mt-2 text-center text-[10px] text-invite-navy/50">Llega 15 min antes</p>
 

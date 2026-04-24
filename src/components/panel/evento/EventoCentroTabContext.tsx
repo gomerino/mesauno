@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 
-export type EventoCentroTabId = "datos" | "invitacion" | "experiencia";
+export type EventoCentroTabId = "tripulacion" | "invitacion" | "experiencia";
 
 type Ctx = {
   tab: EventoCentroTabId;
@@ -13,7 +13,7 @@ const EventoCentroTabContext = createContext<Ctx | null>(null);
 
 export function EventoCentroTabProvider({
   children,
-  initialTab = "datos",
+  initialTab = "tripulacion",
 }: {
   children: ReactNode;
   initialTab?: EventoCentroTabId;

@@ -1,4 +1,4 @@
-import { EventoCentroTabProvider } from "@/components/panel/evento/EventoCentroTabContext";
+import { EventoCentroTabProvider, type EventoCentroTabId } from "@/components/panel/evento/EventoCentroTabContext";
 import { EventoConfigCompleteNote, EventoConfigPrimaryCta } from "@/components/panel/evento/EventoConfigPrimaryCta";
 import { EventoMobileStickyCta } from "@/components/panel/evento/EventoMobileStickyCta";
 import { EventoTabs } from "@/components/panel/evento/EventoTabs";
@@ -21,7 +21,21 @@ import { getViajeMisionMicroFromBundle } from "@/lib/viaje-mission";
 import { loadPanelProgressBundle } from "@/lib/panel-progress-load";
 import { spotifyGetPanelPublicState } from "@/lib/spotify-credentials";
 import { createClient, createStrictServiceClient } from "@/lib/supabase/server";
-import type { ConfiguracionInvitacionEvento, Evento } from "@/types/database";
+import type { ConfiguracionInvitacionEvento, Evento, EventoProgramaHito } from "@/types/database";
+import type { MiembroEquipoRow } from "@/components/panel/EventoTripulacionCabinaSection";
+
+function parseEquipoList(data: unknown): MiembroEquipoRow[] {
+  if (Array.isArray(data)) return data as MiembroEquipoRow[];
+  if (typeof data === "string") {
+    try {
+      const p = JSON.parse(data) as unknown;
+      return Array.isArray(p) ? (p as MiembroEquipoRow[]) : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
 
 function pickWelcome(raw: Record<string, string | string[] | undefined> | undefined): boolean {
   if (!raw) return false;
@@ -30,12 +44,21 @@ function pickWelcome(raw: Record<string, string | string[] | undefined> | undefi
   return s === "1" || s === "true";
 }
 
+function pickCentroTab(raw: Record<string, string | string[] | undefined> | undefined): EventoCentroTabId {
+  const t = raw?.tab;
+  const s = typeof t === "string" ? t : Array.isArray(t) ? t[0] : undefined;
+  if (s === "datos") return "tripulacion";
+  if (s === "tripulacion" || s === "invitacion" || s === "experiencia") return s;
+  return "tripulacion";
+}
+
 export default async function PanelViajePage({
   searchParams,
 }: {
   searchParams: Record<string, string | string[] | undefined>;
 }) {
   const showWelcomeBanner = pickWelcome(searchParams);
+  const initialCentroTab = pickCentroTab(searchParams);
 
   const supabase = await createClient();
   const {
@@ -68,6 +91,10 @@ export default async function PanelViajePage({
   const eventoId = eventoForProgress?.id ?? null;
 
   let configuracionInvitacion: ConfiguracionInvitacionEvento | null = null;
+  let equipoMiembros: MiembroEquipoRow[] = [];
+  let programaHitos: EventoProgramaHito[] = [];
+  let programaHitosError: string | null = null;
+  let programaHitosTableMissing = false;
   if (eventoId) {
     const { data: cfgInv } = await supabase
       .from("configuracion_invitacion_evento")
@@ -75,6 +102,29 @@ export default async function PanelViajePage({
       .eq("evento_id", eventoId)
       .maybeSingle();
     configuracionInvitacion = (cfgInv ?? null) as ConfiguracionInvitacionEvento | null;
+
+    const { data: rawEquipo, error: equipoErr } = await supabase.rpc("evento_equipo_list", {
+      p_evento_id: eventoId,
+    });
+    if (!equipoErr) {
+      equipoMiembros = parseEquipoList(rawEquipo);
+    }
+
+    const { data: rawPrograma, error: programaErr } = await supabase
+      .from("evento_programa_hitos")
+      .select("*")
+      .eq("evento_id", eventoId)
+      .order("orden", { ascending: true })
+      .order("hora", { ascending: true });
+    programaHitos = (rawPrograma ?? []) as EventoProgramaHito[];
+    if (programaErr) {
+      programaHitosError = programaErr.message;
+      programaHitosTableMissing = Boolean(
+        programaErr?.message?.toLowerCase().includes("does not exist") ||
+        programaErr?.message?.includes("evento_programa_hitos") ||
+        programaErr?.code === "42P01"
+      );
+    }
   }
 
   const strictDb = await createStrictServiceClient();
@@ -129,7 +179,7 @@ export default async function PanelViajePage({
           </div>
         ) : null}
 
-        <EventoCentroTabProvider>
+        <EventoCentroTabProvider initialTab={initialCentroTab}>
           <div className={`space-y-4 md:space-y-5 ${mainBottomPad}`}>
             <header className="space-y-1">
               <h1 className={panelSectionTitleClass}>{PANEL_VIAJE_TITLE}</h1>
@@ -157,13 +207,24 @@ export default async function PanelViajePage({
               </p>
             ) : null}
 
-            <EventoTabs />
+            <EventoTabs
+              tabCompletion={{
+                tripulacion: bundle.steps.tab_tripulacion,
+                invitacion: bundle.steps.tab_invitacion,
+                experiencia: bundle.steps.tab_experiencia,
+              }}
+            />
 
             <div className="scroll-mt-20 pt-0.5" id="musica-spotify">
               <EventoForm
                 initial={(evento ?? null) as Evento | null}
                 programaHitosCount={bundle.programaHitosCount}
+                programaHitos={programaHitos}
+                programaHitosError={programaHitosError}
+                programaHitosTableMissing={programaHitosTableMissing}
                 configuracionInvitacion={configuracionInvitacion}
+                equipoMiembros={equipoMiembros}
+                isEventoAdmin={isAdmin}
                 spotify={
                   hasAccess && isAdmin && eventoId
                     ? {

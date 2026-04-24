@@ -6,12 +6,14 @@ import { InvitadosGrupo } from "@/components/panel/pasajeros/InvitadosGrupo";
 import { useEnvioInvitaciones } from "@/hooks/useEnvioInvitaciones";
 import { groupInvitadosByMesa } from "@/lib/invitados-group-by-mesa";
 import { sortInvitadoAcompanantes } from "@/lib/invitado-acompanantes";
+import { invitadoPasaFiltroMetrica, type InvitadoMetricaFiltro } from "@/lib/invitaciones-metricas";
 import { restriccionesFromDb, restriccionesToDb } from "@/lib/restricciones-alimenticias";
 import { supabaseErrorMessage } from "@/lib/supabase-error";
 import { trackEvent } from "@/lib/analytics";
 import { createClient } from "@/lib/supabase/client";
 import type { CanalEnvioInvitacion, Invitado } from "@/types/database";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
@@ -89,6 +91,8 @@ export type InvitadosManagerProps = {
   envio: ReturnType<typeof useEnvioInvitaciones>;
   addInvitadoRef?: MutableRefObject<(() => void) | null>;
   importListRef?: MutableRefObject<(() => void) | null>;
+  /** Vista filtrada desde el home; operaciones usan `rows` completo. */
+  metricaFiltro?: InvitadoMetricaFiltro | null;
 };
 
 function computeDefaultOpenMesaKey(mesas: { key: string }[]): string | null {
@@ -105,6 +109,7 @@ export function InvitadosManager({
   envio,
   addInvitadoRef,
   importListRef,
+  metricaFiltro = null,
 }: InvitadosManagerProps) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
@@ -316,6 +321,11 @@ export function InvitadosManager({
     refreshList();
   }
 
+  const displayRows = useMemo(
+    () => rows.filter((r) => invitadoPasaFiltroMetrica(r, metricaFiltro)),
+    [rows, metricaFiltro]
+  );
+
   const handleDelete = useCallback(
     async (id: string) => {
       if (!confirm("¿Eliminar este invitado?")) return;
@@ -335,14 +345,18 @@ export function InvitadosManager({
     [supabase, setRows]
   );
 
-  const mesasAgrupadas = useMemo(() => groupInvitadosByMesa(rows), [rows]);
+  const mesasAgrupadas = useMemo(() => groupInvitadosByMesa(displayRows), [displayRows]);
   const defaultOpenMesaKey = useMemo(
     () => computeDefaultOpenMesaKey(mesasAgrupadas),
     [mesasAgrupadas]
   );
 
   const [openMesaKey, setOpenMesaKey] = useState<string | null>(() =>
-    computeDefaultOpenMesaKey(groupInvitadosByMesa(initialInvitados))
+    computeDefaultOpenMesaKey(
+      groupInvitadosByMesa(
+        initialInvitados.filter((r) => invitadoPasaFiltroMetrica(r, metricaFiltro))
+      )
+    )
   );
 
   useEffect(() => {
@@ -385,6 +399,17 @@ export function InvitadosManager({
             <p className="mt-2 text-sm text-white/45">
               Usá «Añadir invitado» o «Importar lista» arriba para comenzar.
             </p>
+          </div>
+        ) : displayRows.length === 0 ? (
+          <div className="px-2 py-10 text-center sm:px-4">
+            <p className="font-display text-sm font-medium text-white/70">Sin resultados con este filtro</p>
+            <p className="mt-2 text-sm text-white/45">Probá otra categoría o mostrá la lista completa.</p>
+            <Link
+              href="/panel/pasajeros?from=panel"
+              className="mt-3 inline-block text-sm font-medium text-teal-300/90 underline decoration-teal-500/40 underline-offset-2 hover:text-teal-200"
+            >
+              Ver todos los invitados
+            </Link>
           </div>
         ) : (
           <div className="space-y-4 px-1 pb-2 pt-0.5 sm:space-y-5 sm:px-2 sm:pt-1">

@@ -1,5 +1,7 @@
 # AGENTS.md — Jurnex
 
+**Idioma (agente y colaboración):** español **LATAM neutro (tuteo)** — regla 1 y `.cursor/rules/idioma-latam-neutro.mdc`.
+
 Este archivo es el **bootstrap** para cualquier agente (Cursor, Claude Code, Codex CLI, humano onboarding) que abra este repo.
 
 ## Qué es Jurnex
