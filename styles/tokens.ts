@@ -1,7 +1,7 @@
 /**
- * Jurnex UI — design tokens (única fuente de verdad para color/radio).
- * Alineado al arte de marca: navy invernal (#03182F) + oro/ámbar cálido (mismo eje cromático que el logotipo).
- * Las utilidades `teal-*` de Tailwind apuntan a esta rampa (ver `tailwind.config.ts`).
+ * Jurnex UI — design tokens (color/radio del panel y superficies oscuras).
+ * Croma de invitación pública (papel, aviación) en `src/lib/brand-palette.ts` (import en `tailwind.config.ts`).
+ * Las utilidades `teal-*` de Tailwind = oro de marca (ver `tailwind.config.ts`).
  */
 export const tokens = {
   colors: {

@@ -1,3 +1,4 @@
+import { eventoTienePlanExperienciaProducto } from "@/lib/evento-plan-access";
 import type { Evento } from "@/types/database";
 
 export type EventoNextStep = {
@@ -14,11 +15,10 @@ export function resolveEventoNextStep(params: {
   evento: Evento | null;
   invitadosCount: number;
   programaHitosCount: number;
-  hasAccess: boolean;
   isAdmin: boolean;
   spotifyConnected: boolean;
 }): EventoNextStep {
-  const { evento, invitadosCount, programaHitosCount, hasAccess, isAdmin, spotifyConnected } = params;
+  const { evento, invitadosCount, programaHitosCount, isAdmin, spotifyConnected } = params;
 
   if (invitadosCount === 0) {
     return {
@@ -44,7 +44,7 @@ export function resolveEventoNextStep(params: {
     };
   }
 
-  if (hasAccess && isAdmin && !spotifyConnected) {
+  if (isAdmin && eventoTienePlanExperienciaProducto(evento) && !spotifyConnected) {
     return {
       description: "Conecta música colaborativa y ajusta cómo vive la experiencia tu tripulación.",
       action: "Definir experiencia",

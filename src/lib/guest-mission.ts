@@ -1,6 +1,7 @@
 import type { JourneyMissionStep } from "@/components/panel/journey/journey-mission-types";
 import { deriveEstadoEnvio } from "@/lib/invitado-estado-envio";
-import type { Evento, Invitado } from "@/types/database";
+import { deriveEstadoListaInvitado } from "@/lib/panel-invitado-estado-lista";
+import type { Invitado } from "@/types/database";
 
 /** Pasos de la misión Invitados (franja de la tarjeta y página Pasajeros). */
 export type GuestMissionStepId =
@@ -11,8 +12,8 @@ export type GuestMissionStepId =
 
 export const GUEST_MISSION_ORDER: GuestMissionStepId[] = [
   "invitados_lista",
-  "invitados_mesas",
   "invitados_envio",
+  "invitados_mesas",
   "invitados_meta",
 ];
 
@@ -20,7 +21,8 @@ export const GUEST_MISSION_LABELS: Record<GuestMissionStepId, string> = {
   invitados_lista: "Lista",
   invitados_mesas: "Mesas",
   invitados_envio: "Envío",
-  invitados_meta: "Meta",
+  /** Todos respondieron sí o no a la invitación (sin RSVP pendiente). */
+  invitados_meta: "Respuestas",
 };
 
 /** Personas por fila: titular + acompañantes (tabla o legado). */
@@ -52,22 +54,12 @@ function misionPasoEnvioCumplido(invitados: Invitado[]): boolean {
 }
 
 /**
- * Meta de cupo: si no hay objetivos (>0), el paso cuenta como hecho.
- * Si hay objetivo de invitaciones o personas, debe cumplirse frente a la lista actual.
+ * Paso «Respuestas»: cada invitado ya respondió la invitación (asistencia confirmada o declinada).
+ * Quienes siguen en «Pendiente» en la lista impiden completar el paso.
  */
-export function isGuestMetaStepComplete(
-  evento: Pick<Evento, "objetivo_invitaciones_enviar" | "objetivo_personas_total"> | null,
-  invitados: Pick<Invitado, "invitado_acompanantes" | "nombre_acompanante">[]
-): boolean {
-  const oInv = evento?.objetivo_invitaciones_enviar ?? null;
-  const oPer = evento?.objetivo_personas_total ?? null;
-  const tieneInv = oInv != null && oInv > 0;
-  const tienePer = oPer != null && oPer > 0;
-  if (!tieneInv && !tienePer) return true;
-  let ok = true;
-  if (tieneInv) ok = ok && invitados.length >= (oInv as number);
-  if (tienePer) ok = ok && totalPersonasEnLista(invitados) >= (oPer as number);
-  return ok;
+export function isGuestMetaStepComplete(invitados: Invitado[]): boolean {
+  if (invitados.length === 0) return false;
+  return invitados.every((row) => deriveEstadoListaInvitado(row) !== "pendiente");
 }
 
 export type GuestMissionSteps = Record<GuestMissionStepId, boolean>;
@@ -90,14 +82,11 @@ export function guestMissionStripProps(steps: GuestMissionSteps): {
   return { steps: journeySteps, doneCount, totalCount: GUEST_MISSION_ORDER.length };
 }
 
-export function getGuestMissionSteps(
-  invitados: Invitado[],
-  evento: Pick<Evento, "objetivo_invitaciones_enviar" | "objetivo_personas_total"> | null
-): GuestMissionSteps {
+export function getGuestMissionSteps(invitados: Invitado[]): GuestMissionSteps {
   const lista = invitados.length >= 1;
   const mesas = lista && tieneMesaAsignada(invitados);
   const envio = lista && misionPasoEnvioCumplido(invitados);
-  const meta = lista && isGuestMetaStepComplete(evento, invitados);
+  const meta = lista && isGuestMetaStepComplete(invitados);
   return {
     invitados_lista: lista,
     invitados_mesas: mesas,
@@ -117,11 +106,8 @@ export function guestMissionAggregateState(steps: GuestMissionSteps): GuestMissi
 }
 
 /** Compat: estado único usado antes del strip de 4 pasos. */
-export function resolveGuestMissionState(
-  invitados: Invitado[],
-  evento: Pick<Evento, "objetivo_invitaciones_enviar" | "objetivo_personas_total"> | null
-): GuestMissionState {
-  return guestMissionAggregateState(getGuestMissionSteps(invitados, evento));
+export function resolveGuestMissionState(invitados: Invitado[]): GuestMissionState {
+  return guestMissionAggregateState(getGuestMissionSteps(invitados));
 }
 
 export function guestMissionCtaLabelFromSteps(steps: GuestMissionSteps): string {
@@ -136,7 +122,7 @@ export function guestMissionCtaLabelFromSteps(steps: GuestMissionSteps): string 
     case "invitados_envio":
       return "Enviar invitaciones";
     case "invitados_meta":
-      return "Gestionar invitados →";
+      return "Ver respuestas →";
     default:
       return "Ver la lista";
   }
@@ -154,7 +140,7 @@ export function guestMissionDescriptionFromSteps(steps: GuestMissionSteps): stri
     case "invitados_envio":
       return "Comparte o envía invitaciones";
     case "invitados_meta":
-      return "Completa tu lista y confirma asistencia";
+      return "Que todos respondan si asisten o no";
     default:
       return "Seguí con tu lista";
   }

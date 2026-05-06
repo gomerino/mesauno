@@ -1,3 +1,4 @@
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import Link from "next/link";
 import type { PanelStepId } from "@/lib/panel-setup-progress";
 
@@ -77,11 +78,11 @@ export function PanelSetupSection({ pct, rows, hideIntroOnMobile = false }: Prop
               </div>
               <Link
                 href={row.href}
-                className={`inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold sm:min-h-0 ${
+                className={
                   row.done
-                    ? "border border-white/15 bg-transparent text-slate-200 hover:bg-white/5"
-                    : "bg-teal-500 text-white hover:bg-teal-400"
-                }`}
+                    ? "inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full border border-white/15 bg-transparent px-4 py-2.5 text-sm font-semibold text-slate-200 hover:bg-white/5 sm:min-h-0"
+                    : [panelCtaJurnexPrimary, "min-h-[44px] shrink-0 justify-center px-4 py-2.5 sm:min-h-0"].join(" ")
+                }
               >
                 {row.ctaLabel}
               </Link>

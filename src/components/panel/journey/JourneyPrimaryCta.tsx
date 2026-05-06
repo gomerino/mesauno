@@ -1,25 +1,31 @@
 "use client";
 
+import { panelCtaJurnexJourneyPillLayout, panelCtaJurnexPrimary } from "@/components/panel/ds";
 import { JourneyUnlockCheckout } from "@/components/panel/journey/JourneyUnlockCheckout";
+import { pasajerosVozJurnex } from "@/lib/pasajeros-voz-jurnex";
 import type { JourneyPhaseId } from "@/lib/journey-phases";
+import { planProductoNormalizado } from "@/lib/evento-plan-access";
+import type { CanalEnvioInvitacion, Evento } from "@/types/database";
 import Link from "next/link";
 
 export type JourneyPrimaryCtaProps = {
   invitados_count: number;
-  plan_status: string | null | undefined;
+  /** Plan de producto (`eventos.plan`): esencial desbloquea envíos; experiencia el resto. */
+  plan: Evento["plan"];
   payment_status?: "approved" | "rejected" | "pending" | null;
   invitaciones_enviadas: number;
-  /** Misma condición que el banner de unlock en layout (trial + admin). */
+  /** Admin y aún sin Experiencia (compra inicial o mejora desde Esencial). */
   canCheckout: boolean;
   eventoId: string | null;
   userEmail: string;
   prefillNombre: string;
-  /** Etapa del viaje (fecha del evento); no altera prioridad de pago/plan. */
   phase?: JourneyPhaseId;
+  canalEnvioInvitacion?: CanalEnvioInvitacion | null;
 };
 
-function isPlanActive(status: string | null | undefined): boolean {
-  return status === "paid";
+function tienePlanEnvios(plan: Evento["plan"]): boolean {
+  const n = planProductoNormalizado({ plan });
+  return n === "esencial" || n === "experiencia";
 }
 
 /**
@@ -27,7 +33,7 @@ function isPlanActive(status: string | null | undefined): boolean {
  */
 export function JourneyPrimaryCta({
   invitados_count,
-  plan_status,
+  plan,
   payment_status,
   invitaciones_enviadas,
   canCheckout,
@@ -35,8 +41,9 @@ export function JourneyPrimaryCta({
   userEmail,
   prefillNombre,
   phase = "check-in",
+  canalEnvioInvitacion = null,
 }: JourneyPrimaryCtaProps) {
-  const isActive = isPlanActive(plan_status);
+  const enviosDesbloqueados = tienePlanEnvios(plan);
   const paymentStatus = payment_status ?? null;
 
   const hasInvitaciones = invitaciones_enviadas > 0;
@@ -47,12 +54,14 @@ export function JourneyPrimaryCta({
   let href = "/panel/pasajeros";
   let mode: "link" | "checkout" = "link";
 
-  // Prioridad de render explícita:
-  // 1) plan activo, 2) pending, 3) rejected, 4) invitados + checkout, 5) etapa + invitados 0.
-  if (isActive) {
-    title = "✨ Experiencia activada";
+  // Prioridad: 1) Esencial o Experiencia, 2) pending, 3) rejected, 4) checkout, 5) etapa.
+  if (enviosDesbloqueados) {
+    title =
+      planProductoNormalizado({ plan }) === "experiencia"
+        ? "✨ Experiencia activada"
+        : "Plan Esencial activo";
     if (phase === "check-in") {
-      ctaLabel = "Invitar pasajeros";
+      ctaLabel = `${pasajerosVozJurnex(canalEnvioInvitacion ?? "ambos").cta} ✈️`;
       href = "/panel/pasajeros/envios";
       text = hasInvitaciones
         ? "Comparte el acceso y sigue sumando a quienes vuelan contigo."
@@ -107,8 +116,7 @@ export function JourneyPrimaryCta({
     href = "/panel/viaje";
   }
 
-  const ctaClasses =
-    "inline-flex min-h-[48px] w-full items-center justify-center rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] px-6 py-3.5 text-sm font-semibold text-[#0f172a] shadow-lg ring-1 ring-yellow-400/25 transition-all duration-200 hover:brightness-110 active:scale-[0.99] sm:w-auto sm:min-w-[200px]";
+  const ctaClasses = [panelCtaJurnexPrimary, panelCtaJurnexJourneyPillLayout].join(" ");
 
   const isCheckout = mode === "checkout" && Boolean(eventoId);
 
@@ -118,7 +126,7 @@ export function JourneyPrimaryCta({
         className="relative overflow-hidden rounded-xl border border-white/[0.07] bg-gradient-to-br from-[#0a0e18] via-[#0c101c] to-[#0f141d] p-4 shadow-none backdrop-blur-sm md:p-4"
         aria-label="Siguiente escala del viaje"
       >
-        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]/85">Siguiente escala</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-invite-gold/85">Siguiente escala</p>
         <div className="mt-2 flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-4">
           <div className="min-w-0 flex-1">
             <h2 className="font-display text-base font-semibold leading-snug text-white sm:text-lg">{title}</h2>
@@ -134,11 +142,11 @@ export function JourneyPrimaryCta({
 
   return (
     <section
-      className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-[#0b0f1a] via-[#0c101c] to-[#101828] p-4 shadow-[0_20px_48px_rgba(0,0,0,0.4)] backdrop-blur-md md:p-4"
+      className="relative overflow-hidden rounded-2xl border border-invite-gold/20 bg-gradient-to-br from-[#0b0f1a] via-[#0c101c] to-[#101828] p-4 shadow-[0_20px_48px_rgba(0,0,0,0.4)] backdrop-blur-md md:p-4"
       aria-label="Siguiente escala del viaje"
     >
-      <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[#D4AF37]/[0.06] blur-3xl" aria-hidden />
-      <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]/85">Siguiente escala</p>
+      <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-invite-gold/[0.06] blur-3xl" aria-hidden />
+      <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-invite-gold/85">Siguiente escala</p>
       <h2 className="mt-1.5 font-display text-lg font-semibold leading-snug text-white sm:text-xl">{title}</h2>
       <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-400">{text}</p>
 

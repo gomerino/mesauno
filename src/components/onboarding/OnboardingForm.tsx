@@ -1,5 +1,6 @@
 "use client";
 
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -124,7 +125,7 @@ export function OnboardingForm() {
       className="mx-auto w-full max-w-md space-y-5 rounded-xl border border-white/10 bg-white/[0.04] p-6 shadow-xl backdrop-blur-sm"
     >
       <div>
-        <label htmlFor="ob_email" className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+        <label htmlFor="ob_email" className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
           Email <span className="text-rose-400">*</span>
         </label>
         <input
@@ -135,12 +136,12 @@ export function OnboardingForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/80 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/40"
+          className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/80 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-invite-gold/50 focus:outline-none focus:ring-1 focus:ring-invite-gold/40"
           placeholder="tu@correo.cl"
         />
       </div>
       <div>
-        <label htmlFor="ob_n1" className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+        <label htmlFor="ob_n1" className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
           Nombre novio/a 1 <span className="text-rose-400">*</span>
         </label>
         <input
@@ -151,12 +152,12 @@ export function OnboardingForm() {
           required
           value={nombreNovio1}
           onChange={(e) => setNombreNovio1(e.target.value)}
-          className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/80 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/40"
+          className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/80 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-invite-gold/50 focus:outline-none focus:ring-1 focus:ring-invite-gold/40"
           placeholder="ej. Camila"
         />
       </div>
       <div>
-        <label htmlFor="ob_n2" className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+        <label htmlFor="ob_n2" className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
           Nombre novio/a 2 <span className="text-rose-400">*</span>
         </label>
         <input
@@ -167,12 +168,12 @@ export function OnboardingForm() {
           required
           value={nombreNovio2}
           onChange={(e) => setNombreNovio2(e.target.value)}
-          className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/80 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/40"
+          className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/80 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-invite-gold/50 focus:outline-none focus:ring-1 focus:ring-invite-gold/40"
           placeholder="ej. Diego"
         />
       </div>
       <div>
-        <label htmlFor="ob_fecha" className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+        <label htmlFor="ob_fecha" className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
           Fecha del evento <span className="text-rose-400">*</span>
         </label>
         <input
@@ -182,7 +183,7 @@ export function OnboardingForm() {
           required
           value={fechaEvento}
           onChange={(e) => setFechaEvento(e.target.value)}
-          className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/80 px-4 py-3 text-sm text-white focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/40"
+          className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/80 px-4 py-3 text-sm text-white focus:border-invite-gold/50 focus:outline-none focus:ring-1 focus:ring-invite-gold/40"
         />
       </div>
 
@@ -195,7 +196,7 @@ export function OnboardingForm() {
       <button
         type="submit"
         disabled={busy}
-        className="flex w-full min-h-[48px] items-center justify-center rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] py-3 text-sm font-semibold text-[#0f172a] transition hover:brightness-110 disabled:opacity-60"
+        className={panelCtaJurnexPrimary + " w-full min-h-[48px] justify-center py-3 disabled:opacity-60"}
       >
         {busy ? "Creando tu viaje…" : "Crear mi viaje ✈️"}
       </button>

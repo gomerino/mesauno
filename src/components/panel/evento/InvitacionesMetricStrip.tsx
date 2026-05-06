@@ -40,7 +40,7 @@ export function InvitacionesMetricStrip({
         aria-label={`Referencia de envíos: ${emailsEnviados} de ${totalInvitados || 0}`}
       >
         <div
-          className="h-full rounded-full bg-gradient-to-r from-teal-400 to-[#F5C451]"
+          className="h-full rounded-full bg-gradient-to-r from-teal-400 to-journeyFiesta-gold"
           style={{ width: `${pct}%` }}
         />
       </div>

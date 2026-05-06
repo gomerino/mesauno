@@ -27,7 +27,7 @@ function pagoBanner(pago: string | undefined) {
   if (pago === "pendiente") {
     return (
       <div className="mb-6 rounded-xl border border-amber-500/35 bg-amber-500/15 px-4 py-3 text-sm text-amber-50" role="status">
-        <strong className="font-semibold text-white">Pago en proceso.</strong> Volvé más tarde; te avisamos cuando quede
+        <strong className="font-semibold text-white">Pago en proceso.</strong> Vuelve más tarde; te avisamos cuando quede
         acreditado.
       </div>
     );

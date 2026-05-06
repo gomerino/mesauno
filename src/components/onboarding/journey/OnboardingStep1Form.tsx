@@ -1,5 +1,6 @@
 "use client";
 
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import {
   defaultJourneyState,
   type OnboardingJourneyState,
@@ -68,7 +69,7 @@ export function OnboardingStep1Form() {
       ) : null}
 
       <div>
-        <label htmlFor="ob_email" className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+        <label htmlFor="ob_email" className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
           Email
         </label>
         <input
@@ -80,11 +81,11 @@ export function OnboardingStep1Form() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="tu@correo.cl"
-          className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/80 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/40"
+          className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/80 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-invite-gold/50 focus:outline-none focus:ring-1 focus:ring-invite-gold/40"
         />
       </div>
       <div>
-        <label htmlFor="ob_p1" className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+        <label htmlFor="ob_p1" className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
           Nombre novio/a 1
         </label>
         <input
@@ -93,11 +94,11 @@ export function OnboardingStep1Form() {
           value={partner1}
           onChange={(e) => setPartner1(e.target.value)}
           placeholder="ej. Camila"
-          className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/80 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/40"
+          className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/80 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-invite-gold/50 focus:outline-none focus:ring-1 focus:ring-invite-gold/40"
         />
       </div>
       <div>
-        <label htmlFor="ob_p2" className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+        <label htmlFor="ob_p2" className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
           Nombre novio/a 2
         </label>
         <input
@@ -106,11 +107,11 @@ export function OnboardingStep1Form() {
           value={partner2}
           onChange={(e) => setPartner2(e.target.value)}
           placeholder="ej. Diego"
-          className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/80 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/40"
+          className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/80 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-invite-gold/50 focus:outline-none focus:ring-1 focus:ring-invite-gold/40"
         />
       </div>
       <div>
-        <label htmlFor="ob_date" className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+        <label htmlFor="ob_date" className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
           Fecha del evento
         </label>
         <input
@@ -120,14 +121,14 @@ export function OnboardingStep1Form() {
           required
           value={eventDate}
           onChange={(e) => setEventDate(e.target.value)}
-          className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/80 px-4 py-3 text-sm text-white focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/40"
+          className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/80 px-4 py-3 text-sm text-white focus:border-invite-gold/50 focus:outline-none focus:ring-1 focus:ring-invite-gold/40"
         />
       </div>
 
       <button
         type="submit"
         disabled={busy}
-        className="flex w-full min-h-[52px] items-center justify-center rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] py-3.5 text-sm font-semibold text-[#0f172a] shadow-lg transition hover:brightness-110 disabled:opacity-60"
+        className={panelCtaJurnexPrimary + " w-full min-h-[52px] justify-center py-3.5 disabled:opacity-60"}
       >
         {busy ? "Creando tu viaje…" : "Crear mi viaje ✈️"}
       </button>

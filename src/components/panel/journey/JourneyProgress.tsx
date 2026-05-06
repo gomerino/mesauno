@@ -16,7 +16,7 @@ function ringFor(state: StepState): string {
     case "done":
       return "border-emerald-300/70 bg-emerald-500/20 shadow-[0_0_24px_rgba(52,211,153,0.28)]";
     case "current":
-      return "border-[#D4AF37]/70 bg-[#D4AF37]/18 shadow-[0_0_26px_rgba(212,175,55,0.3)]";
+      return "border-invite-gold/70 bg-invite-gold/18 shadow-[0_0_26px_rgba(212,175,55,0.3)]";
     case "locked":
       return "border-slate-500/45 bg-slate-700/20";
     default:
@@ -70,8 +70,8 @@ export function JourneyProgress({
                 <Lock className="h-3.5 w-3.5 text-slate-300" strokeWidth={2.1} />
               ) : state === "current" ? (
                 <span className="relative flex h-2.5 w-2.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D4AF37]/70 opacity-50" />
-                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#D4AF37]" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-invite-gold/70 opacity-50" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-invite-gold" />
                 </span>
               ) : (
                 <span className="h-2 w-2 rounded-full bg-slate-600" />

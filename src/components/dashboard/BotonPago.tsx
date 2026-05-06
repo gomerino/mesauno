@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import type { PricingPlanId } from "@/lib/pricing-plans";
+import { JX } from "@/lib/jurnex-voz";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -37,7 +38,7 @@ export function BotonPago({ eventoId, className, plan = "experiencia" }: Props) 
         if (local.length >= 2) nombre = local;
       }
       if (nombre.length < 2 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        toast.error("Necesitamos tu nombre y un email válido en la cuenta.");
+        toast.error("Hacen falta al menos un nombre (o cómo os llamen) y un correo con sentido en tu cuenta.");
         return;
       }
 
@@ -57,16 +58,16 @@ export function BotonPago({ eventoId, className, plan = "experiencia" }: Props) 
       const data = (await res.json()) as { init_point?: string; error?: string; detail?: string; hint?: string };
       if (!res.ok) {
         const parts = [data.error, data.detail, data.hint].filter(Boolean);
-        toast.error(parts.length ? parts.join(" ") : "No se pudo iniciar el pago");
+        toast.error(parts.length ? parts.join(" ") : "No pudimos abrir el pago. Vuelve a tocar o inténtalo luego.");
         return;
       }
       if (!data.init_point) {
-        toast.error("Respuesta inválida del servidor");
+        toast.error(JX.errGenerico);
         return;
       }
       window.location.href = data.init_point;
     } catch {
-      toast.error("Error de red al contactar el servidor");
+      toast.error(JX.errRed);
     } finally {
       setLoading(false);
     }

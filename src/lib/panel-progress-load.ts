@@ -3,12 +3,13 @@ import { cache } from "react";
 import { selectEventoForMember } from "@/lib/evento-membership";
 import { spotifyGetPanelPublicState } from "@/lib/spotify-credentials";
 import { createClient, createStrictServiceClient } from "@/lib/supabase/server";
+import { eventoTienePlanExperienciaProducto } from "@/lib/evento-plan-access";
 import {
   getJourneyProgress,
   type JourneyStepId,
 } from "@/lib/panel-setup-progress";
 import { fetchInvitadosPanelRowsWithAcompanantes } from "@/lib/panel-invitados";
-import type { Evento, Invitado } from "@/types/database";
+import type { CanalEnvioInvitacion, Evento, Invitado } from "@/types/database";
 import { parseMockPaymentStatusFromPaymentId, type MockPaymentStatus } from "@/lib/mock-payment";
 
 export type PanelProgressBundle = {
@@ -25,6 +26,7 @@ export type PanelProgressBundle = {
     | "fecha_boda"
     | "fecha_evento"
     | "hora_embarque"
+    | "plan"
     | "plan_status"
     | "destino"
     | "direccion_evento_completa"
@@ -36,6 +38,8 @@ export type PanelProgressBundle = {
   > | null;
   mockPaymentStatus: MockPaymentStatus | null;
   invitados: Invitado[];
+  /** Preferencia de envío (Invitación / pasajeros); `null` si aún no hay fila de config. */
+  canalEnvioInvitacion: CanalEnvioInvitacion | null;
   /** Hitos en programa del día (tabla `evento_programa_hitos`). */
   programaHitosCount: number;
 };
@@ -50,7 +54,7 @@ async function loadPanelProgressBundleInner(
   const { data: evento } = await selectEventoForMember(
     supabase,
     userId,
-    "id, nombre_novio_1, nombre_novio_2, nombre_evento, fecha_boda, fecha_evento, hora_embarque, plan_status, destino, direccion_evento_completa, lugar_evento_linea, motivo_viaje, payment_id, objetivo_invitaciones_enviar, objetivo_personas_total"
+    "id, nombre_novio_1, nombre_novio_2, nombre_evento, fecha_boda, fecha_evento, hora_embarque, plan, plan_status, destino, direccion_evento_completa, lugar_evento_linea, motivo_viaje, payment_id, objetivo_invitaciones_enviar, objetivo_personas_total"
   );
 
   let programaHitosCount = 0;
@@ -74,8 +78,21 @@ async function loadPanelProgressBundleInner(
   }
   const invitados = (invData ?? []) as unknown as Invitado[];
 
-  let spotifyConnected = false;
+  let canalEnvioInvitacion: CanalEnvioInvitacion | null = null;
   if (evento?.id) {
+    const { data: cfgInv } = await supabase
+      .from("configuracion_invitacion_evento")
+      .select("canal_envio")
+      .eq("evento_id", evento.id)
+      .maybeSingle();
+    const c = (cfgInv as { canal_envio?: CanalEnvioInvitacion } | null)?.canal_envio;
+    canalEnvioInvitacion = c ?? null;
+  }
+
+  const spotifyRequeridoParaTabExperiencia = eventoTienePlanExperienciaProducto(evento ?? null);
+
+  let spotifyConnected = false;
+  if (evento?.id && spotifyRequeridoParaTabExperiencia) {
     const strictDb = await createStrictServiceClient();
     if (strictDb) {
       const st = await spotifyGetPanelPublicState(strictDb, evento.id);
@@ -83,7 +100,12 @@ async function loadPanelProgressBundleInner(
     }
   }
 
-  const j = getJourneyProgress(evento ?? null, programaHitosCount, spotifyConnected);
+  const j = getJourneyProgress(
+    evento ?? null,
+    programaHitosCount,
+    spotifyConnected,
+    spotifyRequeridoParaTabExperiencia
+  );
 
   return {
     pct: j.pct,
@@ -95,6 +117,7 @@ async function loadPanelProgressBundleInner(
       (evento as { payment_id?: string | null } | null)?.payment_id ?? null
     ),
     invitados,
+    canalEnvioInvitacion,
     programaHitosCount,
   };
 }
@@ -110,7 +133,8 @@ export const loadPanelProgressBundle = cache(async (userId: string): Promise<Pan
 const STEP_DETAIL: Record<JourneyStepId, string> = {
   tab_tripulacion: "completar tripulación: pareja, fechas, lugar y hora",
   tab_invitacion: "definir el mensaje a invitados en la invitación",
-  tab_experiencia: "tener al menos un hito en el programa y Spotify conectado",
+  tab_experiencia:
+    "completar programa del día (con plan Experiencia también Spotify conectado)",
 };
 
 /** Mensaje principal del journey (home y barra slim). */

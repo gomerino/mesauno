@@ -18,7 +18,7 @@ export default function PricingPage() {
         <section className="border-t border-white/10 bg-[#0a0f1a]/80 px-4 py-12 text-center">
           <p className="text-sm text-slate-500">
             ¿Necesitas ayuda para elegir?{" "}
-            <Link href="/" className="font-medium text-[#D4AF37] hover:underline">
+            <Link href="/" className="font-medium text-invite-gold hover:underline">
               Ver la invitación demo
             </Link>
           </p>

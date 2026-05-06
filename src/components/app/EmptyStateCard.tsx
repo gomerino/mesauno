@@ -1,3 +1,4 @@
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -20,7 +21,7 @@ export function EmptyStateCard({ title, description, actionHref, actionLabel, se
       {actionHref && actionLabel ? (
         <Link
           href={actionHref}
-          className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-full bg-teal-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-400"
+          className={panelCtaJurnexPrimary + " mt-6 min-h-[44px] justify-center px-5 py-2.5"}
         >
           {actionLabel}
         </Link>

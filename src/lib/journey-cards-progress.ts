@@ -1,3 +1,4 @@
+import { eventoTienePlanExperienciaProducto } from "@/lib/evento-plan-access";
 import type { PanelProgressBundle } from "@/lib/panel-progress-load";
 import { JOURNEY_STEP_ORDER } from "@/lib/panel-setup-progress";
 
@@ -27,7 +28,10 @@ export function getJourneyPhasesProgressLines(
     } else if (next === "tab_invitacion") {
       hint = "Escribí el mensaje a invitados (pestaña Invitación).";
     } else if (next === "tab_experiencia") {
-      hint = "Añadí al menos un momento al programa y conectá Spotify.";
+      const needSpotify = eventoTienePlanExperienciaProducto(bundle.evento);
+      hint = needSpotify
+        ? "Agrega al menos un momento al programa y conecta Spotify (plan Experiencia)."
+        : "Agrega al menos un momento al programa del día (pestaña Experiencia).";
     }
   }
 

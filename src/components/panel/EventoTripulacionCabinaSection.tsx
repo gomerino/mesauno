@@ -1,6 +1,7 @@
 "use client";
 
 import { addMemberToEvent, removeMemberFromEvent, type EquipoRol } from "@/app/panel/actions/equipo";
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, type FormEvent } from "react";
 import { toast } from "sonner";
@@ -56,7 +57,9 @@ export function EventoTripulacionCabinaSection({ eventoId, initialMiembros, isAd
         return;
       }
       toast.success(
-        res.mode === "invited" ? "Le enviamos un correo para unirse" : "Ya puede acceder con su cuenta"
+        res.mode === "invited"
+          ? "Le vamos a avisar por correo para sumarse a la tripulación"
+          : "Ya puede abrir y ayudar, con su cuenta a la mano"
       );
       setEmail("");
       router.refresh();
@@ -83,9 +86,9 @@ export function EventoTripulacionCabinaSection({ eventoId, initialMiembros, isAd
         <Link href="/panel/ajustes" className="text-teal-300/90 underline decoration-teal-500/40 hover:text-teal-200">
           Ajustes
         </Link>{" "}
-        (Quién organiza contigo). Desde aquí podés invitar solo con perfiles{" "}
-        <span className="text-white/75">novios</span> o <span className="text-white/75">recepción</span>. Para otro
-        administrador, usá Ajustes.
+        (Quién organiza contigo). Desde aquí invitas con perfiles{" "}
+        <span className="text-white/75">novios</span> o <span className="text-white/75">recepción</span>. Otro
+        administrador, desde Ajustes.
       </p>
 
       {isAdmin && (
@@ -122,7 +125,7 @@ export function EventoTripulacionCabinaSection({ eventoId, initialMiembros, isAd
             <button
               type="submit"
               disabled={pending}
-              className="rounded-lg bg-teal-500/90 px-4 py-2 text-sm font-medium text-white hover:bg-teal-400 disabled:opacity-50"
+              className={panelCtaJurnexPrimary + " justify-center px-4 py-2 disabled:opacity-50"}
             >
               {pending ? "Enviando…" : "Invitar"}
             </button>

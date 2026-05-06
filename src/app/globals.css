@@ -7,6 +7,10 @@
 :root {
   --background: #02182a;
   --foreground: #eaf0f7;
+  /* Papel / invitación (misma croma que `src/lib/brand-palette` + `invite` en tailwind) */
+  --brand-invite-navy: #1a2b48;
+  --brand-inviteJurnex-navy: #02182a;
+  --brand-invite-gold: #d4af37;
 }
 
 /** Lienzo marca: navy + brillo teal/oro + puntos tipo cielo (sin asset raster). */
@@ -75,6 +79,42 @@ body {
     .jurnex-card-primary-intent {
       animation: none;
       box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.1);
+    }
+  }
+
+  @keyframes jurnex-cta-emoji-float {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-2px) rotate(-8deg);
+    }
+  }
+
+  @keyframes jurnex-cta-soft-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(232, 154, 30, 0.22);
+    }
+    50% {
+      box-shadow: 0 0 20px 0 rgba(232, 154, 30, 0.32);
+    }
+  }
+
+  .jurnex-cta-emoji {
+    animation: jurnex-cta-emoji-float 1.7s ease-in-out infinite;
+    transform-origin: 60% 80%;
+  }
+
+  .jurnex-cta-pulse {
+    animation: jurnex-cta-soft-pulse 2.4s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jurnex-cta-emoji,
+    .jurnex-cta-pulse {
+      animation: none;
     }
   }
 }

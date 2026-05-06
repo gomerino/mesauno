@@ -21,7 +21,7 @@ async function requireEditor(eventoId: string) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { supabase: null as null, error: "No autenticado" as const };
+  if (!user) return { supabase: null as null, error: "Hace falta iniciar sesión." as const };
   const { data: ok, error } = await supabase.rpc("user_is_evento_editor_or_admin", {
     p_evento_id: eventoId,
   });

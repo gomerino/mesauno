@@ -21,20 +21,20 @@ export function MasPedidasPlaylist({ items, apoyoTrackUris, variant = "dark", on
     <div
       className={
         isLight
-          ? "mt-3 rounded-xl border border-[#1A2B48]/10 bg-white p-2.5"
+          ? "mt-3 rounded-xl border border-invite-navy/10 bg-white p-2.5"
           : "mt-4 rounded-xl border border-[#1ed760]/25 bg-black/30 p-3"
       }
     >
       <p
         className={
           isLight
-            ? "text-[9px] font-bold uppercase tracking-widest text-[#1A2B48]/45"
+            ? "text-[9px] font-bold uppercase tracking-widest text-invite-navy/45"
             : "text-[10px] font-bold uppercase tracking-widest text-[#1ed760]/90"
         }
       >
         Las más pedidas
       </p>
-      <p className={`mt-1 text-[11px] leading-snug ${isLight ? "text-[#1A2B48]/55" : "text-zinc-500"}`}>
+      <p className={`mt-1 text-[11px] leading-snug ${isLight ? "text-invite-navy/55" : "text-zinc-500"}`}>
         Cada persona cuenta una vez por canción (proponer o apoyar).
       </p>
       <ul className="mt-2 space-y-2">
@@ -44,7 +44,7 @@ export function MasPedidasPlaylist({ items, apoyoTrackUris, variant = "dark", on
             <li
               key={it.track_uri}
               className={`flex items-center gap-2 rounded-lg border p-2 ${
-                isLight ? "border-[#1A2B48]/8 bg-[#F4F1EA]/50" : "border-white/5 bg-white/5"
+                isLight ? "border-invite-navy/8 bg-invite-sand/50" : "border-white/5 bg-white/5"
               }`}
             >
               <div
@@ -57,10 +57,10 @@ export function MasPedidasPlaylist({ items, apoyoTrackUris, variant = "dark", on
                 {it.personas}
               </div>
               <div className="min-w-0 flex-1">
-                <p className={`truncate text-sm font-medium ${isLight ? "text-[#1A2B48]" : "text-white"}`}>
+                <p className={`truncate text-sm font-medium ${isLight ? "text-invite-navy" : "text-white"}`}>
                   {it.track_name ?? "Canción"}
                 </p>
-                <p className={`truncate text-xs ${isLight ? "text-[#1A2B48]/65" : "text-zinc-400"}`}>
+                <p className={`truncate text-xs ${isLight ? "text-invite-navy/65" : "text-zinc-400"}`}>
                   {it.artist_names ?? ""}
                 </p>
               </div>

@@ -8,6 +8,7 @@ import { formatEventTitle } from "@/lib/couple-event-title";
 import { requirePanelScopedEventoId } from "@/lib/panel-evento-scope";
 import { resolveJourneyPhase } from "@/lib/journey-phases";
 import { getJourneyPhasesProgressLines } from "@/lib/journey-cards-progress";
+import { eventoTienePlanExperienciaProducto, eventoTienePlanPagado } from "@/lib/evento-plan-access";
 import { loadPanelProgressBundle } from "@/lib/panel-progress-load";
 import { createClient } from "@/lib/supabase/server";
 import type { EventoProgramaHito } from "@/types/database";
@@ -54,14 +55,14 @@ export default async function PanelProgramaPage({
   const titulo = formatEventTitle(evento);
   const journeyPhase = resolveJourneyPhase(eventoBundle?.fecha_boda, eventoBundle?.fecha_evento);
   const journeyProgress = getJourneyPhasesProgressLines(bundle);
-  const planStatus = eventoBundle?.plan_status ?? null;
-  const hasAccess = planStatus === "paid";
+  const tienePlanProducto = eventoTienePlanPagado(eventoBundle);
+  const planEsExperiencia = eventoTienePlanExperienciaProducto(eventoBundle);
   const invitacionesEnviadas = bundle.invitados.filter((r) => r.email_enviado === true).length;
   let canCheckout = false;
   let prefillNombre = "";
   if (eventoBundle?.id) {
     const { data: isAdmin } = await supabase.rpc("user_is_evento_admin", { p_evento_id: eventoBundle.id });
-    canCheckout = planStatus !== "paid" && Boolean(isAdmin);
+    canCheckout = Boolean(isAdmin) && !eventoTienePlanExperienciaProducto(eventoBundle);
     const n1 = eventoBundle.nombre_novio_1?.trim() ?? "";
     const n2 = eventoBundle.nombre_novio_2?.trim() ?? "";
     prefillNombre = [n1, n2].filter(Boolean).join(" & ");
@@ -78,10 +79,10 @@ export default async function PanelProgramaPage({
     <PanelLayout narrow>
       <PanelBackLink />
       <div className="flex min-h-[13.5rem] flex-col gap-3 md:min-h-[15rem] md:gap-4">
-        {!hasAccess ? (
+        {!tienePlanProducto ? (
           <JourneyPrimaryCta
             invitados_count={bundle.invitados.length}
-            plan_status={planStatus}
+            plan={eventoBundle?.plan ?? null}
             payment_status={bundle.mockPaymentStatus}
             invitaciones_enviadas={invitacionesEnviadas}
             canCheckout={canCheckout}
@@ -89,15 +90,19 @@ export default async function PanelProgramaPage({
             userEmail={user?.email ?? ""}
             prefillNombre={prefillNombre || "Mi evento"}
             phase={journeyPhase}
+            canalEnvioInvitacion={bundle.canalEnvioInvitacion}
           />
         ) : (
-          <p className="text-xs font-medium tracking-wide text-[#D4AF37]/85">✨ Experiencia activa</p>
+          <p className="text-xs font-medium tracking-wide text-invite-gold/85">
+            {planEsExperiencia ? "✨ Experiencia activa" : "Plan Esencial activo"}
+          </p>
         )}
         <JourneyPhasesBar
           phase={journeyPhase}
-          className={hasAccess ? "mt-1.5 md:mt-2" : ""}
+          className={tienePlanProducto ? "mt-1.5 md:mt-2" : ""}
           progressPrimary={journeyProgress.primary}
           progressHint={journeyProgress.hint}
+          isPlanActive={planEsExperiencia}
         />
       </div>
 

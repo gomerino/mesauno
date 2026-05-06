@@ -82,7 +82,7 @@ export function PostPaymentUnlockCelebration({ paymentId }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-[700] flex animate-fadeIn items-center justify-center bg-black/50 backdrop-blur-[2px]"
+      className="fixed inset-0 z-postpay-700 flex animate-fadeIn items-center justify-center bg-black/50 backdrop-blur-[2px]"
       role="presentation"
       aria-hidden
     >
@@ -102,7 +102,7 @@ export function PostPaymentUnlockCelebration({ paymentId }: Props) {
               />
             ))}
             <Lock
-              className="absolute h-14 w-14 animate-unlockLockExit text-[#D4AF37]"
+              className="absolute h-14 w-14 animate-unlockLockExit text-invite-gold"
               strokeWidth={2}
               aria-hidden
             />
@@ -110,7 +110,7 @@ export function PostPaymentUnlockCelebration({ paymentId }: Props) {
         ) : null}
 
         <span
-          className={`relative z-10 font-display text-6xl leading-none text-[#D4AF37] drop-shadow-[0_0_24px_rgba(212,175,55,0.55)] ${
+          className={`relative z-10 font-display text-6xl leading-none text-invite-gold drop-shadow-[0_0_24px_rgba(212,175,55,0.55)] ${
             reducedMotion ? "scale-100 rotate-180 opacity-100" : "animate-unlockSparkleIn"
           }`}
           aria-hidden

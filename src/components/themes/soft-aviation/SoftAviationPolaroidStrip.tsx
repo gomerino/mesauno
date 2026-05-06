@@ -52,12 +52,12 @@ export function SoftAviationPolaroidStrip({ eventoId, fotos, setFotos, compact }
   if (fotos.length === 0) {
     return (
       <div
-        className={`rounded-2xl border border-dashed border-[#1A2B48]/12 bg-[#F4F1EA]/50 text-center text-[#1A2B48] ${
+        className={`rounded-2xl border border-dashed border-invite-navy/12 bg-invite-sand/50 text-center text-invite-navy ${
           compact ? "px-3 py-6" : "px-4 py-10"
         }`}
       >
         <p className={`font-inviteSerif ${compact ? "text-base" : "text-lg"}`}>Nuestra bitácora</p>
-        <p className="mt-2 text-sm text-[#1A2B48]/60">
+        <p className="mt-2 text-sm text-invite-navy/60">
           Cuando empiecen a llegar las fotos, verás un carrusel tipo polaroid aquí.
         </p>
       </div>
@@ -69,7 +69,7 @@ export function SoftAviationPolaroidStrip({ eventoId, fotos, setFotos, compact }
   return (
     <div className={compact ? "" : "-mx-1"}>
       {!compact ? (
-        <p className="mb-3 text-center font-inviteSerif text-lg text-[#1A2B48]">Nuestra bitácora</p>
+        <p className="mb-3 text-center font-inviteSerif text-lg text-invite-navy">Nuestra bitácora</p>
       ) : null}
       <div className={`flex snap-x snap-mandatory gap-3 overflow-x-auto [scrollbar-width:thin] ${compact ? "pb-1 pt-0" : "pb-4 pt-2"}`}>
         {slice.map((f, i) => (
@@ -77,9 +77,9 @@ export function SoftAviationPolaroidStrip({ eventoId, fotos, setFotos, compact }
             key={f.id}
             type="button"
             onClick={() => window.open(eventoFotoPublicUrl(f.storage_path), "_blank", "noopener,noreferrer")}
-            className={`w-[min(68vw,200px)] shrink-0 snap-center rounded-lg border border-[#1A2B48]/8 bg-white p-2 pb-7 text-left shadow-sm transition hover:border-[#1A2B48]/18 ${ROTATIONS[i % ROTATIONS.length]}`}
+            className={`w-[min(68vw,200px)] shrink-0 snap-center rounded-lg border border-invite-navy/8 bg-white p-2 pb-7 text-left shadow-sm transition hover:border-invite-navy/18 ${ROTATIONS[i % ROTATIONS.length]}`}
           >
-            <div className="relative aspect-square w-full overflow-hidden rounded bg-[#1A2B48]/5">
+            <div className="relative aspect-square w-full overflow-hidden rounded bg-invite-navy/5">
               <Image
                 src={eventoFotoPublicUrl(f.storage_path)}
                 alt=""

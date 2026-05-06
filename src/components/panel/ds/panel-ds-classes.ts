@@ -34,9 +34,39 @@ export const panelColMain = "lg:col-span-8";
 
 export const panelColSidebar = "lg:col-span-4";
 
-/** Botón primario panel (teal sobre oscuro). */
-export const panelBtnPrimary =
-  "inline-flex items-center justify-center rounded-lg bg-teal-500 px-4 py-2 text-sm font-medium text-black transition-colors duration-200 hover:bg-teal-400 disabled:pointer-events-none disabled:opacity-50";
+/**
+ * Capa visual / acción (sin `rounded-full` ni cuerpo de tipografía) — `JourneyPrimaryCta` y CTA píldora comparten esto.
+ * Para un botón listo, usar `panelCtaJurnexPrimary` o componer + `text-sm font-semibold rounded-full …`.
+ */
+export const panelCtaJurnexGoldSurface =
+  "bg-gradient-to-r from-invite-gold to-invite-gold-deep text-slate-900 shadow-lg ring-1 ring-yellow-400/25";
+export const panelCtaJurnexGoldAction =
+  "transition-all duration-200 hover:brightness-110 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-50";
+
+/**
+ * CTA oro: layout fijo (píldora, cuerpo semibold) — añade `w-full min-h-[48px] px-* py-*` según el bloque.
+ * Alias: `panelBtnPrimary` (mismo valor).
+ */
+export const panelCtaJurnexPrimary = [
+  "inline-flex items-center justify-center rounded-full text-sm font-semibold",
+  panelCtaJurnexGoldSurface,
+  panelCtaJurnexGoldAction,
+].join(" ");
+
+/**
+ * Tamaño y relleno del CTA de «Siguiente escala» (`JourneyPrimaryCta`):
+ * píldora mín. 200px de ancho a partir de `sm`, aire horizontal `px-6` y `min-h` 48.
+ */
+export const panelCtaJurnexJourneyPillLayout =
+  "min-h-[48px] w-full justify-center px-6 py-3.5 sm:w-auto sm:min-w-[200px]";
+
+/**
+ * Misma píldora pero siempre a todo el ancho (barra fija móvil y móvil «pasajeros»; sin `sm:w-auto`).
+ */
+export const panelCtaJurnexJourneyPillLayoutFull = "min-h-[48px] w-full justify-center px-6 py-3.5";
+
+/** @deprecated Mismo criterio oro; nombre histórico — usar `panelCtaJurnexPrimary` o los tokens de oro. */
+export const panelBtnPrimary = panelCtaJurnexPrimary;
 
 /** Botón secundario — borde sutil. */
 export const panelBtnSecondary =
@@ -48,5 +78,4 @@ export const panelBtnGhost =
 
 /** Barra de progreso panel (teal → oro). */
 export const panelProgressTrack = "h-1 w-full overflow-hidden rounded-full bg-white/10";
-export const panelProgressFill =
-  "h-full rounded-full bg-gradient-to-r from-teal-400 to-[#F5C451]";
+export const panelProgressFill = "h-full rounded-full bg-gradient-to-r from-teal-400 to-teal-500";

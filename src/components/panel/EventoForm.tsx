@@ -19,6 +19,7 @@ import {
   resolveInvitacionThemeId,
 } from "@/lib/invitacion-theme";
 import { createClient } from "@/lib/supabase/client";
+import { JX } from "@/lib/jurnex-voz";
 import { trackEvent } from "@/lib/analytics";
 import { useEventoCentroTab } from "@/components/panel/evento/EventoCentroTabContext";
 import Link from "next/link";
@@ -51,9 +52,13 @@ export type EventoFormProps = {
   initial: Evento | null;
   spotify?: {
     eventoId: string;
+    /** Plan pagado activo; si no, la card muestra activación del viaje. */
+    hasAccess: boolean;
     connected: boolean;
     playlistId: string | null;
     strictDb: boolean;
+    /** Si es false (plan Esencial u otro), la card se muestra bloqueada. */
+    planExperienciaProducto: boolean;
   } | null;
   programaHitosCount?: number;
   /** Hitos del día (mismo origen que `/panel/viaje/programa`) para editar en la card Experiencia. */
@@ -298,7 +303,7 @@ export function EventoForm({
       theme_id: next,
       source: "panel_evento",
     });
-    toast.success("Estilo aplicado a todas las invitaciones ✨");
+    toast.success(JX.estiloTodasInvitaciones);
   }
 
   async function persistSection(section: SectionId) {
@@ -344,7 +349,7 @@ export function EventoForm({
       router.refresh();
       setExpanded(null);
       trackEvent("evento_section_saved", { section });
-      toast.success("Cambios guardados ✨");
+      toast.success(JX.guardado);
       return;
     }
 
@@ -357,7 +362,7 @@ export function EventoForm({
     router.refresh();
     setExpanded(null);
     trackEvent("evento_section_saved", { section });
-    toast.success("Cambios guardados ✨");
+    toast.success(JX.guardado);
   }
 
   async function persistCanalEnvio() {
@@ -376,7 +381,7 @@ export function EventoForm({
     router.refresh();
     setExpanded(null);
     trackEvent("evento_section_saved", { section: "invitacion_canal" });
-    toast.success("Canal de envío guardado");
+    toast.success(JX.comoContactais);
   }
 
   async function persistRegalosInvitacion() {
@@ -398,7 +403,7 @@ export function EventoForm({
     router.refresh();
     setExpanded(null);
     trackEvent("evento_section_saved", { section: "invitacion_regalos" });
-    toast.success("Preferencias de regalos guardadas");
+    toast.success(JX.regalosPreferencias);
   }
 
   const tripulacionStatus: SectionStatus = (() => {
@@ -561,8 +566,8 @@ export function EventoForm({
               <div className="border-t border-white/10 pt-4">
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-white/50">Metas de lista (opcional)</p>
                 <p className="mt-1 text-xs leading-relaxed text-white/50">
-                  Si definís números objetivo, la misión «Meta» del panel se completa al alcanzarlos con tu lista actual
-                  (invitaciones = filas; personas incluyen acompañantes).
+                  Opcional: referencias para tu planificación (invitaciones = filas; personas incluyen acompañantes). La
+                  misión «Respuestas» en Pasajeros se completa cuando cada invitado respondió si asiste o no.
                 </p>
                 <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
@@ -825,30 +830,6 @@ export function EventoForm({
                   </div>
                 </section>
                 <section>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-white/50">Lugar y dirección</p>
-                  <div className="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div className="sm:col-span-2">
-                      <label className={label}>Nombre del centro o venue</label>
-                      <input
-                        className={input}
-                        value={lugar_evento_linea}
-                        onChange={(e) => setLugarLinea(e.target.value)}
-                        placeholder="Ej. Viña, salón, nombre comercial"
-                      />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label className={label}>Dirección completa (mapa e itinerario)</label>
-                      <input
-                        className={input}
-                        value={direccion_evento_completa}
-                        onChange={(e) => setDireccionCompleta(e.target.value)}
-                        placeholder="Calle, número, comuna, región (para mapa e itinerario)"
-                      />
-                      <p className="mt-1 text-[10px] text-white/40">Única dirección usada en &quot;Cómo llegar&quot; y QR</p>
-                    </div>
-                  </div>
-                </section>
-                <section>
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-white/50">Dress code</p>
                   <div className="mt-2">
                     <input className={input} value={dress_code} onChange={(e) => setDressCode(e.target.value)} placeholder="Elegante" />
@@ -904,6 +885,30 @@ export function EventoForm({
                         placeholder="12A o varias líneas; se ve en el detalle de embarque"
                       />
                       <p className="mt-1 text-[10px] text-white/40">En el grid del boarding, columna Destino. Si el invitado tiene asiento propio, manda sobre este valor.</p>
+                    </div>
+                  </div>
+                </section>
+                <section>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-white/50">Lugar y dirección</p>
+                  <div className="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="sm:col-span-2">
+                      <label className={label}>Nombre del centro o venue</label>
+                      <input
+                        className={input}
+                        value={lugar_evento_linea}
+                        onChange={(e) => setLugarLinea(e.target.value)}
+                        placeholder="Ej. Viña, salón, nombre comercial"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className={label}>Dirección completa (mapa e itinerario)</label>
+                      <input
+                        className={input}
+                        value={direccion_evento_completa}
+                        onChange={(e) => setDireccionCompleta(e.target.value)}
+                        placeholder="Calle, número, comuna, región (para mapa e itinerario)"
+                      />
+                      <p className="mt-1 text-[10px] text-white/40">Única dirección usada en &quot;Cómo llegar&quot; y QR</p>
                     </div>
                   </div>
                 </section>
@@ -1004,7 +1009,7 @@ export function EventoForm({
           >
             <div className="space-y-3">
               <p className="text-xs text-white/60">
-                Definí cómo querés contactar a tus invitados cuando habilitemos envíos desde la plataforma.
+                Cómo les escriben por defecto (se usa en el panel de pasajeros y al insistir, según elijas allí).
               </p>
               <fieldset className="space-y-2">
                 <legend className="sr-only">Canal de envío</legend>
@@ -1048,36 +1053,126 @@ export function EventoForm({
           </JurnexEditableCard>
 
           {spotify ? (
-            <JurnexEditableCard
-              title="Música colaborativa (Spotify)"
-              status={spotify.connected ? "Listo" : "Pendiente"}
-              open={cardOpen("spotify")}
-              onOpenChange={(o) => cardSetOpen("spotify", o)}
-              preview={
-                <p className="text-xs text-white/70">
-                  {spotify.connected ? "Playlist vinculada al panel." : "Conectá Spotify para la playlist colaborativa."}
-                </p>
-              }
-            >
-              {!spotify.strictDb ? (
-                <p className="text-xs text-amber-200/90">
-                  La música colaborativa requiere configuración del servidor (service role). Si ves esto en producción,
-                  contacta soporte.
-                </p>
-              ) : (
-                <Suspense
-                  fallback={
-                    <div className="h-32 animate-pulse rounded-lg border border-jurnex-primary/15 bg-black/20" aria-hidden />
-                  }
-                >
-                  <SpotifyPlaylistConnect
-                    eventoId={spotify.eventoId}
-                    spotifyConnected={spotify.connected}
-                    initialPlaylistId={spotify.playlistId}
-                  />
-                </Suspense>
-              )}
-            </JurnexEditableCard>
+            !spotify.hasAccess ? (
+              <JurnexEditableCard
+                title="Música colaborativa (Spotify)"
+                status="Viaje en prueba"
+                open={cardOpen("spotify")}
+                onOpenChange={(o) => cardSetOpen("spotify", o)}
+                preview={
+                  <p className="text-xs text-white/55">
+                    Disponible cuando actives el viaje con un plan de pago (Experiencia incluye esta función).
+                  </p>
+                }
+              >
+                <div className="space-y-4 text-sm leading-relaxed text-white/75">
+                  <p>
+                    La playlist colaborativa con Spotify se configura con el viaje activado. El producto{" "}
+                    <strong className="text-white/90">Experiencia</strong> incluye esta función además del plan pagado.
+                  </p>
+                  <Link
+                    href="/pricing"
+                    className={panelBtnPrimary + " inline-flex min-h-[44px] items-center justify-center px-5"}
+                  >
+                    Ver planes
+                  </Link>
+                </div>
+              </JurnexEditableCard>
+            ) : !isEventoAdmin ? (
+              <JurnexEditableCard
+                title="Música colaborativa (Spotify)"
+                status={
+                  !spotify.planExperienciaProducto
+                    ? "Plan Experiencia"
+                    : spotify.connected
+                      ? "Listo"
+                      : "Pendiente"
+                }
+                open={cardOpen("spotify")}
+                onOpenChange={(o) => cardSetOpen("spotify", o)}
+                preview={
+                  <p className="text-xs text-white/70">
+                    {!spotify.planExperienciaProducto
+                      ? "Incluido en el plan Experiencia. Quien administra el evento puede revisar los planes."
+                      : spotify.connected
+                        ? "Hay una playlist vinculada al evento."
+                        : "Aún no hay cuenta de Spotify conectada."}
+                  </p>
+                }
+              >
+                <div className="space-y-3 text-sm leading-relaxed text-white/75">
+                  {!spotify.planExperienciaProducto ? (
+                    <p>
+                      La música colaborativa para que los invitados sumen canciones forma parte del{" "}
+                      <strong className="font-semibold text-white/90">plan Experiencia</strong>. Solo quien administra el
+                      evento puede cambiar el plan o la configuración.
+                    </p>
+                  ) : (
+                    <p>
+                      Solo quien administra el evento puede vincular Spotify o cambiar la playlist. Si necesitas
+                      cambios, pídele a esa persona que entre aquí.
+                    </p>
+                  )}
+                </div>
+              </JurnexEditableCard>
+            ) : spotify.planExperienciaProducto ? (
+              <JurnexEditableCard
+                title="Música colaborativa (Spotify)"
+                status={spotify.connected ? "Listo" : "Pendiente"}
+                open={cardOpen("spotify")}
+                onOpenChange={(o) => cardSetOpen("spotify", o)}
+                preview={
+                  <p className="text-xs text-white/70">
+                    {spotify.connected ? "Playlist vinculada al panel." : "Conecta Spotify para la playlist colaborativa."}
+                  </p>
+                }
+              >
+                {!spotify.strictDb ? (
+                  <p className="text-xs text-amber-200/90">
+                    La música colaborativa requiere configuración del servidor (service role). Si ves esto en producción,
+                    contacta soporte.
+                  </p>
+                ) : (
+                  <Suspense
+                    fallback={
+                      <div className="h-32 animate-pulse rounded-lg border border-jurnex-primary/15 bg-black/20" aria-hidden />
+                    }
+                  >
+                    <SpotifyPlaylistConnect
+                      eventoId={spotify.eventoId}
+                      spotifyConnected={spotify.connected}
+                      initialPlaylistId={spotify.playlistId}
+                    />
+                  </Suspense>
+                )}
+              </JurnexEditableCard>
+            ) : (
+              <JurnexEditableCard
+                title="Música colaborativa (Spotify)"
+                status="Bloqueado"
+                open={cardOpen("spotify")}
+                onOpenChange={(o) => cardSetOpen("spotify", o)}
+                preview={
+                  <p className="text-xs text-white/55">
+                    Incluido en el plan Experiencia.{" "}
+                    <Link href="/pricing" className="font-medium text-teal-300/95 underline decoration-teal-500/40">
+                      Ver planes
+                    </Link>
+                  </p>
+                }
+              >
+                <div className="space-y-4 text-sm leading-relaxed text-white/75">
+                  <p>
+                    Puedes vincular una playlist para que la tripulación sume canciones desde la invitación. Esta función
+                    viene con el{" "}
+                    <strong className="font-semibold text-white/90">plan Experiencia</strong>.
+                  </p>
+                  <Link href="/pricing" className={panelBtnPrimary + " inline-flex min-h-[44px] items-center justify-center px-5"}>
+                    Ver planes y opciones
+                  </Link>
+                </div>
+              </JurnexEditableCard>
+            )
           ) : null}
         </>
       ) : null}

@@ -23,7 +23,7 @@ export default async function OnboardingPage() {
 
   return (
     <>
-      <p className="text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]/90">
+      <p className="text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-invite-gold/90">
         Tu gran día como un viaje
       </p>
       <h1 className="mt-3 text-center font-display text-3xl font-bold text-white sm:text-4xl">Creá tu viaje</h1>

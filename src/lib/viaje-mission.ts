@@ -9,13 +9,6 @@ const VIAJE_MISSION_LABELS: Record<JourneyStepId, string> = {
   tab_experiencia: "Experiencia",
 };
 
-/** Micro por bloque: qué implica completar cada pestaña del viaje. */
-const VIAJE_STEP_MICROS_PENDING: Record<JourneyStepId, string> = {
-  tab_tripulacion: "Nombres, fechas, lugar y hora",
-  tab_invitacion: "Mensaje a invitados en la invitación",
-  tab_experiencia: "Al menos un hito en el programa y Spotify conectado",
-};
-
 /** Misma lógica que la tarjeta «Viaje» en el home (`JourneyViajeClient`) y el bloque de `/panel/viaje`. */
 export function getViajeMissionStripFromSteps(
   journeySteps: Record<JourneyStepId, boolean>
@@ -35,7 +28,6 @@ export function getViajeMissionStripFromSteps(
       id,
       label: VIAJE_MISSION_LABELS[id],
       state,
-      micro: VIAJE_STEP_MICROS_PENDING[id],
     };
   });
 
@@ -45,12 +37,12 @@ export function getViajeMissionStripFromSteps(
 
 /**
  * Párrafo superior de la caja de misión (bajo el título implícito).
- * Encaja con el siguiente paso y con los micros de cada franja.
+ * Encaja con el siguiente paso pendiente del viaje.
  */
 export function getViajeMisionMicroFromBundle(bundle: PanelProgressBundle): string {
   const all = JOURNEY_STEP_ORDER.every((id) => bundle.steps[id]);
   if (all) {
-    return "Tres bloques listos. Podés seguir afinando o ir a invitar pasajeros cuando quieras.";
+    return "Tres bloques listos. Puedes seguir afinando o ir a invitar pasajeros cuando quieras.";
   }
   const { primary, hint } = getJourneyPhasesProgressLines(bundle);
   if (hint) {

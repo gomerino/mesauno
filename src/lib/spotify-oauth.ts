@@ -1,3 +1,4 @@
+import { eventoTienePlanExperienciaProducto } from "@/lib/evento-plan-access";
 import { createClient, createStrictServiceClient } from "@/lib/supabase/server";
 import { spotifyExchangeCode, spotifyCreatePlaylist, spotifyResolveUserIdAfterAuthorization } from "@/lib/spotify-api";
 import { getSpotifyClientId, getSpotifyRedirectUriForRequest, SPOTIFY_MODIFY_SCOPES } from "@/lib/spotify-config";
@@ -37,6 +38,20 @@ export async function spotifyOAuthAuthorizeGET(request: Request): Promise<Respon
     return NextResponse.json({ error: "Solo el administrador puede conectar Spotify." }, { status: 403 });
   }
 
+  const { data: evRow } = await supabase
+    .from("eventos")
+    .select("plan, plan_status")
+    .eq("id", eventoId)
+    .maybeSingle();
+  if (!eventoTienePlanExperienciaProducto(evRow)) {
+    const origin = await getSiteOrigin();
+    return NextResponse.redirect(
+      `${origin}/panel/viaje?spotify_error=${encodeURIComponent(
+        "La música colaborativa está disponible con el plan Experiencia."
+      )}`
+    );
+  }
+
   const state = signSpotifyOAuthState(eventoId);
   // Scopes definidos en `spotify-config` (playlist-modify-*, playback, biblioteca).
   const scope = SPOTIFY_MODIFY_SCOPES.join(" ");
@@ -74,6 +89,20 @@ export async function spotifyOAuthCallbackGET(request: Request): Promise<Respons
     return fail("No se pudo resolver la URI de retorno de Spotify (revisa SPOTIFY_REDIRECT_URI o la URL del sitio).");
   }
 
+  const db = await createStrictServiceClient();
+  if (!db) {
+    return fail("Falta SUPABASE_SERVICE_ROLE_KEY en el servidor.");
+  }
+
+  const { data: evPlan } = await db
+    .from("eventos")
+    .select("plan, plan_status")
+    .eq("id", eventoId)
+    .maybeSingle();
+  if (!eventoTienePlanExperienciaProducto(evPlan)) {
+    return fail("La música colaborativa requiere el plan Experiencia.");
+  }
+
   const tokens = await spotifyExchangeCode(code, redirectUri);
   if (!tokens?.access_token || !tokens.refresh_token) {
     return fail("No se pudo obtener el token de Spotify.");
@@ -83,11 +112,6 @@ export async function spotifyOAuthCallbackGET(request: Request): Promise<Respons
     tokens.access_token,
     tokens.refresh_token
   );
-
-  const db = await createStrictServiceClient();
-  if (!db) {
-    return fail("Falta SUPABASE_SERVICE_ROLE_KEY en el servidor.");
-  }
 
   const ok = await spotifyUpsertRefreshToken(db, eventoId, refreshToStore, spotifyUserId);
   if (!ok) {
@@ -116,5 +140,5 @@ export async function spotifyOAuthCallbackGET(request: Request): Promise<Respons
     }
   }
 
-  return NextResponse.redirect(`${origin}/panel/viaje?spotify=connected`);
+  return NextResponse.redirect(`${origin}/panel/viaje?tab=experiencia&spotify=connected#musica-spotify`);
 }

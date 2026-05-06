@@ -220,6 +220,29 @@ export async function spotifyAddTracksToPlaylist(
   return { ok: true };
 }
 
+/** Reemplaza todos los ítems de la playlist por `trackUris` (orden preservado). */
+export async function spotifyReplacePlaylistTracks(
+  accessToken: string,
+  playlistId: string,
+  trackUris: string[]
+): Promise<SpotifyAddTracksResult> {
+  const id = playlistId.trim();
+  const res = await fetch(`https://api.spotify.com/v1/playlists/${encodeURIComponent(id)}/tracks`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ uris: trackUris }),
+  });
+  const bodyText = await res.text();
+  if (!res.ok) {
+    logSpotifyApiError("api/playlists/tracks (PUT replace)", res.status, bodyText);
+    return { ok: false, status: res.status, spotifyMessage: extractSpotifyWebApiErrorMessage(bodyText) };
+  }
+  return { ok: true };
+}
+
 /** Mensaje `error.message` de la Web API (formato varía entre endpoints). */
 export function extractSpotifyWebApiErrorMessage(bodyText: string): string {
   const raw = bodyText.trim();

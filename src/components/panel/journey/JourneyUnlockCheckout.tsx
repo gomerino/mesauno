@@ -1,5 +1,6 @@
 "use client";
 
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import { PRICING_PLANS, type PricingPlanId } from "@/lib/pricing-plans";
 import { useCallback, useState } from "react";
 
@@ -120,7 +121,10 @@ export function JourneyUnlockCheckout({ eventoId, userEmail, prefillNombre }: Jo
             type="button"
             disabled={busy}
             onClick={() => void checkout()}
-            className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full bg-gradient-to-r from-[#e0c356] via-[#D4AF37] to-[#b8941f] px-4 py-2.5 text-sm font-semibold text-[#0f172a] shadow-[0_4px_22px_-4px_rgba(212,175,55,0.42)] ring-1 ring-yellow-300/35 transition hover:brightness-[1.07] disabled:opacity-60 sm:px-5 lg:min-h-[44px] lg:min-w-[13rem] lg:px-6"
+            className={
+              panelCtaJurnexPrimary +
+              " min-h-[48px] w-full justify-center px-4 py-2.5 disabled:opacity-60 sm:px-5 lg:min-h-[44px] lg:min-w-[13rem] lg:px-6"
+            }
           >
             {busy ? (
               <span>Abriendo Mercado Pago…</span>

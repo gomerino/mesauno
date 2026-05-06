@@ -15,6 +15,7 @@ import {
 } from "@/theme/panel-themes";
 import type { JourneyPhaseId } from "@/lib/journey-phases";
 import type { LucideIcon } from "lucide-react";
+import { Lock } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -97,6 +98,32 @@ function NavLink({
   );
 }
 
+const ATERIZAJE_LOCKED_TITLE =
+  "Activa el plan Experiencia para usar Aterrizaje (álbum y recuerdos).";
+
+function NavLinkLocked({
+  label,
+  icon: Icon,
+}: {
+  label: string;
+  icon: LucideIcon;
+}) {
+  return (
+    <span
+      aria-disabled="true"
+      aria-label={`${label}. ${ATERIZAJE_LOCKED_TITLE}`}
+      title={ATERIZAJE_LOCKED_TITLE}
+      className="flex cursor-not-allowed items-center gap-3 rounded-md px-3 py-2 text-sm text-white/35"
+    >
+      <Icon className="h-4 w-4 shrink-0 opacity-45" strokeWidth={2} aria-hidden />
+      <span className="flex min-w-0 flex-1 items-center gap-1.5">
+        <span className="truncate">{label}</span>
+        <Lock className="h-3.5 w-3.5 shrink-0 text-white/40" strokeWidth={2} aria-hidden />
+      </span>
+    </span>
+  );
+}
+
 type Props = {
   userEmail: string;
   children: React.ReactNode;
@@ -105,6 +132,8 @@ type Props = {
   journeyPhase: JourneyPhaseId;
   journeyProgressPrimary?: string;
   journeyProgressHint?: string | null;
+  /** Plan Experiencia pagado: desbloquea Aterrizaje (`/panel/recuerdos`). */
+  experienciaPlanActive: boolean;
 };
 
 export function PanelShell({
@@ -114,6 +143,7 @@ export function PanelShell({
   journeyPhase,
   journeyProgressPrimary,
   journeyProgressHint,
+  experienciaPlanActive,
 }: Props) {
   const pathname = usePathname();
   const journeyHome = isJourneyHomePath(pathname);
@@ -181,25 +211,19 @@ export function PanelShell({
                 />
               ))}
               <div className="mt-6 border-t border-white/10 pt-4" aria-hidden />
-              {PANEL_SIDEBAR_GROUPS[1].map(({ href, label, icon, end }) => (
-                <NavLink
-                  key={href}
-                  href={href}
-                  label={label}
-                  icon={icon}
-                  active={navActive(pathname, href, end)}
-                />
-              ))}
-              <div className="mt-6 border-t border-white/10 pt-4" aria-hidden />
-              {PANEL_SIDEBAR_GROUPS[2].map(({ href, label, icon, end }) => (
-                <NavLink
-                  key={href}
-                  href={href}
-                  label={label}
-                  icon={icon}
-                  active={navActive(pathname, href, end)}
-                />
-              ))}
+              {PANEL_SIDEBAR_GROUPS[1].map((item) =>
+                item.id === "aterrizaje" && !experienciaPlanActive ? (
+                  <NavLinkLocked key={item.href} label={item.label} icon={item.icon} />
+                ) : (
+                  <NavLink
+                    key={item.href}
+                    href={item.href}
+                    label={item.label}
+                    icon={item.icon}
+                    active={navActive(pathname, item.href, item.end)}
+                  />
+                )
+              )}
             </nav>
 
             <Link
@@ -239,7 +263,7 @@ export function PanelShell({
           </div>
         </div>
 
-        <PanelMobileBottomNav />
+        <PanelMobileBottomNav experienciaPlanActive={experienciaPlanActive} />
       </div>
     </PanelJourneyThemeContext.Provider>
   );

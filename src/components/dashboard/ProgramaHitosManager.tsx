@@ -1,5 +1,6 @@
 "use client";
 
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import {
   createProgramaHito,
   deleteProgramaHito,
@@ -244,7 +245,7 @@ export function ProgramaHitosManager({ eventoId, initialHitos }: Props) {
           <button
             type="submit"
             disabled={pending}
-            className="rounded-full bg-teal-500 px-5 py-2 text-sm font-semibold text-white hover:bg-teal-400 disabled:opacity-50"
+            className={panelCtaJurnexPrimary + " justify-center px-5 py-2 disabled:opacity-50"}
           >
             {pending ? "Guardando…" : editingId ? "Guardar cambios" : "Añadir al programa"}
           </button>

@@ -23,10 +23,14 @@ export type RsvpAsistenciaCerradaFields = {
 };
 
 /**
- * Asistencia «cerrada» para el panel: RSVP sí/no o check-in vía asistencia_confirmada.
- * Si es true, no mostramos en paralelo el flujo de envío para no duplicar lectura.
+ * Asistencia «cerrada» para el panel: RSVP definitivo (sí/no) o check-in, salvo
+ * el caso `rsvp_estado === "pendiente"` (p. ej. «Aún no lo tengo claro») que no debe
+ * ocultar el flujo de envío ni resumirse como asistencia confirmada.
  */
 export function isAsistenciaRespuestaCerrada(row: RsvpAsistenciaCerradaFields): boolean {
+  if (row.rsvp_estado === "pendiente" && row.asistencia_confirmada === true) {
+    return false;
+  }
   if (row.asistencia_confirmada === true) return true;
   return hasCompletedRsvp(row.rsvp_estado);
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import { JourneyCard } from "@/components/panel/journey/JourneyCard";
 import type { PanelProgressBundle } from "@/lib/panel-progress-load";
 import { getViajeMissionStripFromSteps } from "@/lib/viaje-mission";
@@ -12,6 +13,7 @@ import {
   guestMissionStripProps,
   type GuestMissionSteps,
 } from "@/lib/guest-mission";
+import { eventoTienePlanExperienciaProducto } from "@/lib/evento-plan-access";
 import { trackEvent } from "@/lib/analytics";
 import { getPhaseBaseOrder, type JourneyCardKey } from "@/lib/journey-card-order";
 import {
@@ -28,10 +30,17 @@ import React, { useEffect, useState, type ReactNode } from "react";
 
 type EventoViaje = NonNullable<PanelProgressBundle["evento"]>;
 
+/** Un solo origen: título de cada `JourneyCard` y texto «Siguiente: …». */
+const JOURNEY_CARD_TITLE: Record<JourneyCardKey, string> = {
+  evento: "Viaje",
+  pasajeros: "Pasajeros",
+  experiencia: "Aterrizaje",
+};
+
 type Props = {
   evento: EventoViaje | null;
   phase: JourneyPhaseId;
-  /** Misiones de invitados (lista, mesas, envío, meta); misma fuente que la página Pasajeros. */
+  /** Misiones de invitados (lista, envío, mesas, respuestas RSVP); misma fuente que la página Pasajeros. */
   guestMissionSteps: GuestMissionSteps;
   /** `"invitados"` / `"pasajeros"` / `"evento"` / `"experiencia"` / `"aterrizaje"` / `"recuerdos"` (Aterrizaje). */
   focusTarget?: string | null;
@@ -99,7 +108,7 @@ export function JourneyViajeClient({
     };
   }, [evento?.id]);
 
-  const isPaid = evento?.plan_status === "paid";
+  const tienePlanExperienciaProducto = eventoTienePlanExperienciaProducto(evento);
 
   const phaseFocusEvento = phase === "check-in";
   const phaseFocusPasajeros = phase === "check-in";
@@ -126,17 +135,17 @@ export function JourneyViajeClient({
   const pasajerosFocused = focusIs("pasajeros");
   const pasajerosStrip = guestMissionStripProps(guestMissionSteps);
 
-  // Aterrizaje (misma franja de misión que Viaje e Invitados: descargar fotos en ZIP)
-  const recuerdosStripProps = isPaid
+  // Aterrizaje (misma franja de misión que Viaje y Pasajeros: descargar fotos en ZIP)
+  const recuerdosStripProps = tienePlanExperienciaProducto
     ? {
         ...getRecuerdosFotosMissionStrip(recuerdosDescargaHecha),
         ariaLabel: "Progreso de recuerdos en Aterrizaje",
       }
     : undefined;
-  const experienciaDescription = isPaid
+  const experienciaDescription = tienePlanExperienciaProducto
     ? recuerdosMisionDescription(recuerdosDescargaHecha)
     : "Cierre y recuerdos ✨";
-  const experienciaCta = isPaid
+  const experienciaCta = tienePlanExperienciaProducto
     ? recuerdosMisionCtaLabel(recuerdosDescargaHecha)
     : "Definir aterrizaje";
 
@@ -148,7 +157,7 @@ export function JourneyViajeClient({
     : !guestMissionSteps.invitados_lista
       ? "empty"
       : "in_progress";
-  const experienciaMissionStatus: MissionStatus = !isPaid
+  const experienciaMissionStatus: MissionStatus = !tienePlanExperienciaProducto
     ? "locked"
     : recuerdosDescargaHecha
       ? "completed"
@@ -162,7 +171,7 @@ export function JourneyViajeClient({
     steps: pasajerosStrip.steps,
     doneCount: pasajerosStrip.doneCount,
     totalCount: pasajerosStrip.totalCount,
-    ariaLabel: "Progreso de invitados",
+    ariaLabel: "Progreso de pasajeros",
   };
 
   type CardSpec = {
@@ -178,7 +187,7 @@ export function JourneyViajeClient({
       node: (
         <JourneyCard
           key="evento"
-          title="Viaje"
+          title={JOURNEY_CARD_TITLE.evento}
           description={eventoDescription}
           icon={<Plane className="text-white/85" strokeWidth={1.65} aria-hidden />}
           status={eventoCardStatus}
@@ -202,7 +211,7 @@ export function JourneyViajeClient({
       node: (
         <JourneyCard
           key="pasajeros"
-          title="Invitados"
+          title={JOURNEY_CARD_TITLE.pasajeros}
           description={pasajerosDescription}
           icon={<Users className="text-white/85" strokeWidth={1.65} aria-hidden />}
           status={pasajerosCardStatus}
@@ -227,17 +236,19 @@ export function JourneyViajeClient({
       node: (
         <JourneyCard
           key="experiencia"
-          title="Aterrizaje"
+          title={JOURNEY_CARD_TITLE.experiencia}
           description={experienciaDescription}
           icon={<span aria-hidden>✨</span>}
-          status={!isPaid ? "locked" : recuerdosDescargaHecha ? "completed" : "active"}
-          href={isPaid ? "/panel/recuerdos?from=mission" : undefined}
+          status={
+            !tienePlanExperienciaProducto ? "locked" : recuerdosDescargaHecha ? "completed" : "active"
+          }
+          href={tienePlanExperienciaProducto ? "/panel/recuerdos?from=mission" : undefined}
           phaseHighlight={phaseFocusExperiencia || focusIs("experiencia")}
-          ctaLabel={isPaid ? experienciaCta : undefined}
-          pulse={isPaid && !recuerdosDescargaHecha && focusIs("experiencia")}
+          ctaLabel={tienePlanExperienciaProducto ? experienciaCta : undefined}
+          pulse={tienePlanExperienciaProducto && !recuerdosDescargaHecha && focusIs("experiencia")}
           missionStrip={recuerdosStripProps}
           onNavigate={
-            isPaid
+            tienePlanExperienciaProducto
               ? () =>
                   trackEvent("panel_mission_cta_clicked", {
                     target: "experiencia",
@@ -276,12 +287,12 @@ export function JourneyViajeClient({
   if (!evento) {
     return (
       <div className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-8 text-center shadow-[0_0_40px_rgba(212,175,55,0.06)] backdrop-blur-md transition-all duration-500">
-        <Plane className="mx-auto h-10 w-10 text-[#D4AF37]/80" aria-hidden />
+        <Plane className="mx-auto h-10 w-10 text-invite-gold/80" aria-hidden />
         <p className="mt-4 text-lg font-semibold text-white">Todavía no tienes un viaje creado</p>
-        <p className="mt-2 text-sm text-slate-400">Empezamos desde aquí: carga los datos e ingresa al panel.</p>
+        <p className="mt-2 text-sm text-slate-400">Arranca aquí: carga vuestro evento y abre el panel a tu ritmo.</p>
         <Link
           href="/onboarding"
-          className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] px-8 text-sm font-semibold text-[#0f172a] shadow-[0_8px_32px_rgba(212,175,55,0.25)] transition hover:brightness-110"
+          className={panelCtaJurnexPrimary + " mt-6 min-h-[48px] justify-center px-8"}
         >
           Crear mi viaje ✈️
         </Link>
@@ -296,7 +307,7 @@ export function JourneyViajeClient({
           <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">Para despegar</h2>
           {topActionable ? (
             <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-teal-300/80">
-              Siguiente: {labelForKey(topActionable.key)}
+              Siguiente: {JOURNEY_CARD_TITLE[topActionable.key]}
             </span>
           ) : null}
         </div>
@@ -324,15 +335,4 @@ export function JourneyViajeClient({
       </section>
     </div>
   );
-}
-
-function labelForKey(key: JourneyCardKey): string {
-  switch (key) {
-    case "evento":
-      return "Evento";
-    case "pasajeros":
-      return "Invitados";
-    case "experiencia":
-      return "Aterrizaje";
-  }
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import { RECUERDOS_ALBUM_EVENTO_ID, RECUERDOS_SIN_MOMENTO_HITO_ID, type RecuerdosZipPack } from "@/lib/recuerdos-fotos-constants";
 import { markRecuerdosFotosDownloadMision } from "@/lib/recuerdos-mission";
 import { eventoFotoPublicUrl } from "@/lib/evento-foto-url";
@@ -181,7 +182,7 @@ export function RecuerdosProgramaFotosClient({ eventoId, bloques, totalFotos }: 
               e.preventDefault();
               void downloadTodasLasDelEvento();
             }}
-            className="inline-flex min-h-[44px] w-full shrink-0 items-center justify-center gap-2 rounded-full border border-teal-500/50 bg-teal-500/15 px-4 text-sm font-medium text-teal-200 transition hover:border-teal-400/60 hover:bg-teal-500/25 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-[12rem]"
+            className={panelCtaJurnexPrimary + " min-h-[44px] w-full shrink-0 justify-center gap-2 px-4 sm:w-auto sm:min-w-[12rem] disabled:cursor-not-allowed disabled:opacity-50"}
             disabled={loadingAll || totalFotos === 0}
           >
             {loadingAll ? (

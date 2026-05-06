@@ -3,15 +3,15 @@
  * para que el cambio de pantalla no rompa el ritmo visual.
  */
 export const PANEL_VIAJE_TITLE = "Tu viaje";
-export const PANEL_VIAJE_SUBTITLE = "Tripulación, invitación y experiencia en tres pasos claros.";
+export const PANEL_VIAJE_SUBTITLE = "Quiénes acompañan, cómo luce la invitación y el día, en tres movimientos.";
 
 export const PANEL_INVITADOS_TITLE = "Tus Pasajeros";
-export const PANEL_INVITADOS_SUBTITLE = "Lista, envíos y confirmaciones.";
+export const PANEL_INVITADOS_SUBTITLE = "Quiénes, qué les toca, y qué responde cada invitado — acompáñalos a vuestro día.";
 
 export const PANEL_RECUERDOS_EYEBROW = "Aterrizaje";
 export const PANEL_RECUERDOS_TITLE = "Lo que queda del viaje";
 export const PANEL_RECUERDOS_SUBTITLE =
-  "Un lugar para volver cuando el gran día pasó: regalos, recuerdos y los detalles que querés conservar.";
+  "Donde volver cuando haya aterrizado el gran día: regalos, fotos y lo pequeño que haya sido grande.";
 
 /** Mismo contenedor que en la ficha Viaje (sincroniza bordes y márgenes). */
 export const panelJourneyPageWrapClass = "mx-auto w-full max-w-5xl space-y-4 md:space-y-5";

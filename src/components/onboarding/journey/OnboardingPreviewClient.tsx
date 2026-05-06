@@ -1,5 +1,6 @@
 "use client";
 
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import { BoardingPassPreview } from "@/components/onboarding/journey/BoardingPassPreview";
 import {
   defaultJourneyState,
@@ -96,7 +97,7 @@ export function OnboardingPreviewClient() {
     return (
       <p className="text-center text-sm text-slate-400">
         Falta el evento.{" "}
-        <Link href="/onboarding" className="text-[#D4AF37] hover:underline">
+        <Link href="/onboarding" className="text-invite-gold hover:underline">
           Volver al inicio
         </Link>
       </p>
@@ -106,7 +107,7 @@ export function OnboardingPreviewClient() {
   if (!ready || !state) {
     return (
       <div className="mx-auto flex min-h-[320px] max-w-sm flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-8">
-        <div className="h-10 w-10 animate-pulse rounded-full bg-[#D4AF37]/30" />
+        <div className="h-10 w-10 animate-pulse rounded-full bg-invite-gold/30" />
         <p className="text-sm text-slate-400">Preparando tu pase…</p>
       </div>
     );
@@ -120,7 +121,7 @@ export function OnboardingPreviewClient() {
       <div className="mt-8 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
         <Link
           href={`/onboarding/details?eventId=${encodeURIComponent(eventIdParam)}`}
-          className="inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] px-6 text-sm font-semibold text-[#0f172a] shadow-lg transition hover:brightness-110"
+          className={panelCtaJurnexPrimary + " min-h-[48px] flex-1 justify-center px-6"}
         >
           Personalizar mi viaje
         </Link>

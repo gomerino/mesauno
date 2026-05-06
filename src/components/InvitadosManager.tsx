@@ -3,15 +3,15 @@
 import { BulkImportInvitados } from "@/components/BulkImportInvitados";
 import { Button, Input, Textarea } from "@/components/jurnex-ui";
 import { InvitadosGrupo } from "@/components/panel/pasajeros/InvitadosGrupo";
-import { useEnvioInvitaciones } from "@/hooks/useEnvioInvitaciones";
 import { groupInvitadosByMesa } from "@/lib/invitados-group-by-mesa";
 import { sortInvitadoAcompanantes } from "@/lib/invitado-acompanantes";
 import { invitadoPasaFiltroMetrica, type InvitadoMetricaFiltro } from "@/lib/invitaciones-metricas";
 import { restriccionesFromDb, restriccionesToDb } from "@/lib/restricciones-alimenticias";
+import { JX } from "@/lib/jurnex-voz";
 import { supabaseErrorMessage } from "@/lib/supabase-error";
 import { trackEvent } from "@/lib/analytics";
 import { createClient } from "@/lib/supabase/client";
-import type { CanalEnvioInvitacion, Invitado } from "@/types/database";
+import type { Invitado } from "@/types/database";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -87,8 +87,8 @@ export type InvitadosManagerProps = {
   initialInvitados: Invitado[];
   rows: Invitado[];
   setRows: Dispatch<SetStateAction<Invitado[]>>;
-  canalPreferido: CanalEnvioInvitacion;
-  envio: ReturnType<typeof useEnvioInvitaciones>;
+  /** Plan Esencial o Experiencia pagado; controla copiar enlace por fila. */
+  planPagado: boolean;
   addInvitadoRef?: MutableRefObject<(() => void) | null>;
   importListRef?: MutableRefObject<(() => void) | null>;
   /** Vista filtrada desde el home; operaciones usan `rows` completo. */
@@ -105,8 +105,7 @@ export function InvitadosManager({
   initialInvitados,
   rows,
   setRows,
-  canalPreferido,
-  envio,
+  planPagado,
   addInvitadoRef,
   importListRef,
   metricaFiltro = null,
@@ -230,8 +229,8 @@ export function InvitadosManager({
     } = await supabase.auth.getUser();
     if (authErr || !user) {
       setSaving(false);
-      setFormError("Inicia sesión para guardar.");
-      toast.error("Inicia sesión para guardar.", { duration: 4000 });
+      setFormError(JX.iniciaSesion);
+      toast.error(JX.iniciaSesion, { duration: 4000 });
       return;
     }
     const payload = payloadFromForm(form, eventoId, user.id, editingId);
@@ -259,7 +258,7 @@ export function InvitadosManager({
         setRows((r) => r.map((x) => (x.id === editingId ? full : x)));
       }
       closeModal();
-      toast.success("Invitado actualizado", { duration: 4000 });
+      toast.success(JX.invitadoActualizado, { duration: 4000 });
       refreshList();
       return;
     }
@@ -284,7 +283,7 @@ export function InvitadosManager({
 
     if (insErr || newId == null || typeof newId !== "string") {
       setSaving(false);
-      const msg = insErr ? supabaseErrorMessage(insErr) : "No se pudo crear el invitado";
+      const msg = insErr ? supabaseErrorMessage(insErr) : "No pudimos añadir a esta persona. Revisa e inténtalo otra vez.";
       setFormError(msg);
       toast.error(msg, { duration: 4000 });
       return;
@@ -317,7 +316,7 @@ export function InvitadosManager({
       companions_count: form.acompanantes.filter((n) => n.trim().length > 0).length,
     });
     closeModal();
-    toast.success("Persona añadida a la lista", { duration: 4000 });
+    toast.success(JX.invitadoAñadido, { duration: 4000 });
     refreshList();
   }
 
@@ -328,16 +327,16 @@ export function InvitadosManager({
 
   const handleDelete = useCallback(
     async (id: string) => {
-      if (!confirm("¿Eliminar este invitado?")) return;
+      if (!confirm("¿Quitar a esta persona de la lista?")) return;
       setDeletingId(id);
       try {
         const { error } = await supabase.from("invitados").delete().eq("id", id);
         if (error) {
-          toast.error("No se pudo eliminar. Intenta nuevamente.", { duration: 4000 });
+          toast.error(JX.eliminarFalla, { duration: 4000 });
           return;
         }
         setRows((r) => r.filter((x) => x.id !== id));
-        toast.success("Invitado eliminado de la lista", { duration: 4000 });
+        toast.success(JX.invitadoBorrado, { duration: 4000 });
       } finally {
         setDeletingId(null);
       }
@@ -370,22 +369,11 @@ export function InvitadosManager({
     setOpenMesaKey((cur) => (cur === key ? null : key));
   }, []);
 
-  const onEnviarRow = useCallback(
-    (id: string) => void envio.enviarIds(`row:${id}`, [id]),
-    [envio]
-  );
-  const onReenviarRow = useCallback(
-    (id: string) => void envio.reenviarIds(`row:${id}`, [id]),
-    [envio]
-  );
-  const onEnviarGrupo = useCallback(
-    (mesaKey: string, ids: string[]) => void envio.enviarIds(`mesa:${mesaKey}`, ids),
-    [envio]
-  );
-  const onReenviarGrupo = useCallback(
-    (mesaKey: string, ids: string[]) => void envio.reenviarIds(`mesa:${mesaKey}`, ids),
-    [envio]
-  );
+  const [siteOrigin, setSiteOrigin] = useState("");
+
+  useEffect(() => {
+    setSiteOrigin(typeof window === "undefined" ? "" : window.location.origin);
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -397,7 +385,7 @@ export function InvitadosManager({
           <div className="px-2 py-10 text-center sm:px-4">
             <p className="font-display text-sm font-medium text-white/70">Lista vacía</p>
             <p className="mt-2 text-sm text-white/45">
-              Usá «Añadir invitado» o «Importar lista» arriba para comenzar.
+              Usa «Añadir invitado» o «Importar lista» arriba para comenzar.
             </p>
           </div>
         ) : displayRows.length === 0 ? (
@@ -416,17 +404,12 @@ export function InvitadosManager({
             {mesasAgrupadas.map((mesa) => (
               <InvitadosGrupo
                 key={mesa.key}
-                mesaKey={mesa.key}
                 label={mesa.label}
                 invitados={mesa.invitados}
                 isOpen={openMesaKey === mesa.key}
                 onToggle={() => toggleMesa(mesa.key)}
-                canalPreferido={canalPreferido}
-                busyScope={envio.busyScope}
-                onEnviarGrupo={onEnviarGrupo}
-                onReenviarGrupo={onReenviarGrupo}
-                onEnviarRow={onEnviarRow}
-                onReenviarRow={onReenviarRow}
+                siteOrigin={siteOrigin}
+                planPagado={planPagado}
                 onEdit={openEdit}
                 onDelete={handleDelete}
                 deletingId={deletingId}
@@ -465,7 +448,7 @@ export function InvitadosManager({
                 <div>
                   <label className={label}>Acompañantes en la misma invitación (opcional)</label>
                   <p className="mb-2 text-xs text-jurnex-text-muted">
-                    Familia o personas que comparten esta misma invitación; podés añadir varias líneas.
+                    Familia o personas bajo el mismo pase. Puedes añadir varias líneas.
                   </p>
                   <div className="space-y-2">
                     {form.acompanantes.map((line, i) => (

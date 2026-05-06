@@ -85,3 +85,11 @@ comment on column public.invitados.estado_envio is
   'Estado del flujo de invitación: pendiente → enviado → abierto; confirmado al confirmar asistencia (RSVP).';
 comment on column public.invitados.canal_envio is
   'Último canal usado o previsto para el envío (correo / WhatsApp / ambos).';
+
+-- 3) Tema de invitación Jurnex Aviation (requerido por FK eventos.theme_id / RPC de cambio de tema)
+insert into public.themes (id, name, slug)
+values
+  ('jurnex-aviation', 'Jurnex Aviation', 'jurnex-aviation')
+on conflict (id) do update
+set name = excluded.name,
+  slug = excluded.slug;

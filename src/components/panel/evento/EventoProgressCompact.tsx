@@ -22,7 +22,7 @@ function ProgressRow({ label, progress, ariaLabel }: { label: string; progress: 
         aria-label={ariaLabel}
       >
         <div
-          className="h-full rounded-full bg-gradient-to-r from-teal-400 to-[#F5C451]"
+          className="h-full rounded-full bg-gradient-to-r from-teal-400 to-journeyFiesta-gold"
           style={{ width: `${pct}%` }}
         />
       </div>

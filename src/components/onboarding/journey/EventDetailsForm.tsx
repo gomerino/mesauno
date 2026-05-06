@@ -1,5 +1,6 @@
 "use client";
 
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import {
   defaultJourneyState,
   loadJourneyFromStorage,
@@ -89,7 +90,7 @@ export function EventDetailsForm() {
   if (!eventId || !state) {
     return (
       <p className="text-center text-sm text-slate-400">
-        <Link href="/onboarding" className="text-[#D4AF37] hover:underline">
+        <Link href="/onboarding" className="text-invite-gold hover:underline">
           Empezar de nuevo
         </Link>
       </p>
@@ -99,51 +100,51 @@ export function EventDetailsForm() {
   return (
     <div className="mx-auto w-full max-w-lg space-y-5 rounded-2xl border border-white/10 bg-white/[0.04] p-6">
       <div>
-        <label className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
           Nombre del evento
         </label>
         <input
           value={state.event_name ?? ""}
           onChange={(e) => updateField({ event_name: e.target.value })}
           placeholder="ej. La boda de Camila & Diego"
-          className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/80 px-4 py-3 text-sm text-white placeholder:text-slate-500"
+          className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/80 px-4 py-3 text-sm text-white placeholder:text-slate-500"
         />
       </div>
       <div>
-        <label className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
           Lugar (nombre)
         </label>
         <input
           value={state.location_name ?? ""}
           onChange={(e) => updateField({ location_name: e.target.value })}
           placeholder="ej. Viña Santa Rita"
-          className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/80 px-4 py-3 text-sm text-white"
+          className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/80 px-4 py-3 text-sm text-white"
         />
       </div>
       <div>
-        <label className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
           Dirección
         </label>
         <input
           value={state.address ?? ""}
           onChange={(e) => updateField({ address: e.target.value })}
           placeholder="Calle, comuna, región"
-          className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/80 px-4 py-3 text-sm text-white"
+          className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/80 px-4 py-3 text-sm text-white"
         />
       </div>
       <div>
-        <label className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
           Dress code
         </label>
         <input
           value={state.dress_code ?? ""}
           onChange={(e) => updateField({ dress_code: e.target.value })}
           placeholder="ej. Elegante / Cocktail"
-          className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/80 px-4 py-3 text-sm text-white"
+          className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/80 px-4 py-3 text-sm text-white"
         />
       </div>
       <div>
-        <label className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
           Mensaje (opcional)
         </label>
         <textarea
@@ -151,7 +152,7 @@ export function EventDetailsForm() {
           onChange={(e) => updateField({ message: e.target.value })}
           rows={3}
           placeholder="Unas palabras para tus invitados…"
-          className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/80 px-4 py-3 text-sm text-white placeholder:text-slate-500"
+          className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/80 px-4 py-3 text-sm text-white placeholder:text-slate-500"
         />
       </div>
 
@@ -174,7 +175,7 @@ export function EventDetailsForm() {
       <button
         type="button"
         onClick={() => router.push(`/onboarding/guests?eventId=${encodeURIComponent(eventId)}`)}
-        className="w-full rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] py-3 text-sm font-semibold text-[#0f172a]"
+        className={panelCtaJurnexPrimary + " w-full justify-center py-3"}
       >
         Siguiente: invitados
       </button>

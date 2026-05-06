@@ -8,12 +8,14 @@ import {
   playlistInsertAporte,
   spotifyGetCredentials,
   spotifyUpdateRefreshTokenIfPresent,
+  spotifyUpsertRefreshToken,
 } from "@/lib/spotify-credentials";
 import {
   mensajeUsuarioSpotifyAddTrack,
   spotifyAccessTokenAllowsPlaylistModify,
   spotifyAccessTokenJwtScopes,
   spotifyAddTracksToPlaylist,
+  spotifyFetchCurrentUserId,
   spotifyFetchPlaylistOwner,
   spotifyRefreshAccessToken,
   type SpotifyPlaylistMetaResult,
@@ -89,33 +91,45 @@ export async function addTrackToPlaylist(invitationAccessToken: string, track: T
 
   await spotifyUpdateRefreshTokenIfPresent(db, invitado.evento_id, refreshed.refresh_token);
 
-  let playlistMeta: SpotifyPlaylistMetaResult | null = null;
-  let ownerMatches = true;
+  // Si la conexión vieja no guardó `spotify_user_id` (p. ej. /me falló al conectar), lo resolvemos
+  // ahora con el access token fresco y lo persistimos. Sin esto saltábamos la validación de dueño.
+  let spotifyUserId = creds.spotify_user_id?.trim() || null;
+  if (!spotifyUserId) {
+    const me = await spotifyFetchCurrentUserId(refreshed.access_token, { logFailure: true });
+    if (me) {
+      spotifyUserId = me;
+      await spotifyUpsertRefreshToken(db, invitado.evento_id, creds.refresh_token!, me);
+    } else {
+      return {
+        ok: false,
+        error:
+          "No pudimos verificar la cuenta de Spotify vinculada. Pídele a quien organiza el evento que vuelva a vincular Spotify desde el panel.",
+      };
+    }
+  }
 
-  if (creds.spotify_user_id) {
-    playlistMeta = await spotifyFetchPlaylistOwner(refreshed.access_token, playlistId);
-    if (!playlistMeta.ok) {
-      return {
-        ok: false,
-        error:
-          "No pudimos validar la playlist del evento. Los novios deben revisar el enlace en el panel.",
-      };
-    }
-    ownerMatches = playlistMeta.ownerId === creds.spotify_user_id;
-    if (!ownerMatches && !playlistMeta.collaborative) {
-      return {
-        ok: false,
-        error:
-          "La playlist del evento no coincide con la cuenta de Spotify vinculada. Los novios deben revisar la configuración en el panel.",
-      };
-    }
-    if (playlistMeta.collaborative && !ownerMatches) {
-      return {
-        ok: false,
-        error:
-          "Esta playlist es colaborativa y la cuenta vinculada no es la dueña. Spotify no permite añadir canciones desde la app en ese caso. Usa una playlist cuya dueña sea la cuenta vinculada, o vincula la cuenta del dueño.",
-      };
-    }
+  const playlistMeta: SpotifyPlaylistMetaResult = await spotifyFetchPlaylistOwner(
+    refreshed.access_token,
+    playlistId
+  );
+  if (!playlistMeta.ok) {
+    return {
+      ok: false,
+      error:
+        playlistMeta.status === 404
+          ? "La playlist del evento ya no existe en Spotify. Pídele a quien organiza que la actualice en el panel."
+          : "No pudimos validar la playlist del evento. Pídele a quien organiza que la revise en el panel.",
+    };
+  }
+  const ownerMatches = playlistMeta.ownerId === spotifyUserId;
+  if (!ownerMatches) {
+    // Spotify ya no permite POST /tracks en playlists colaborativas desde la API si no eres dueño
+    // (cambio 2024). Cualquier caso “otro dueño” lo bloqueamos con mensaje accionable.
+    return {
+      ok: false,
+      error:
+        "La playlist conectada no pertenece a la cuenta de Spotify vinculada, así que la API no deja añadir canciones. Pídele a quien organiza que entre al panel y use «Crear playlist nueva con mi cuenta» o pegue el enlace de una propia.",
+    };
   }
 
   const added = await spotifyAddTracksToPlaylist(refreshed.access_token, playlistId, [uri]);
@@ -125,12 +139,15 @@ export async function addTrackToPlaylist(invitationAccessToken: string, track: T
         spotifyMessage: added.spotifyMessage?.slice(0, 300),
         refresh_scope: refreshed.scope ?? "(omitido)",
         jwt_scopes: spotifyAccessTokenJwtScopes(refreshed.access_token)?.join(" ") ?? "(opaco o sin scp)",
+        playlistId,
+        ownerMatches,
+        collaborative: playlistMeta.collaborative,
       });
     }
     let error = mensajeUsuarioSpotifyAddTrack(added.status, added.spotifyMessage);
-    if (added.status === 403 && playlistMeta?.ok && playlistMeta.collaborative && ownerMatches) {
+    if (added.status === 403 && playlistMeta.collaborative) {
       error +=
-        " Si la lista está en modo colaborativo, prueba desactivar la colaboración o crea una playlist nueva sin colaboración y actualízala en el panel.";
+        " Spotify dejó de permitir añadir desde la API en listas marcadas como colaborativas. Pídele a quien organiza que cree una playlist nueva sin colaboración o use «Crear playlist nueva con mi cuenta» en el panel.";
     }
     return { ok: false, error };
   }

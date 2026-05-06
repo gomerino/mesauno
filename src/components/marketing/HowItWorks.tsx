@@ -11,8 +11,8 @@ const steps = [
   },
   {
     n: "3",
-    title: "Comparte el pase y suma rumbo",
-    body: "Cada invitado con su enlace. Cuando quieras, el marketplace y los proveedores cerca, al ritmo de tu boda.",
+    title: "Comparte el pase y confirma asistencia",
+    body: "Cada invitado recibe su enlace con experiencia completa: ticket, RSVP y datos clave del evento, todo coherente con tu tablero.",
   },
 ] as const;
 

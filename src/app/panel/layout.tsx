@@ -6,6 +6,7 @@ import { loadPanelProgressBundle } from "@/lib/panel-progress-load";
 import { resolveJourneyPhase } from "@/lib/journey-phases";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { isUserStaffOnly } from "@/lib/membership-roles";
+import { eventoTienePlanExperienciaProducto, eventoTienePlanPagado } from "@/lib/evento-plan-access";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -38,9 +39,8 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   let showUnlock = false;
   let prefillNombre = "";
   if (eventoId && evento) {
-    const planStatus = (evento as { plan_status?: string }).plan_status ?? "trial";
     const { data: isAdmin } = await supabase.rpc("user_is_evento_admin", { p_evento_id: eventoId });
-    showUnlock = planStatus !== "paid" && Boolean(isAdmin);
+    showUnlock = !eventoTienePlanPagado(evento) && Boolean(isAdmin);
     const n1 = (evento as { nombre_novio_1?: string | null }).nombre_novio_1?.trim() ?? "";
     const n2 = (evento as { nombre_novio_2?: string | null }).nombre_novio_2?.trim() ?? "";
     prefillNombre = [n1, n2].filter(Boolean).join(" & ");
@@ -55,6 +55,8 @@ export default async function PanelLayout({ children }: { children: React.ReactN
       />
     ) : null;
 
+  const experienciaPlanActive = eventoTienePlanExperienciaProducto(evento);
+
   return (
     <>
       <PanelShell
@@ -63,6 +65,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         journeyPhase={journeyPhase}
         journeyProgressPrimary={journeyProgressPrimary}
         journeyProgressHint={journeyProgressHint}
+        experienciaPlanActive={experienciaPlanActive}
       >
         {children}
       </PanelShell>

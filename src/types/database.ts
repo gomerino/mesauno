@@ -306,3 +306,48 @@ export type MarketplaceTarjeta = {
   precio_desde_clp: number | null;
   medios_count: number;
 };
+
+export type PlaylistEventoEstado = "draft" | "conectada";
+
+export type AporteCancionEstado = "pendiente" | "aprobado" | "rechazado";
+
+export type AporteCancionFuente = "invitado" | "novio";
+
+export type PlaylistEvento = {
+  id: string;
+  evento_id: string;
+  spotify_playlist_id: string | null;
+  estado: PlaylistEventoEstado;
+  created_at: string;
+};
+
+export type Cancion = {
+  id: string;
+  spotify_id: string | null;
+  titulo: string;
+  artista: string;
+  imagen: string | null;
+  duracion_ms: number | null;
+  created_at: string;
+};
+
+export type AporteCancion = {
+  id: string;
+  evento_id: string;
+  usuario_id: string | null;
+  invitado_id: string | null;
+  cancion_id: string;
+  estado: AporteCancionEstado;
+  fuente: AporteCancionFuente;
+  /** Contador de votos (tabla `votos_canciones`). */
+  votos?: number;
+  created_at: string;
+};
+
+export type VotoCancion = {
+  id: string;
+  aporte_id: string;
+  usuario_id: string | null;
+  invitado_id: string | null;
+  created_at: string;
+};

@@ -1,12 +1,11 @@
 import { GrowthNudge } from "@/components/app/GrowthNudge";
 import { PanelLayout } from "@/components/panel/ds";
-import { JourneyPrimaryCta } from "@/components/panel/journey/JourneyPrimaryCta";
 import { PasajerosPage } from "@/components/panel/pasajeros/PasajerosPage";
 import { createClient } from "@/lib/supabase/server";
 import { panelJourneyPageWrapClass } from "@/lib/panel-section-copy";
 import { fetchInvitadosPanelRowsWithAcompanantes } from "@/lib/panel-invitados";
-import { resolveJourneyPhase } from "@/lib/journey-phases";
 import { loadPanelProgressBundle } from "@/lib/panel-progress-load";
+import { eventoTienePlanPagado } from "@/lib/evento-plan-access";
 import { parseMetricaFiltroFromSearch } from "@/lib/invitado-metrica-url";
 import type { Invitado } from "@/types/database";
 
@@ -44,39 +43,11 @@ export default async function PanelInvitadosPage({
   const metricaFiltro = parseMetricaFiltroFromSearch(
     typeof metricaRaw === "string" ? metricaRaw : Array.isArray(metricaRaw) ? metricaRaw[0] : undefined
   );
-  const journeyPhase = resolveJourneyPhase(evento?.fecha_boda, evento?.fecha_evento);
-  const planStatus = evento?.plan_status ?? null;
-  const hasAccess = planStatus === "paid";
-  const invitacionesEnviadas = invitados.filter((r) => r.email_enviado === true).length;
-  let canCheckout = false;
-  let prefillNombre = "";
-  if (evento?.id) {
-    const { data: isAdmin } = await supabase.rpc("user_is_evento_admin", { p_evento_id: evento.id });
-    canCheckout = planStatus !== "paid" && Boolean(isAdmin);
-    const n1 = evento.nombre_novio_1?.trim() ?? "";
-    const n2 = evento.nombre_novio_2?.trim() ?? "";
-    prefillNombre = [n1, n2].filter(Boolean).join(" & ");
-  }
+  const planPagado = eventoTienePlanPagado(evento);
 
   return (
     <PanelLayout>
       <div className={panelJourneyPageWrapClass}>
-        {!hasAccess ? (
-        <div>
-          <JourneyPrimaryCta
-            invitados_count={invitados.length}
-            plan_status={planStatus}
-            payment_status={bundle.mockPaymentStatus}
-            invitaciones_enviadas={invitacionesEnviadas}
-            canCheckout={canCheckout}
-            eventoId={evento?.id ?? null}
-            userEmail={user?.email ?? ""}
-            prefillNombre={prefillNombre || "Mi evento"}
-            phase={journeyPhase}
-          />
-        </div>
-      ) : null}
-
       {!evento && (
         <div>
           <GrowthNudge
@@ -107,6 +78,7 @@ export default async function PanelInvitadosPage({
         <div id="agregar-invitados" className="scroll-mt-24">
           <PasajerosPage
             eventoId={evento?.id ?? null}
+            planPagado={planPagado}
             initialInvitados={invitados}
             fromMission={fromMission}
             metricaFiltro={metricaFiltro}

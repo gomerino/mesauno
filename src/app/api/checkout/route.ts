@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   try {
     body = (await request.json()) as typeof body;
   } catch {
-    return NextResponse.json({ error: "Cuerpo JSON inválido." }, { status: 400 });
+    return NextResponse.json({ error: "No pudimos leer el pago. Recarga e inténtalo otra vez." }, { status: 400 });
   }
 
   const bypass = shouldUseMercadoPagoCheckoutBypass(request, { bodyBypass: body.bypass === true });

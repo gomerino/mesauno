@@ -1,5 +1,7 @@
 import { createServiceClient } from "@/lib/supabase/server";
+import { computeEstadoEnvioAfterRsvp } from "@/lib/invitado-estado-envio";
 import { restriccionesToDb } from "@/lib/restricciones-alimenticias";
+import type { Invitado } from "@/types/database";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -25,13 +27,32 @@ export async function POST(request: Request) {
   }
 
   const supabase = await createServiceClient();
+
+  const { data: prior, error: fetchErr } = await supabase
+    .from("invitados")
+    .select("id, rsvp_estado, asistencia_confirmada, invitacion_vista, email_enviado, estado_envio")
+    .eq("id", invitadoId)
+    .maybeSingle();
+
+  if (fetchErr) {
+    return NextResponse.json({ error: fetchErr.message }, { status: 500 });
+  }
+  if (!prior) {
+    return NextResponse.json({ error: "Invitado no encontrado" }, { status: 404 });
+  }
+
   const { data, error } = await supabase
     .from("invitados")
     .update({
       restricciones_alimenticias: restriccionesToDb(
         restricciones_alimenticias == null ? null : String(restricciones_alimenticias)
       ),
-      ...(rsvp_estado ? { rsvp_estado } : {}),
+      ...(rsvp_estado
+        ? {
+            rsvp_estado: rsvp_estado,
+            estado_envio: computeEstadoEnvioAfterRsvp(prior as Invitado, { rsvp_estado: rsvp_estado }),
+          }
+        : {}),
     })
     .eq("id", invitadoId)
     .select("id")

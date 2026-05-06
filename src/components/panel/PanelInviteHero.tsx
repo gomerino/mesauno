@@ -16,7 +16,7 @@ type Props = {
 export function PanelInviteHero({ tituloNovios, fechaEvento, horaEmbarque, fechaLegible }: Props) {
   return (
     <header
-      className="relative -mx-6 mb-1.5 shrink-0 overflow-hidden rounded-b-2xl border-b border-white/10 bg-gradient-to-br from-jurnex-bg via-[#0f172a] to-teal-950/40 text-white shadow-[0_8px_28px_rgba(0,0,0,0.35)] sm:mb-2 md:-mx-6 md:mb-2.5"
+      className="relative -mx-6 mb-1.5 shrink-0 overflow-hidden rounded-b-2xl border-b border-white/10 bg-gradient-to-br from-jurnex-bg via-slate-900 to-teal-950/40 text-white shadow-[0_8px_28px_rgba(0,0,0,0.35)] sm:mb-2 md:-mx-6 md:mb-2.5"
       aria-label="Matrimonio"
     >
       <div

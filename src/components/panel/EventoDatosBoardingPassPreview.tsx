@@ -1,6 +1,7 @@
 "use client";
 
 import { BoardingPassCard } from "@/components/BoardingPassCard";
+import { AviationInvitacionProvider } from "@/components/themes/AviationInvitacionContext";
 import { SoftAviationTicket } from "@/components/themes/soft-aviation/SoftAviationTicket";
 import { boardingPassQrMapUrlMerged, mergeEventoParaPase } from "@/lib/evento-boarding";
 import type { InvitacionThemeId } from "@/lib/invitacion-theme";
@@ -63,16 +64,24 @@ export function EventoDatosBoardingPassPreview({ previewEvento, themeId }: Props
         y lugar que definas.
       </p>
       <div className="mt-3 w-full min-w-0">
-        {themeId === "soft-aviation" ? (
-          <div className="w-full min-w-0 rounded-2xl bg-invite-sand p-2 sm:px-3 sm:py-3">
+        {themeId === "soft-aviation" || themeId === "jurnex-aviation" ? (
+          <div
+            className={
+              themeId === "jurnex-aviation"
+                ? "w-full min-w-0 rounded-2xl bg-inviteJurnex-sand p-2 sm:px-3 sm:py-3"
+                : "w-full min-w-0 rounded-2xl bg-invite-sand p-2 sm:px-3 sm:py-3"
+            }
+          >
             <div className="mx-auto w-full min-w-0 max-w-[20.5rem]">
-              <SoftAviationTicket
-                invitado={invitadoPreview}
-                evento={previewEvento}
-                merged={merged}
-                mapUrl={mapUrl}
-                programaHitos={EMPTY_PROGRAMA}
-              />
+              <AviationInvitacionProvider value={themeId === "jurnex-aviation" ? "jurnex" : "soft"}>
+                <SoftAviationTicket
+                  invitado={invitadoPreview}
+                  evento={previewEvento}
+                  merged={merged}
+                  mapUrl={mapUrl}
+                  programaHitos={EMPTY_PROGRAMA}
+                />
+              </AviationInvitacionProvider>
             </div>
           </div>
         ) : (
@@ -82,7 +91,13 @@ export function EventoDatosBoardingPassPreview({ previewEvento, themeId }: Props
         )}
       </div>
       <p className="mt-3 text-center text-[10px] text-white/40">
-        Tema: {themeId === "soft-aviation" ? "Premium Aviation" : "Clásico"} · cámbialo en la pestaña Invitación, sección
+        Tema:{" "}
+        {themeId === "soft-aviation"
+          ? "Premium Aviation"
+          : themeId === "jurnex-aviation"
+            ? "Jurnex Aviation"
+            : "Clásico"}{" "}
+        · cámbialo en la pestaña Invitación, sección
         &quot;Estilo de invitación&quot;
       </p>
     </div>

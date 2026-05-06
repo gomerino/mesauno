@@ -1,3 +1,4 @@
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 
@@ -14,7 +15,7 @@ export default function MarketplaceProveedorNotFound() {
         </p>
         <Link
           href="/marketplace"
-          className="mt-8 inline-flex rounded-full bg-teal-500 px-6 py-3 text-sm font-semibold text-white hover:bg-teal-400"
+          className={panelCtaJurnexPrimary + " mt-8 justify-center px-6 py-3"}
         >
           Ir al marketplace
         </Link>

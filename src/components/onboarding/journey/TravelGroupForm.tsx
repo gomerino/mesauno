@@ -1,5 +1,6 @@
 "use client";
 
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import { createClient } from "@/lib/supabase/client";
 import {
   defaultJourneyState,
@@ -243,7 +244,7 @@ export function TravelGroupForm() {
   if (!eventId || !journey) {
     return (
       <p className="text-center text-sm text-slate-400">
-        <Link href="/onboarding" className="text-[#D4AF37] hover:underline">
+        <Link href="/onboarding" className="text-invite-gold hover:underline">
           Empezar de nuevo
         </Link>
       </p>
@@ -260,8 +261,8 @@ export function TravelGroupForm() {
       </div>
 
       <form onSubmit={(e) => void onSubmit(e)} className="space-y-6">
-        <div className="rounded-2xl border border-[#D4AF37]/35 bg-[#D4AF37]/[0.07] p-4 sm:p-5">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-[#D4AF37]">Pasajero principal</p>
+        <div className="rounded-2xl border border-invite-gold/35 bg-invite-gold/[0.07] p-4 sm:p-5">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-invite-gold">Pasajero principal</p>
           <div className="mt-4 space-y-3">
             <div>
               <label htmlFor="tg-name" className="block text-xs font-medium text-slate-400">
@@ -274,7 +275,7 @@ export function TravelGroupForm() {
                 required
                 autoComplete="name"
                 placeholder="Como en el pase"
-                className="mt-1.5 w-full rounded-lg border border-white/15 bg-[#0f172a]/90 px-3 py-3 text-sm text-white placeholder:text-slate-600"
+                className="mt-1.5 w-full rounded-lg border border-white/15 bg-slate-900/90 px-3 py-3 text-sm text-white placeholder:text-slate-600"
               />
             </div>
             <div>
@@ -287,7 +288,7 @@ export function TravelGroupForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
-                className="mt-1.5 w-full rounded-lg border border-white/15 bg-[#0f172a]/90 px-3 py-3 text-sm text-white"
+                className="mt-1.5 w-full rounded-lg border border-white/15 bg-slate-900/90 px-3 py-3 text-sm text-white"
               />
             </div>
             <div>
@@ -300,7 +301,7 @@ export function TravelGroupForm() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 autoComplete="tel"
-                className="mt-1.5 w-full rounded-lg border border-white/15 bg-[#0f172a]/90 px-3 py-3 text-sm text-white"
+                className="mt-1.5 w-full rounded-lg border border-white/15 bg-slate-900/90 px-3 py-3 text-sm text-white"
               />
             </div>
           </div>
@@ -315,13 +316,13 @@ export function TravelGroupForm() {
               onChange={(e) => setCompanionInput(e.target.value)}
               onKeyDown={onCompanionKeyDown}
               placeholder="Nombre del acompañante"
-              className="min-w-0 flex-1 rounded-lg border border-white/15 bg-[#0f172a]/80 px-3 py-3 text-sm text-white placeholder:text-slate-600"
+              className="min-w-0 flex-1 rounded-lg border border-white/15 bg-slate-900/80 px-3 py-3 text-sm text-white placeholder:text-slate-600"
               aria-label="Nombre del acompañante"
             />
             <button
               type="button"
               onClick={() => addCompanionLine(companionInput)}
-              className="shrink-0 rounded-lg border border-[#D4AF37]/40 bg-[#D4AF37]/15 px-4 py-3 text-sm font-medium text-[#D4AF37] hover:bg-[#D4AF37]/25"
+              className="shrink-0 rounded-lg border border-invite-gold/40 bg-invite-gold/15 px-4 py-3 text-sm font-medium text-invite-gold hover:bg-invite-gold/25"
             >
               Añadir
             </button>
@@ -364,7 +365,7 @@ export function TravelGroupForm() {
         <button
           type="submit"
           disabled={busy || !primaryName.trim()}
-          className="w-full rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] py-3.5 text-sm font-semibold text-[#0f172a] shadow-lg disabled:opacity-50"
+          className={panelCtaJurnexPrimary + " w-full justify-center py-3.5 disabled:opacity-50"}
         >
           {busy ? "Guardando…" : "Guardar grupo de viaje"}
         </button>

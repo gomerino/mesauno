@@ -1,8 +1,10 @@
 import { PanelLayout } from "@/components/panel/ds";
 import { PanelPostPaymentSuccess } from "@/components/panel/PanelPostPaymentSuccess";
+import { eventoTienePlanPagado } from "@/lib/evento-plan-access";
 import { selectEventoForMember } from "@/lib/evento-membership";
 import { loadPanelProgressBundle } from "@/lib/panel-progress-load";
 import { createClient } from "@/lib/supabase/server";
+import type { EventoPlanGate } from "@/lib/evento-plan-access";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
@@ -39,15 +41,13 @@ export default async function PanelSuccessPage({
     user.id,
     "id, plan, plan_status, monto_pagado, payment_id"
   );
-  const evento = eventoRaw as {
+  const evento = eventoRaw as (EventoPlanGate & {
     id?: string;
-    plan?: string | null;
-    plan_status?: string | null;
     monto_pagado?: number | null;
     payment_id?: string | null;
-  } | null;
+  }) | null;
 
-  if (!evento?.id || evento.plan_status !== "paid") {
+  if (!evento?.id || !eventoTienePlanPagado(evento)) {
     redirect("/panel");
   }
 

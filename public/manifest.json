@@ -1,6 +1,7 @@
 {
-  "name": "Jurnex",
+  "name": "Jurnex — vuestro viaje a la boda",
   "short_name": "Jurnex",
+  "description": "Invitación, pasajeros y el día, con el tono cálido de un viaje compartido.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#02182a",

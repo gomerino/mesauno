@@ -1,3 +1,4 @@
+import { panelCtaJurnexJourneyPillLayout, panelCtaJurnexJourneyPillLayoutFull, panelCtaJurnexPrimary } from "@/components/panel/ds";
 import { PanelBackLink } from "@/components/panel/PanelBackLink";
 import { PanelPageContainer } from "@/components/panel/PanelPageContainer";
 import { PanelPageHeader } from "@/components/panel/PanelPageHeader";
@@ -85,7 +86,7 @@ export default async function PanelInvitacionHubPage() {
       <div className="mt-6 md:hidden">
         <Link
           href={primaryHref}
-          className="flex min-h-[48px] w-full items-center justify-center rounded-full bg-teal-500 px-4 text-sm font-semibold text-white shadow-lg shadow-teal-950/30 transition hover:bg-teal-400"
+          className={panelCtaJurnexPrimary + " " + panelCtaJurnexJourneyPillLayoutFull}
         >
           {primaryLabel}
         </Link>
@@ -103,7 +104,7 @@ export default async function PanelInvitacionHubPage() {
       <div className="mt-6 hidden md:block">
         <Link
           href={primaryHref}
-          className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-teal-500 px-6 text-sm font-semibold text-white shadow-md hover:bg-teal-400"
+          className={panelCtaJurnexPrimary + " " + panelCtaJurnexJourneyPillLayout}
         >
           {primaryLabel}
         </Link>
@@ -127,7 +128,7 @@ export default async function PanelInvitacionHubPage() {
         )}
         <Link
           href="/panel/pasajeros/vista"
-          className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-teal-500/40 px-5 text-sm font-semibold text-teal-200 hover:bg-teal-500/10"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-amber-500/35 px-5 text-sm font-semibold text-amber-200/95 hover:bg-amber-500/10"
         >
           Compartir desde el panel
         </Link>

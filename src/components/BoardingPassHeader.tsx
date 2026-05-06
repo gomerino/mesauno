@@ -22,8 +22,8 @@ export type BoardingPassHeaderProps = {
   airlineName?: string;
   tagline?: string;
   className?: string;
-  /** Colores: legacy azul boarding (#001d66) o oro + marino (como el check-in). */
-  palette?: "legacy" | "invite";
+  /** Colores: legacy · invite (premium) · inviteJurnex (marca Jurnex). */
+  palette?: "legacy" | "invite" | "inviteJurnex";
   /** `branded` = C&G · Boda; `airports` = origen/destino personalizados. */
   routeDisplay?: "branded" | "airports";
 };

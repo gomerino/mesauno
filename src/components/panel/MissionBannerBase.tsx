@@ -32,12 +32,12 @@ export function MissionBannerBase({
 }: Props) {
   const inner =
     variant === "premium"
-      ? "rounded-2xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#0a1628] via-teal-950/25 to-[#D4AF37]/[0.1] px-4 py-4 text-sm text-slate-200 shadow-[0_1px_0_0_rgba(255,255,255,0.06)_inset] sm:px-5 sm:py-4"
+      ? "rounded-2xl border border-invite-gold/25 bg-gradient-to-br from-[#0a1628] via-teal-950/25 to-invite-gold/[0.1] px-4 py-4 text-sm text-slate-200 shadow-[0_1px_0_0_rgba(255,255,255,0.06)_inset] sm:px-5 sm:py-4"
       : "rounded-xl border border-teal-500/30 bg-teal-500/10 px-4 py-3 text-sm text-teal-50";
 
   const kickerCls =
     variant === "premium"
-      ? "font-display text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]/90"
+      ? "font-display text-[10px] font-semibold uppercase tracking-[0.22em] text-invite-gold/90"
       : "font-display text-[10px] font-semibold uppercase tracking-[0.22em] text-teal-200/90";
 
   const messageCls = variant === "premium" ? "mt-1 text-slate-300" : "mt-1 text-teal-100/90";

@@ -28,8 +28,8 @@ export function OnboardingPlanNotice({ planFromUrl }: Props) {
   if (!plan) return null;
 
   return (
-    <div className="mb-8 rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-4 py-3 text-center text-sm text-slate-200">
-      <span className="font-semibold text-[#D4AF37]">{planDisplayName(plan)}</span>
+    <div className="mb-8 rounded-xl border border-invite-gold/30 bg-invite-gold/10 px-4 py-3 text-center text-sm text-slate-200">
+      <span className="font-semibold text-invite-gold">{planDisplayName(plan)}</span>
       <span className="text-slate-400"> — listo para configurar después de tu vista previa.</span>
     </div>
   );

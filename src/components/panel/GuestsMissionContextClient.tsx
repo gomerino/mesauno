@@ -1,6 +1,7 @@
 "use client";
 
 import { MissionBannerBase } from "@/components/panel/MissionBannerBase";
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import { trackEvent } from "@/lib/analytics";
 import { guestMissionCtaLabel, type GuestMissionState } from "@/lib/guest-mission";
 import { useRouter } from "next/navigation";
@@ -30,13 +31,13 @@ export function GuestsMissionContextClient({ fromMission, missionState }: Props)
   return (
     <MissionBannerBase
       variant="premium"
-      title="Misión Invitados"
+      title="Misión Pasajeros"
       message={message}
       action={
         <div className="flex flex-wrap items-center gap-2">
           <a
             href="#agregar-invitados"
-            className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-teal-500 to-teal-400 px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-teal-950/25 transition hover:brightness-110"
+            className={panelCtaJurnexPrimary + " items-center gap-1 px-4 py-2.5 text-xs"}
           >
             {guestMissionCtaLabel(missionState)}
           </a>
@@ -46,7 +47,7 @@ export function GuestsMissionContextClient({ fromMission, missionState }: Props)
               trackEvent("mission_back_to_panel", { target: "invitados" });
               router.push(`/panel?focus=invitados&t=${Date.now()}`);
             }}
-            className="inline-flex items-center gap-1 rounded-full border border-[#D4AF37]/30 bg-white/[0.05] px-4 py-2.5 text-xs font-medium text-slate-200 transition hover:border-[#D4AF37]/45 hover:bg-white/10 hover:text-white"
+            className="inline-flex items-center gap-1 rounded-full border border-invite-gold/30 bg-white/[0.05] px-4 py-2.5 text-xs font-medium text-slate-200 transition hover:border-invite-gold/45 hover:bg-white/10 hover:text-white"
           >
             ← Volver al panel
           </button>

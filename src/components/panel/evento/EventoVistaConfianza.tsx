@@ -41,7 +41,7 @@ export function EventoVistaConfianza({
           Ver vista previa →
         </Link>
       ) : (
-        <p className="mt-3 text-xs text-white/45">Añadí pasajeros en Invitados para generar una vista previa.</p>
+        <p className="mt-3 text-xs text-white/45">Agrega pasajeros en Invitados para generar una vista previa.</p>
       )}
     </div>
   );

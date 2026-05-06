@@ -67,7 +67,7 @@ export function PhotoUpload({ invitacionToken, onUploaded, fabBottomExtra }: Pro
 
   const shell = (
     <div
-      className="pointer-events-none fixed z-[200] flex flex-col items-end gap-2"
+      className="pointer-events-none fixed z-modals-200 flex flex-col items-end gap-2"
       style={{
         bottom: bottomExpr,
         right: "max(1.25rem, env(safe-area-inset-right, 0px))",

@@ -1,4 +1,11 @@
 import type { Config } from "tailwindcss";
+import {
+  brandInvite,
+  brandInviteJurnex,
+  brandJurnexModals,
+  brandJourneyFiesta,
+  brandSpotify,
+} from "./src/lib/brand-palette";
 import { tokens } from "./styles/tokens";
 
 /**
@@ -28,6 +35,24 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      zIndex: {
+        /** Escala fija (modales, overlays) — nombres semánticos, valores sin cambio visual */
+        "fab-install": "45",
+        "sticky-cta": "55",
+        checkout: "70",
+        "checkout-panel": "71",
+        "modals-200": "200",
+        "gallery-260": "260",
+        "postpay-700": "700",
+        "itinerary-7600": "7600",
+        "paywall-6000": "6000",
+        "aviation-cta-8900": "8900",
+        "aviation-rsvp-9200": "9200",
+        /** RSVP a pantalla completa: por encima del CTA (8900) y del resto de la invitación; bajo ajuste si hace falta. */
+        "aviation-rsvp-overlay-9600": "9600",
+        "aviation-qr-9400": "9400",
+        "panel-mobile-500": "500",
+      },
       keyframes: {
         stampDrop: {
           "0%": { transform: "scale(0.35) rotate(-14deg)", opacity: "0" },
@@ -140,13 +165,21 @@ const config: Config = {
           sand: "#fef3c7",
           deep: "#134e4a",
         },
-        invite: {
-          cream: "#FDFDF5",
-          /** Fondo base tema premium (arena sólida, alto contraste) */
-          sand: "#F4F1EA",
-          gold: "#D4AF37",
-          navy: "#1A2B48",
+        /** Invitación premium (soft) — un solo origen: `src/lib/brand-palette` */
+        invite: { ...brandInvite },
+        /** Tema Jurnex Aviation: misma estructura, `brand-palette` */
+        inviteJurnex: { ...brandInviteJurnex },
+        /** Modales y gradientes al panel oscuro (checkout, etc.) */
+        jurnexPanel: {
+          "checkout-from": brandJurnexModals.checkoutFrom,
+          "checkout-to": brandJurnexModals.checkoutTo,
+          dock: brandJurnexModals.dock,
         },
+        spotify: {
+          brand: brandSpotify,
+        },
+        /** Journey panel: tema “Fiesta” */
+        journeyFiesta: { ...brandJourneyFiesta },
       },
       borderRadius: {
         jurnex: "16px",

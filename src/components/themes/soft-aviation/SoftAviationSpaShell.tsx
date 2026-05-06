@@ -6,8 +6,14 @@ import { PhotoUpload } from "@/components/invitacion/PhotoUpload";
 import { InvitacionMusicaColaborativa } from "@/components/invitacion/InvitacionMusicaColaborativa";
 import { InvitacionViewTracker } from "@/components/InvitacionViewTracker";
 import type { InvitacionThemePageProps } from "@/components/themes/invitacion-theme-props";
+import {
+  AviationInvitacionProvider,
+  type AviationInvitacionVariant,
+} from "@/components/themes/AviationInvitacionContext";
+import { getAviationInviteShellUi } from "@/lib/aviation-invite-shell-ui";
 import { SoftAviationFotosClient } from "@/components/themes/soft-aviation/SoftAviationFotosClient";
 import { SoftAviationGuestActions } from "@/components/themes/soft-aviation/SoftAviationGuestActions";
+import { SoftAviationCheckInFlow } from "@/components/themes/soft-aviation/SoftAviationCheckInFlow";
 import { SoftAviationHero } from "@/components/themes/soft-aviation/SoftAviationHero";
 import { SoftAviationPostalMotivo } from "@/components/themes/soft-aviation/SoftAviationPostalMotivo";
 import { SoftAviationRegalosPanel } from "@/components/themes/soft-aviation/SoftAviationRegalosPanel";
@@ -15,15 +21,17 @@ import { SoftAviationTicket } from "@/components/themes/soft-aviation/SoftAviati
 import { formatFechaEventoLarga } from "@/lib/format-fecha-evento";
 import { emitInvitacionFotoSubida } from "@/lib/invitacion-foto-upload-client";
 import { hasAnyPlaylist } from "@/lib/event-playlist-env";
+import { epigrafeDesdeMotivo } from "@/lib/invitacion-epigrafe";
+import { restriccionesFromDb } from "@/lib/restricciones-alimenticias";
 import { computeSoftAviationInviteFlags } from "@/lib/soft-aviation-invite-state";
 import type { LucideIcon } from "lucide-react";
-import { CalendarDays, Camera, Gift, Mail, Music2, QrCode, Ticket, X } from "lucide-react";
+import { CalendarDays, Camera, Gift, Mail, Music2, QrCode, Ticket, Utensils, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
-export type SoftAviationMainTab = "ticket" | "motivo" | "regalos" | "fotos" | "playlist" | "itinerario";
+export type SoftAviationMainTab = "ticket" | "motivo" | "regalos" | "fotos" | "playlist" | "itinerario" | "dietas";
 
 const NAV: {
   id: SoftAviationMainTab;
@@ -36,6 +44,7 @@ const NAV: {
   { id: "ticket", label: "Pase de abordaje", short: "Pase", dockShort: "Pase", Icon: Ticket },
   { id: "motivo", label: "Carta de invitación", short: "Carta", dockShort: "Carta", Icon: Mail },
   { id: "regalos", label: "Regalos", short: "Regalo", dockShort: "Regalo", Icon: Gift },
+  { id: "dietas", label: "Restricciones alimenticias", short: "Dietas", dockShort: "Dietas", Icon: Utensils },
   { id: "fotos", label: "Bitácora de fotos", short: "Fotos", dockShort: "Fotos", Icon: Camera },
   { id: "playlist", label: "Música", short: "Música", dockShort: "Música", Icon: Music2 },
   { id: "itinerario", label: "Itinerario del día", short: "Plan", dockShort: "Plan", Icon: CalendarDays },
@@ -52,10 +61,9 @@ export function SoftAviationSpaShell({
   programaFotosPorHito,
   albumFotos,
   musicColabEnabled,
-  recentTracks,
-  topTracks,
-  apoyoTrackUris,
-}: InvitacionThemePageProps) {
+  aviationVariant = "soft",
+}: InvitacionThemePageProps & { aviationVariant?: AviationInvitacionVariant }) {
+  const u = getAviationInviteShellUi(aviationVariant);
   const router = useRouter();
   const trackingToken = invitado.token_acceso ?? invitado.id;
   const tituloNovios =
@@ -68,6 +76,7 @@ export function SoftAviationSpaShell({
 
   const [activeTab, setActiveTab] = useState<SoftAviationMainTab>("ticket");
   const [checkInQrOpen, setCheckInQrOpen] = useState(false);
+  const [dietaryOpen, setDietaryOpen] = useState(false);
   const [rsvpEstadoLive, setRsvpEstadoLive] = useState<string | null>(invitado.rsvp_estado ?? null);
 
   const { isConfirmed, isEventDay } = computeSoftAviationInviteFlags(
@@ -81,17 +90,21 @@ export function SoftAviationSpaShell({
 
   /**
    * Pase + Carta siempre; Plan si hay hitos (lectura pública, sin depender del RSVP);
-   * Regalos/Música si confirmó; Fotos si es día del evento.
+   * Dietas/Regalos solo si confirmó asistencia;
+   * Música si hay enlace(s) en env o playlist colaborativa en panel (no exige RSVP);
+   * Fotos si es día del evento.
    */
   const navItems = useMemo(() => {
     const core = NAV.filter((n) => n.id === "ticket" || n.id === "motivo");
     const planTab = hasItinerario ? NAV.filter((n) => n.id === "itinerario") : [];
     const postConfirm = isConfirmed
-      ? NAV.filter((n) => n.id === "regalos" || n.id === "playlist")
+      ? NAV.filter((n) => n.id === "dietas" || n.id === "regalos")
       : [];
+    const playlistTab =
+      hasPlaylist || musicColabEnabled ? NAV.filter((n) => n.id === "playlist") : [];
     const fotosTab = isEventDay ? NAV.filter((n) => n.id === "fotos") : [];
-    return [...core, ...planTab, ...postConfirm, ...fotosTab];
-  }, [isConfirmed, isEventDay, hasItinerario]);
+    return [...core, ...planTab, ...postConfirm, ...playlistTab, ...fotosTab];
+  }, [isConfirmed, isEventDay, hasItinerario, hasPlaylist, musicColabEnabled]);
 
   const navColumnCount = navItems.length + (isEventDay ? 1 : 0);
 
@@ -105,25 +118,25 @@ export function SoftAviationSpaShell({
   }, [navItems, activeTab]);
 
   const motivoText = merged.motivo_viaje?.trim() ?? "";
+  const epigrafeHero = epigrafeDesdeMotivo(merged.motivo_viaje, 140);
   const eventoId = invitado.evento_id ?? null;
   const fechaLegible = formatFechaEventoLarga(merged.fecha_evento);
 
   const checkInPayload = (invitado.qr_code_token ?? invitado.id).trim();
   const checkInFileName = `check-in-${(invitado.nombre_pasajero || "invitado").slice(0, 24).replace(/\s+/g, "-")}.png`;
+  const sectionFrame = "animate-fadeIn mx-auto w-full max-w-[20rem] min-w-0 py-2 sm:py-4";
+  const sectionFrameLoose = `${sectionFrame} px-0`;
+
+  const handleNavClick = (id: SoftAviationMainTab) => {
+    if (id === "dietas") {
+      setDietaryOpen(true);
+      return;
+    }
+    setActiveTab(id);
+  };
 
   /** Más aire en móvil por barra inferior + CTA RSVP + FAB de fotos. */
   const photoFabBottomExtra = useMemo(() => "10.5rem", []);
-
-  useEffect(() => {
-    const prevBody = document.body.style.overflow;
-    const prevHtml = document.documentElement.style.overflow;
-    document.body.style.overflow = "hidden";
-    document.documentElement.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prevBody;
-      document.documentElement.style.overflow = prevHtml;
-    };
-  }, []);
 
   useEffect(() => {
     if (!checkInQrOpen) return;
@@ -138,34 +151,34 @@ export function SoftAviationSpaShell({
     checkInQrOpen && typeof document !== "undefined"
       ? createPortal(
           <div
-            className="fixed inset-0 z-[9400] flex animate-fadeIn items-end justify-center p-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:items-center sm:p-6"
+            className="fixed inset-0 z-aviation-qr-9400 flex animate-fadeIn items-end justify-center p-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:items-center sm:p-6"
             role="dialog"
             aria-modal="true"
             aria-labelledby="checkin-qr-title"
           >
             <button
               type="button"
-              className="absolute inset-0 bg-[#1A2B48]/45 backdrop-blur-[2px]"
+              className={u.modalBackdrop}
               aria-label="Cerrar"
               onClick={() => setCheckInQrOpen(false)}
             />
-            <div className="relative z-10 w-full max-w-sm overflow-hidden rounded-2xl border border-[#1A2B48]/12 bg-[#F4F1EA] shadow-2xl">
-              <div className="flex items-center justify-between border-b border-[#1A2B48]/10 bg-white/90 px-3 py-2.5">
-                <h2 id="checkin-qr-title" className="font-inviteSerif text-base font-semibold text-[#1A2B48]">
+            <div className={u.modalPanel}>
+              <div className={u.modalHeader}>
+                <h2 id="checkin-qr-title" className={u.modalTitle}>
                   Ingreso
                 </h2>
                 <button
                   type="button"
                   onClick={() => setCheckInQrOpen(false)}
-                  className="rounded-full p-2 text-[#1A2B48]/50 transition hover:bg-[#1A2B48]/5 hover:text-[#1A2B48]"
+                  className={u.modalClose}
                   aria-label="Cerrar"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
               <div className="max-h-[min(78dvh,32rem)] overflow-y-auto overscroll-contain p-3 sm:p-4">
-                <p className="mb-2 text-center text-xs text-[#1A2B48]/60">Presenta este código al ingreso</p>
-                <div className="rounded-xl border border-[#1A2B48]/10 bg-white">
+                <p className={u.modalHint}>Presenta este código al ingreso</p>
+                <div className={u.modalQrBox}>
                   <InvitacionCheckInQr payload={checkInPayload} fileName={checkInFileName} />
                 </div>
               </div>
@@ -176,7 +189,8 @@ export function SoftAviationSpaShell({
       : null;
 
   return (
-    <div className="flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#F4F1EA] font-inviteBody text-[#1A2B48] antialiased [color-scheme:light]">
+    <AviationInvitacionProvider value={aviationVariant}>
+    <div className={u.pageRoot}>
       <InvitacionViewTracker accessToken={trackingToken} />
       {activeTab === "itinerario" && isEventDay && eventoId && token.trim() ? (
         <PhotoUpload
@@ -189,9 +203,9 @@ export function SoftAviationSpaShell({
         />
       ) : null}
 
-      <div className="flex min-h-0 min-w-0 flex-1 flex-row">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-row overflow-hidden">
         {/* Desktop/tablet: rail izquierdo. Móvil: oculto (navegación abajo, más ancho útil y pulgar). */}
-        <aside className="hidden w-[4.75rem] shrink-0 flex-col border-r border-[#1A2B48]/10 bg-white/95 shadow-[2px_0_12px_rgba(26,43,72,0.04)] backdrop-blur-md supports-[backdrop-filter]:bg-white/88 md:flex">
+        <aside className={u.aside}>
           <nav
             className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overflow-x-hidden px-1 py-2 [-webkit-overflow-scrolling:touch]"
             aria-label="Secciones de la invitación"
@@ -205,23 +219,21 @@ export function SoftAviationSpaShell({
                   title={label}
                   aria-label={label}
                   aria-current={active ? "page" : undefined}
-                  onClick={() => setActiveTab(id)}
+                  onClick={() => handleNavClick(id)}
                   className={`relative flex w-full flex-col items-center gap-0.5 rounded-lg py-2 transition ${
-                    active
-                      ? "bg-[#D4AF37]/22 text-[#1A2B48] shadow-sm ring-1 ring-[#D4AF37]/35"
-                      : "text-[#1A2B48]/50 hover:bg-[#1A2B48]/5 hover:text-[#1A2B48]/85"
+                    active ? u.navBtnActive : u.navBtn
                   }`}
                 >
                   <span
-                    className={`absolute left-0 top-1/2 h-8 w-[3px] -translate-y-1/2 rounded-full ${active ? "bg-[#D4AF37]" : "bg-transparent"}`}
+                    className={`absolute left-0 top-1/2 h-8 w-[3px] -translate-y-1/2 rounded-full ${active ? u.navBar : "bg-transparent"}`}
                     aria-hidden
                   />
                   <Icon
-                    className={`h-[1.05rem] w-[1.05rem] shrink-0 sm:h-5 sm:w-5 ${active ? "text-[#1A2B48]" : ""}`}
+                    className={`h-[1.05rem] w-[1.05rem] shrink-0 sm:h-5 sm:w-5 ${active ? u.navIconActive : ""}`}
                     strokeWidth={active ? 2.5 : 1.75}
                     aria-hidden
                   />
-                  <span className="max-w-full whitespace-normal break-words px-0.5 text-center text-[6px] font-semibold leading-[1.15] tracking-tight sm:text-[6.5px]">
+                  <span className="max-w-full whitespace-normal break-words px-0.5 text-center text-[8px] font-semibold leading-[1.2] tracking-tight min-[400px]:text-[9px] md:text-[10px]">
                     {short}
                   </span>
                 </button>
@@ -230,34 +242,35 @@ export function SoftAviationSpaShell({
           </nav>
 
           {isEventDay ? (
-            <div className="shrink-0 border-t border-[#1A2B48]/10 px-1 py-2">
+            <div className={u.asideQrTop}>
               <button
                 type="button"
                 title="Código QR de ingreso"
                 aria-label="Mostrar código QR para ingreso"
                 onClick={() => setCheckInQrOpen(true)}
-                className="flex w-full flex-col items-center gap-0.5 rounded-lg py-2 text-[#1A2B48]/70 transition hover:bg-[#D4AF37]/15 hover:text-[#1A2B48]"
+                className={u.qrAsideBtn}
               >
                 <QrCode className="h-[1.05rem] w-[1.05rem] shrink-0 sm:h-5 sm:w-5" strokeWidth={2} aria-hidden />
-                <span className="max-w-[3rem] text-center text-[5px] font-semibold leading-[1.05] sm:text-[6px]">QR</span>
+                <span className="max-w-[3rem] text-center text-[6px] font-semibold leading-[1.05] sm:text-[7px]">QR</span>
               </button>
             </div>
           ) : null}
         </aside>
 
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-hidden">
           <SoftAviationHero
             tituloNovios={tituloNovios}
             fechaEvento={merged.fecha_evento}
             horaEmbarque={merged.hora_embarque}
             fechaLegible={fechaLegible}
             portadaFotos={albumFotos}
-            compact={activeTab === "ticket"}
+            compact={false}
+            epigrafe={epigrafeHero}
           />
 
-          <div className="mx-auto min-h-0 w-full max-w-lg flex-1 overflow-y-auto overscroll-contain px-3 pb-[max(8.5rem,env(safe-area-inset-bottom))] pt-0.5 max-md:pb-[max(10rem,env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch]">
+          <div className="mx-auto min-h-0 min-w-0 w-full max-w-[20rem] flex-1 touch-pan-y overflow-x-hidden overflow-y-auto overscroll-y-auto px-2 pb-[max(8.5rem,env(safe-area-inset-bottom))] pt-0.5 min-[400px]:max-w-[22rem] md:max-w-[38rem] lg:max-w-[42rem] max-md:pb-[max(7rem,env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch]">
         {activeTab === "ticket" ? (
-          <div key="ticket" className="flex min-h-full flex-col items-center justify-center px-1 py-1 sm:py-2">
+          <div key="ticket" className={`${sectionFrame} flex min-h-full min-w-0 flex-col items-center justify-center`}>
             <SoftAviationTicket
               invitado={invitado}
               evento={evento}
@@ -265,6 +278,18 @@ export function SoftAviationSpaShell({
               mapUrl={qrValue}
               programaHitos={programaHitos}
               isEventDay={isEventDay}
+              actionSlot={
+                <SoftAviationGuestActions
+                  invitadoId={invitado.id}
+                  invitado={invitado}
+                  evento={evento}
+                  initialEstado={rsvpEstadoLive ?? invitado.rsvp_estado}
+                  restriccionesRaw={invitado.restricciones_alimenticias}
+                  spotifyPlaylistUrl={spotifyUrl}
+                  footerMode="embedded"
+                  onRsvpEstadoChange={setRsvpEstadoLive}
+                />
+              }
             />
           </div>
         ) : null}
@@ -276,7 +301,7 @@ export function SoftAviationSpaShell({
         {activeTab === "regalos" ? <SoftAviationRegalosPanel key="regalos" /> : null}
 
         {activeTab === "fotos" ? (
-          <div key="fotos" className="animate-fadeIn px-1 py-4">
+          <div key="fotos" className={sectionFrameLoose}>
             {eventoId ? (
               <SoftAviationFotosClient
                 eventoId={eventoId}
@@ -284,12 +309,12 @@ export function SoftAviationSpaShell({
                 initialFotos={albumFotos}
                 photoFabBottomExtra={photoFabBottomExtra}
                 hideOuterSection
-                albumCardClassName="rounded-2xl border border-[#1A2B48]/10 bg-white p-4 shadow-sm [&_h2]:font-inviteSerif [&_h2]:text-[#1A2B48] [&_p]:text-[#1A2B48]/70"
+                albumCardClassName={u.albumCard}
                 albumTitle="Bitácora compartida"
                 albumBlurb="Sube y revisa fotos del evento 📸"
               />
             ) : (
-              <div className="rounded-2xl border border-dashed border-[#1A2B48]/15 bg-white/80 p-8 text-center text-sm text-[#1A2B48]/60">
+              <div className={u.albumEmpty}>
                 La bitácora estará disponible cuando el evento tenga álbum activo.
               </div>
             )}
@@ -297,16 +322,16 @@ export function SoftAviationSpaShell({
         ) : null}
 
         {activeTab === "playlist" ? (
-          <div key="playlist" className="animate-fadeIn w-full px-1 py-4">
-            <p className="mb-5 text-center text-xs leading-relaxed text-[#1A2B48]/70">
+          <div key="playlist" className={sectionFrameLoose}>
+            <p className={u.playlistIntro}>
               Escucha la playlist del evento y suma canciones para la fiesta.
             </p>
-            <div className="mx-auto flex w-full max-w-md flex-col gap-8">
+            <div className="mx-auto flex w-full min-w-0 max-w-full flex-col gap-8">
               {hasPlaylist ? (
                 <section className="w-full" aria-labelledby="playlist-escuchar-heading">
                   <h2
                     id="playlist-escuchar-heading"
-                    className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-[#1A2B48]/45"
+                    className={u.escucharHeading}
                   >
                     Escuchar
                   </h2>
@@ -316,10 +341,10 @@ export function SoftAviationSpaShell({
                         href={appleUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex w-full flex-col items-center gap-3 rounded-2xl border-2 border-[#D4AF37] bg-[#1A2B48] px-6 py-6 text-center shadow-md transition hover:brightness-110"
+                        className={u.appleCard}
                       >
                         <span
-                          className="flex h-12 w-12 items-center justify-center rounded-full bg-[#D4AF37]/20 text-white ring-2 ring-[#D4AF37]/50"
+                          className={u.appleIcon}
                           aria-hidden
                         >
                           <svg viewBox="0 0 24 24" className="h-7 w-7" fill="currentColor">
@@ -327,7 +352,7 @@ export function SoftAviationSpaShell({
                           </svg>
                         </span>
                         <div>
-                          <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#D4AF37]">Apple Music</p>
+                          <p className={u.appleMusicLabel}>Apple Music</p>
                           <p className="mt-1 font-inviteSerif text-lg font-semibold text-white">Abrir playlist</p>
                           <p className="mt-1 text-xs text-white/70">Escucha la banda sonora del gran día</p>
                         </div>
@@ -339,9 +364,9 @@ export function SoftAviationSpaShell({
                         href={spotifyUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-[#1A2B48]/15 bg-white px-5 py-3 text-sm font-semibold text-[#1A2B48] shadow-sm transition hover:border-[#D4AF37]/60 hover:bg-[#FFF9F0]"
+                        className={u.spotifyLink}
                       >
-                        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1DB954] text-white">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-spotify-brand text-white">
                           <Music2 className="h-4 w-4" aria-hidden />
                         </span>
                         Abrir playlist en Spotify
@@ -353,7 +378,7 @@ export function SoftAviationSpaShell({
                         href={playlists.other}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-center text-sm font-medium text-[#1A2B48] underline decoration-[#D4AF37] decoration-2 underline-offset-4 hover:text-[#D4AF37]"
+                        className={u.otherLink}
                       >
                         Abrir enlace de música
                       </Link>
@@ -364,30 +389,30 @@ export function SoftAviationSpaShell({
 
               {musicColabEnabled ? (
                 <section
-                  className={`w-full ${hasPlaylist ? "border-t border-[#1A2B48]/10 pt-2" : ""}`}
+                  className={`w-full ${hasPlaylist ? u.colabSectionBorder : ""}`}
                   aria-labelledby="playlist-colab-heading"
                 >
                   <h2
                     id="playlist-colab-heading"
-                    className="mb-1 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-[#1A2B48]/45"
+                    className={u.colabHeading}
                   >
                     Proponer y apoyar
                   </h2>
                   <InvitacionMusicaColaborativa
                     invitationAccessToken={token}
-                    initialRecent={recentTracks}
-                    initialTop={topTracks}
-                    apoyoTrackUris={apoyoTrackUris}
+                    eventoId={eventoId ?? ""}
+                    invitacionConfirmada={isConfirmed}
+                    spotifySyncDisponible={musicColabEnabled}
                     surface="light"
                   />
                 </section>
               ) : hasPlaylist ? (
-                <p className="border-t border-[#1A2B48]/10 pt-6 text-center text-xs text-[#1A2B48]/55">
+                <p className={u.colabNote}>
                   Las sugerencias y votos en vivo se activan cuando quien organiza conecta Spotify en el panel del
                   evento.
                 </p>
               ) : (
-                <p className="text-center text-sm text-[#1A2B48]/55">
+                <p className={u.colabEmpty}>
                   Pronto publicaremos el enlace a la playlist y las canciones colaborativas.
                 </p>
               )}
@@ -396,10 +421,10 @@ export function SoftAviationSpaShell({
         ) : null}
 
         {activeTab === "itinerario" ? (
-          <div key="itinerario" className="animate-fadeIn px-1 py-4">
-            <p className="mb-2 text-center text-xs text-[#1A2B48]/65">Revisa cómo llegar y horarios</p>
+          <div key="itinerario" className={sectionFrameLoose}>
+            <p className={u.itinIntro}>Revisa cómo llegar y horarios</p>
             {hasItinerario ? (
-              <div className="rounded-2xl border border-[#1A2B48]/10 bg-white p-3 shadow-sm sm:p-4 [&_.font-display]:font-inviteSerif">
+              <div className={u.itinBox}>
                 <InvitacionCronograma
                   hitos={programaHitos}
                   fechaEvento={merged.fecha_evento}
@@ -407,7 +432,7 @@ export function SoftAviationSpaShell({
                 />
               </div>
             ) : (
-              <div className="rounded-2xl border border-dashed border-[#1A2B48]/15 bg-white/80 p-8 text-center text-sm text-[#1A2B48]/60">
+              <div className={u.itinEmpty}>
                 El plan del día se publicará aquí cuando esté listo.
               </div>
             )}
@@ -415,37 +440,14 @@ export function SoftAviationSpaShell({
         ) : null}
           </div>
 
-          <div
-            className={
-              isEventDay && isConfirmed
-                ? "contents"
-                : "shrink-0 border-t border-[#1A2B48]/8 bg-[#F4F1EA]/95 px-2 pt-2 pb-2 shadow-[0_-4px_20px_rgba(26,43,72,0.06)] backdrop-blur-md supports-[backdrop-filter]:bg-[#F4F1EA]/88 md:pb-[max(0.35rem,env(safe-area-inset-bottom,0px))]"
-            }
-          >
-            <SoftAviationGuestActions
-              invitadoId={invitado.id}
-              invitado={invitado}
-              evento={evento}
-              initialEstado={rsvpEstadoLive ?? invitado.rsvp_estado}
-              restriccionesRaw={invitado.restricciones_alimenticias}
-              spotifyPlaylistUrl={spotifyUrl}
-              footerMode="embedded"
-              isEventDay={isEventDay}
-              onRsvpEstadoChange={setRsvpEstadoLive}
-            />
-          </div>
-
           {/* Móvil: barra fija inferior — alcance del pulgar, contenido a ancho completo sin rail lateral. */}
           <nav
-            className="shrink-0 border-t border-[#1A2B48]/12 bg-white/98 shadow-[0_-8px_28px_rgba(26,43,72,0.1)] md:hidden"
+            className={u.mobileNav}
             style={{ paddingBottom: "max(0.4rem, env(safe-area-inset-bottom))" }}
             aria-label="Secciones de la invitación"
           >
-            {!isConfirmed ? (
-              <p className="px-2 pt-1.5 text-center text-[9px] leading-tight text-[#1A2B48]/55">Confirma tu asistencia ✈️</p>
-            ) : null}
             <div
-              className="grid w-full gap-0.5 px-0.5 pt-1"
+              className="grid w-full gap-0.5 px-0.5 py-1"
               style={{ gridTemplateColumns: `repeat(${navColumnCount}, minmax(0, 1fr))` }}
             >
               {navItems.map(({ id, label, dockShort, Icon }) => {
@@ -457,19 +459,17 @@ export function SoftAviationSpaShell({
                     title={label}
                     aria-label={label}
                     aria-current={active ? "page" : undefined}
-                    onClick={() => setActiveTab(id)}
+                    onClick={() => handleNavClick(id)}
                     className={`flex min-h-[3.25rem] min-w-0 flex-col items-center justify-center rounded-xl py-1 touch-manipulation transition active:scale-[0.97] ${
-                      active
-                        ? "bg-[#D4AF37]/22 text-[#1A2B48] ring-1 ring-[#D4AF37]/35"
-                        : "text-[#1A2B48]/50 active:bg-[#1A2B48]/5"
+                      active ? u.mobileNavBtnActive : u.mobileNavBtn
                     }`}
                   >
                     <Icon
-                      className={`h-[1.15rem] w-[1.15rem] shrink-0 sm:h-5 sm:w-5 ${active ? "text-[#1A2B48]" : ""}`}
+                      className={`h-[1.15rem] w-[1.15rem] shrink-0 sm:h-5 sm:w-5 ${active ? u.navIconActive : ""}`}
                       strokeWidth={active ? 2.5 : 1.75}
                       aria-hidden
                     />
-                    <span className="mt-0.5 max-w-[100%] truncate px-0.5 text-center text-[8px] font-semibold leading-[1.1] tracking-tight">
+                    <span className="mt-0.5 max-w-[100%] truncate px-0.5 text-center text-[9px] font-semibold leading-[1.1] tracking-tight min-[400px]:text-[10px]">
                       {dockShort}
                     </span>
                   </button>
@@ -481,10 +481,10 @@ export function SoftAviationSpaShell({
                   title="Código QR de ingreso"
                   aria-label="Mostrar código QR para ingreso"
                   onClick={() => setCheckInQrOpen(true)}
-                  className="flex min-h-[3.25rem] min-w-0 flex-col items-center justify-center rounded-xl py-1 text-[#1A2B48]/70 touch-manipulation transition active:scale-[0.97] active:bg-[#D4AF37]/18"
+                  className={u.mobileQrBtn}
                 >
                   <QrCode className="h-[1.15rem] w-[1.15rem] shrink-0 sm:h-5 sm:w-5" strokeWidth={2} aria-hidden />
-                  <span className="mt-0.5 max-w-[100%] truncate text-center text-[8px] font-semibold leading-[1.1]">QR</span>
+                  <span className="mt-0.5 max-w-[100%] truncate text-center text-[9px] font-semibold leading-[1.1] min-[400px]:text-[10px]">QR</span>
                 </button>
               ) : null}
             </div>
@@ -493,6 +493,20 @@ export function SoftAviationSpaShell({
       </div>
 
       {qrModal}
+      {dietaryOpen ? (
+        <SoftAviationCheckInFlow
+          invitadoId={invitado.id}
+          initialEstado={rsvpEstadoLive ?? invitado.rsvp_estado}
+          initialRestricciones={restriccionesFromDb(invitado.restricciones_alimenticias)}
+          fechaEvento={merged.fecha_evento}
+          planKind={evento?.plan ?? null}
+          spotifyPlaylistUrl={spotifyUrl}
+          flowMode="details"
+          onClose={() => setDietaryOpen(false)}
+          onRsvpSaved={setRsvpEstadoLive}
+        />
+      ) : null}
     </div>
+    </AviationInvitacionProvider>
   );
 }

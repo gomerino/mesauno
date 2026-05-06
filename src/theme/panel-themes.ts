@@ -100,11 +100,11 @@ export function journeyNavActiveClasses(theme: JourneyThemeId): string {
     case "relax":
       return "border-teal-400/35 bg-teal-500/10 font-medium text-teal-200";
     case "fiesta":
-      return "border-[#F5C451]/40 bg-[#F5C451]/14 font-medium text-[#F5D78A]";
+      return "border-journeyFiesta-gold/40 bg-journeyFiesta-gold/14 font-medium text-journeyFiesta-light";
     case "intimo":
       return "border-rose-400/30 bg-rose-950/30 font-medium text-rose-100";
     default:
-      return "border-[#F5C451]/30 bg-[#F5C451]/10 font-medium text-[#F5C451]";
+      return "border-journeyFiesta-gold/30 bg-journeyFiesta-gold/10 font-medium text-journeyFiesta-gold";
   }
 }
 
@@ -114,11 +114,11 @@ export function journeyMobileNavActiveClass(theme: JourneyThemeId): string {
     case "relax":
       return "text-teal-300";
     case "fiesta":
-      return "text-[#F5D78A]";
+      return "text-journeyFiesta-light";
     case "intimo":
       return "text-rose-300";
     default:
-      return "text-[#F5C451]";
+      return "text-journeyFiesta-gold";
   }
 }
 
@@ -127,11 +127,11 @@ export function journeyPublicLinkHoverClass(theme: JourneyThemeId): string {
     case "relax":
       return "hover:text-teal-300/90";
     case "fiesta":
-      return "hover:text-[#F5C451]/90";
+      return "hover:text-journeyFiesta-gold/90";
     case "intimo":
       return "hover:text-rose-300/90";
     default:
-      return "hover:text-[#F5C451]/90";
+      return "hover:text-journeyFiesta-gold/90";
   }
 }
 
@@ -156,11 +156,11 @@ export function journeyHeaderAccentClasses(theme: JourneyThemeId): {
     case "fiesta":
       return {
         headerShadow: "shadow-[0_0_48px_rgba(245,196,81,0.12)]",
-        orb: "bg-[#F5C451]/[0.09]",
+        orb: "bg-journeyFiesta-gold/[0.09]",
         iconBox:
-          "border-[#F5C451]/35 bg-gradient-to-br from-[#F5C451]/25 to-transparent shadow-[0_10px_36px_rgba(245,196,81,0.22)]",
-        plane: "text-[#F5C451]",
-        eyebrow: "text-[#F5C451]/90",
+          "border-journeyFiesta-gold/35 bg-gradient-to-br from-journeyFiesta-gold/25 to-transparent shadow-[0_10px_36px_rgba(245,196,81,0.22)]",
+        plane: "text-journeyFiesta-gold",
+        eyebrow: "text-journeyFiesta-gold/90",
       };
     case "intimo":
       return {
@@ -174,11 +174,11 @@ export function journeyHeaderAccentClasses(theme: JourneyThemeId): {
     default:
       return {
         headerShadow: "shadow-[0_0_40px_rgba(245,196,81,0.06)]",
-        orb: "bg-[#F5C451]/[0.07]",
+        orb: "bg-journeyFiesta-gold/[0.07]",
         iconBox:
-          "border-[#F5C451]/30 bg-gradient-to-br from-[#F5C451]/20 to-transparent shadow-[0_8px_32px_rgba(245,196,81,0.15)]",
-        plane: "text-[#F5C451]",
-        eyebrow: "text-[#F5C451]/80",
+          "border-journeyFiesta-gold/30 bg-gradient-to-br from-journeyFiesta-gold/20 to-transparent shadow-[0_8px_32px_rgba(245,196,81,0.15)]",
+        plane: "text-journeyFiesta-gold",
+        eyebrow: "text-journeyFiesta-gold/80",
       };
   }
 }

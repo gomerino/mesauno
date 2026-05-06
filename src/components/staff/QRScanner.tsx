@@ -1,5 +1,6 @@
 "use client";
 
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { Html5Qrcode } from "html5-qrcode";
 import { toast } from "sonner";
@@ -11,7 +12,7 @@ async function importHtml5Qrcode() {
 
 export type QRScannerProps = {
   onScan: (decodedText: string) => void;
-  /** Si es false, se detiene la cámara (p. ej. mientras se valida en el servidor). */
+  /** Si es false, se detiene la c?mara (p. ej. mientras se valida en el servidor). */
   scanningEnabled: boolean;
 };
 
@@ -146,7 +147,7 @@ export function QRScanner({ onScan, scanningEnabled }: QRScannerProps) {
         }
         if (isPermissionDeniedError(e)) {
           setView("permission_denied");
-          toast.error("Permiso de cámara denegado");
+          toast.error("Permiso de c?mara denegado");
           return;
         }
         setView(cameraPickActiveRef.current ? "camera_pick" : "idle");
@@ -160,12 +161,12 @@ export function QRScanner({ onScan, scanningEnabled }: QRScannerProps) {
     if (typeof window === "undefined") return;
     if (!window.isSecureContext) {
       setView("unsupported");
-      toast.error("La cámara requiere HTTPS o localhost");
+      toast.error("La c?mara requiere HTTPS o localhost");
       return;
     }
     if (!navigator.mediaDevices?.getUserMedia) {
       setView("unsupported");
-      toast.error("Tu navegador no permite acceso a la cámara");
+      toast.error("Tu navegador no permite acceso a la c?mara");
       return;
     }
 
@@ -176,15 +177,15 @@ export function QRScanner({ onScan, scanningEnabled }: QRScannerProps) {
     } catch (e) {
       if (isPermissionDeniedError(e)) {
         setView("permission_denied");
-        toast.error("Permiso de cámara denegado");
+        toast.error("Permiso de c?mara denegado");
         return;
       }
       if (isMediaNotFoundError(e)) {
-        toast.error("No se detectó ninguna cámara");
+        toast.error("No se detect? ninguna c?mara");
         setView("idle");
         return;
       }
-      toast.error("No se pudo acceder a la cámara");
+      toast.error("No se pudo acceder a la c?mara");
       setView("idle");
       return;
     }
@@ -194,13 +195,13 @@ export function QRScanner({ onScan, scanningEnabled }: QRScannerProps) {
     try {
       list = await Html5Qrcode.getCameras();
     } catch {
-      toast.error("No se pudo listar las cámaras");
+      toast.error("No se pudo listar las c?maras");
       setView("idle");
       return;
     }
 
     if (list.length === 0) {
-      toast.error("No hay cámaras disponibles");
+      toast.error("No hay c?maras disponibles");
       setView("idle");
       return;
     }
@@ -209,7 +210,7 @@ export function QRScanner({ onScan, scanningEnabled }: QRScannerProps) {
       await runStart({ facingMode: { ideal: "environment" } });
       return;
     } catch {
-      /* intentar otra cámara o selector manual */
+      /* intentar otra c?mara o selector manual */
     }
 
     if (list.length > 1) {
@@ -223,8 +224,8 @@ export function QRScanner({ onScan, scanningEnabled }: QRScannerProps) {
       setCameras(list);
       setPickedCameraId(list[0].id);
       setView("camera_pick");
-      toast.message("Varias cámaras detectadas", {
-        description: "Elige cuál usar para escanear.",
+      toast.message("Varias c?maras detectadas", {
+        description: "Elige cu?l usar para escanear.",
       });
       return;
     }
@@ -236,7 +237,7 @@ export function QRScanner({ onScan, scanningEnabled }: QRScannerProps) {
         setView("permission_denied");
         return;
       }
-      toast.error("No se pudo iniciar la cámara");
+      toast.error("No se pudo iniciar la c?mara");
       setView("idle");
     }
   }, [runStart]);
@@ -248,10 +249,10 @@ export function QRScanner({ onScan, scanningEnabled }: QRScannerProps) {
     } catch (e) {
       if (isPermissionDeniedError(e)) {
         setView("permission_denied");
-        toast.error("Permiso de cámara denegado");
+        toast.error("Permiso de c?mara denegado");
         return;
       }
-      toast.error("No se pudo abrir la cámara seleccionada");
+      toast.error("No se pudo abrir la c?mara seleccionada");
     }
   }, [pickedCameraId, runStart]);
 
@@ -269,26 +270,26 @@ export function QRScanner({ onScan, scanningEnabled }: QRScannerProps) {
     };
   }, [stopScanner]);
 
-  const primaryLabel = hasStartedOnce ? "Escanear siguiente" : "Iniciar Escáner";
+  const primaryLabel = hasStartedOnce ? "Escanear siguiente" : "Iniciar Esc?ner";
 
   return (
     <div className="flex w-full flex-col gap-4">
       {view === "permission_denied" && (
         <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
-          La cámara es necesaria para el Check-in. Por favor, actívala en la configuración de tu navegador.
+          La c?mara es necesaria para el Check-in. Por favor, act?vala en la configuraci?n de tu navegador.
         </div>
       )}
 
       {view === "unsupported" && (
         <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
-          Este dispositivo o navegador no permite usar la cámara desde la web. Prueba con Safari o Chrome actualizado
+          Este dispositivo o navegador no permite usar la c?mara desde la web. Prueba con Safari o Chrome actualizado
           en HTTPS.
         </div>
       )}
 
       {view === "camera_pick" && (
         <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
-          <p className="text-sm text-slate-300">Selecciona la cámara a usar (por ejemplo, la frontal en escritorio).</p>
+          <p className="text-sm text-slate-300">Selecciona la c?mara a usar (por ejemplo, la frontal en escritorio).</p>
           <select
             value={pickedCameraId}
             onChange={(e) => setPickedCameraId(e.target.value)}
@@ -296,7 +297,7 @@ export function QRScanner({ onScan, scanningEnabled }: QRScannerProps) {
           >
             {cameras.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.label?.trim() || "Cámara"}
+                {c.label?.trim() || "C?mara"}
               </option>
             ))}
           </select>
@@ -304,9 +305,9 @@ export function QRScanner({ onScan, scanningEnabled }: QRScannerProps) {
             type="button"
             onClick={() => void startWithPickedCamera()}
             disabled={!pickedCameraId}
-            className="rounded-xl bg-teal-500 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-900/30 disabled:opacity-50"
+            className={panelCtaJurnexPrimary + " w-full justify-center py-3 disabled:opacity-50"}
           >
-            Usar esta cámara
+            Usar esta c?mara
           </button>
         </div>
       )}
@@ -315,7 +316,7 @@ export function QRScanner({ onScan, scanningEnabled }: QRScannerProps) {
         <button
           type="button"
           onClick={() => void tryStartCamera()}
-          className="rounded-xl bg-teal-500 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-900/30"
+          className={panelCtaJurnexPrimary + " w-full justify-center py-3"}
         >
           {view === "permission_denied" ? "Reintentar" : primaryLabel}
         </button>
@@ -342,7 +343,7 @@ export function QRScanner({ onScan, scanningEnabled }: QRScannerProps) {
             </div>
             {view === "starting" && (
               <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/50 text-sm text-white">
-                Iniciando cámara…
+                Iniciando c?mara���
               </div>
             )}
           </div>

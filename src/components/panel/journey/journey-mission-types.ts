@@ -6,11 +6,9 @@ export type JourneyMissionStepState = "done" | "active" | "pending" | "locked";
 
 export type JourneyMissionStep = {
   id: string;
-  /** Etiqueta corta (una palabra ideal). */
+  /** Etiqueta corta bajo el indicador del paso. */
   label: string;
   state: JourneyMissionStepState;
-  /** Línea breve bajo la etiqueta: qué falta o «Listo». */
-  micro?: string;
 };
 
 export type MissionStripProps = {

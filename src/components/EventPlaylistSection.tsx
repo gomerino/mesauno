@@ -15,7 +15,7 @@ function SpotifyRow({ url, showEmbed }: { url: string; showEmbed: boolean }) {
         className="flex items-center gap-2.5 px-3 py-2.5 transition hover:bg-black/[0.03] sm:px-4"
       >
         <span
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1DB954] text-white shadow-sm"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-spotify-brand text-white shadow-sm"
           aria-hidden
         >
           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">

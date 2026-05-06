@@ -18,7 +18,7 @@ export function EventoConfigPrimaryCta({ result, className = "" }: Props) {
   return (
     <button
       type="button"
-      className={`${panelBtnPrimary} flex h-12 w-full items-center justify-center rounded-xl text-center text-sm font-semibold text-black ${className}`.trim()}
+      className={`${panelBtnPrimary} h-12 w-full items-center justify-center text-center ${className}`.trim()}
       onClick={() => {
         if (result.action === "programa") {
           router.push("/panel/viaje?tab=experiencia");
@@ -40,7 +40,7 @@ export function EventoConfigCompleteNote() {
       <p className="text-sm text-white/60">Evento listo ✨</p>
       <Link
         href="/panel/pasajeros"
-        className={`${panelBtnPrimary} flex w-full items-center justify-center rounded-xl py-3.5 text-center text-sm font-semibold text-black shadow-sm shadow-teal-900/20 md:w-auto md:min-w-[16rem] md:py-3`}
+        className={`${panelBtnPrimary} w-full items-center justify-center py-3.5 text-center md:w-auto md:min-w-[16rem] md:py-3`}
       >
         Enviar invitaciones →
       </Link>

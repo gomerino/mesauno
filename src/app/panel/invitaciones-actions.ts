@@ -11,7 +11,7 @@ export async function sendInvitationsFromPanelAction(eventoId: string, mode: Bul
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    return { ok: false as const, error: "No autenticado" };
+    return { ok: false as const, error: "Hace falta iniciar sesión." };
   }
 
   const siteOrigin = await getSiteOrigin();

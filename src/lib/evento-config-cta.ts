@@ -6,7 +6,6 @@ import type { PanelProgressBundle } from "@/lib/panel-progress-load";
 export type EventoConfigCTAInput = {
   evento: Evento | null;
   bundle: Pick<PanelProgressBundle, "programaHitosCount" | "steps">;
-  hasAccess: boolean;
   isAdmin: boolean;
   spotifyConnected: boolean;
   spotifySectionAvailable: boolean;
@@ -22,7 +21,7 @@ export type EventoConfigCTAResult =
  * el usuario puede ir a Pasajeros desde el aviso final, no como CTA principal.
  */
 export function getEventoConfigCTA(params: EventoConfigCTAInput): EventoConfigCTAResult {
-  const { evento, bundle, hasAccess, isAdmin, spotifyConnected, spotifySectionAvailable } = params;
+  const { evento, bundle, isAdmin, spotifyConnected, spotifySectionAvailable } = params;
 
   if (!isEventBasicsComplete(evento)) {
     return { status: "pending", label: "Completar información", action: "tab", tab: "tripulacion" };
@@ -36,7 +35,7 @@ export function getEventoConfigCTA(params: EventoConfigCTAInput): EventoConfigCT
     return { status: "pending", label: "Configurar programa", action: "programa" };
   }
 
-  if (spotifySectionAvailable && hasAccess && isAdmin && !spotifyConnected) {
+  if (spotifySectionAvailable && isAdmin && !spotifyConnected) {
     return { status: "pending", label: "Agregar música", action: "tab", tab: "experiencia" };
   }
 

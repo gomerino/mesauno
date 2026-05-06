@@ -1,5 +1,6 @@
 "use client";
 
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import { BoardingPassPreview } from "@/components/onboarding/journey/BoardingPassPreview";
 import { OnboardingPaywallModal } from "@/components/onboarding/journey/OnboardingPaywallModal";
 import {
@@ -41,7 +42,7 @@ export function OnboardingFullClient() {
   if (!eventId) {
     return (
       <p className="text-center text-sm text-slate-400">
-        <Link href="/onboarding" className="text-[#D4AF37] hover:underline">
+        <Link href="/onboarding" className="text-invite-gold hover:underline">
           Empezar tu viaje
         </Link>
       </p>
@@ -63,13 +64,13 @@ export function OnboardingFullClient() {
       <button
         type="button"
         onClick={() => setPaywallOpen(true)}
-        className="mt-10 flex min-h-[52px] w-full max-w-md items-center justify-center rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] px-6 text-sm font-semibold text-[#0f172a] shadow-xl transition hover:brightness-110"
+        className={panelCtaJurnexPrimary + " mt-10 min-h-[52px] w-full max-w-md justify-center px-6"}
       >
         Mandar invitaciones ✈️
       </button>
       <p className="mt-6 text-center text-xs text-slate-500">
         ¿Ya tienes cuenta?{" "}
-        <Link href="/login?next=/panel" className="text-[#D4AF37] hover:underline">
+        <Link href="/login?next=/panel" className="text-invite-gold hover:underline">
           Ir al panel
         </Link>
       </p>

@@ -14,7 +14,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Jurnex — Crea tu viaje de bodas",
   description:
-    "Panel de novios, invitación estilo pase de abordaje, invitados, programa, recuerdos, marketplace de proveedores y pago con Mercado Pago. Tu boda, en un solo lugar.",
+    "Panel de novios e invitación estilo pase de abordaje, con RSVP, invitados, programa y recuerdos en un solo flujo premium desde la primera visita.",
 };
 
 export default function HomePage() {
@@ -30,17 +30,13 @@ export default function HomePage() {
       <LandingMidCta />
       <HowItWorks />
       <CTA />
-      <footer className="border-t border-jurnex-border bg-jurnex-bg px-4 py-10 text-center text-xs text-jurnex-text-muted">
+      <footer className="border-t border-jurnex-secondary/25 bg-jurnex-bg px-4 py-10 text-center text-xs text-jurnex-text-secondary">
         <div className="mx-auto flex max-w-xl flex-wrap items-center justify-center gap-x-4 gap-y-2">
-          <Link href="/marketplace" className="hover:text-slate-300">
-            Marketplace
-          </Link>
-          <span className="text-slate-700">·</span>
-          <Link href="/login" className="hover:text-slate-300">
+          <Link href="/login" className="hover:text-jurnex-text-primary">
             Panel novios
           </Link>
-          <span className="text-slate-700">·</span>
-          <a href={DEMO_URL} target="_blank" rel="noopener noreferrer" className="hover:text-slate-300">
+          <span className="text-jurnex-secondary/60">·</span>
+          <a href={DEMO_URL} target="_blank" rel="noopener noreferrer" className="hover:text-jurnex-text-primary">
             Ejemplo de invitación
           </a>
         </div>

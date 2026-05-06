@@ -35,7 +35,7 @@ export function InvitadosEnvioAccordion({ summaryMetrics, children }: Props) {
     >
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 sm:px-4 [&::-webkit-details-marker]:hidden">
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]/90">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-invite-gold/90">
             Correo y seguimiento
           </p>
           <p className="mt-1 font-display text-base font-semibold text-white md:text-lg">

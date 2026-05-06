@@ -41,12 +41,18 @@ export async function createPlanCheckoutPreferenceResponse(
 ): Promise<NextResponse> {
   const mpConfig = createMercadoPagoConfig();
   if (!input.bypass && !mpConfig) {
-    return NextResponse.json({ error: "Mercado Pago no está configurado (MP_ACCESS_TOKEN)." }, { status: 503 });
+    return NextResponse.json(
+      { error: "El pago con Mercado Pago no está listo aún. Quien cuida el sitio puede dejarlo configurado." },
+      { status: 503 }
+    );
   }
 
   const supabase = await createStrictServiceClient();
   if (!supabase) {
-    return NextResponse.json({ error: "Servidor sin SUPABASE_SERVICE_ROLE_KEY." }, { status: 503 });
+    return NextResponse.json(
+      { error: "Tuvimos un fallo al preparar el pago. Vuelve en un rato o avísanos." },
+      { status: 503 }
+    );
   }
 
   const planRaw = input.plan?.trim();
@@ -54,23 +60,23 @@ export async function createPlanCheckoutPreferenceResponse(
   const email = input.email?.trim().toLowerCase() ?? "";
 
   if (!isPricingPlanId(planRaw)) {
-    return NextResponse.json({ error: "Plan inválido." }, { status: 400 });
+    return NextResponse.json({ error: "Ese plan no está disponible. Elige Esencial o Experiencia e inténtalo otra vez." }, { status: 400 });
   }
   const plan = planRaw as PricingPlanId;
 
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (nombre.length < 2) {
-    return NextResponse.json({ error: "Indica tu nombre." }, { status: 400 });
+    return NextResponse.json({ error: "Escribe al menos un nombre o cómo te gusta que os llamen, con dos letras o más." }, { status: 400 });
   }
   if (!EMAIL_RE.test(email)) {
-    return NextResponse.json({ error: "Email inválido." }, { status: 400 });
+    return NextResponse.json({ error: "Ese correo no parece completo. Compruébalo e inténtalo otra vez." }, { status: 400 });
   }
 
   let eventoId: string | null = null;
   const rawEv = input.evento_id?.trim();
   if (rawEv) {
     if (!UUID_RE.test(rawEv)) {
-      return NextResponse.json({ error: "evento_id inválido." }, { status: 400 });
+      return NextResponse.json({ error: "No reconocemos el evento. Vuelve a la ficha e inténtalo otra vez." }, { status: 400 });
     }
     eventoId = rawEv;
   }
@@ -101,7 +107,7 @@ export async function createPlanCheckoutPreferenceResponse(
 
   if (insErr || !sessionRow?.id) {
     console.error("[create-plan-checkout-preference] insert session", insErr);
-    return NextResponse.json({ error: "No se pudo iniciar el checkout." }, { status: 500 });
+    return NextResponse.json({ error: "No pudimos abrir el camino al pago. Vuelve a la pantalla e inténtalo en un rato." }, { status: 500 });
   }
 
   const sessionId = sessionRow.id as string;
@@ -151,7 +157,10 @@ export async function createPlanCheckoutPreferenceResponse(
     const initPoint = isMercadoPagoSandboxMode() ? pref.sandbox_init_point : pref.init_point;
     if (!initPoint) {
       await supabase.from("checkout_sessions").delete().eq("id", sessionId);
-      return NextResponse.json({ error: "No se obtuvo init_point de Mercado Pago." }, { status: 502 });
+      return NextResponse.json(
+        { error: "No pudimos conectar con Mercado Pago. Vuelve a abrir el pago en un momento." },
+        { status: 502 }
+      );
     }
 
     await supabase.from("checkout_sessions").update({ mp_preference_id: pref.id ?? null }).eq("id", sessionId);
@@ -168,7 +177,7 @@ export async function createPlanCheckoutPreferenceResponse(
     const expose = shouldExposeMercadoPagoDetail();
     return NextResponse.json(
       {
-        error: "No se pudo crear la preferencia en Mercado Pago.",
+        error: "No se pudo seguir con Mercado Pago. Puede ser un fallo temporal: inténtalo otra vez.",
         ...(expose ? { detail: mpMsg } : {}),
         hint:
           !canUseMercadoPagoNotificationUrl(origin)

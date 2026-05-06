@@ -253,6 +253,8 @@ function SoftAviationBoardingMock() {
 const MOCKS: Record<InvitacionThemeId, React.ReactNode> = {
   legacy: <LegacyBoardingMock />,
   "soft-aviation": <SoftAviationBoardingMock />,
+  /** Misma silueta que Premium Aviation; en vivo usa oro/ marino Jurnex. */
+  "jurnex-aviation": <SoftAviationBoardingMock />,
 };
 
 export function InvitationThemePicker({ value, onChange, disabled }: Props) {
@@ -260,7 +262,7 @@ export function InvitationThemePicker({ value, onChange, disabled }: Props) {
     <div
       role="radiogroup"
       aria-label="Estilo de invitación"
-      className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+      className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
     >
       {INVITACION_THEMES.map((t) => {
         const selected = value === t.id;

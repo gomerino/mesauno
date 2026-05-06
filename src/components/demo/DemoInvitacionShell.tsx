@@ -63,7 +63,7 @@ export function DemoInvitacionShell({ embed = false }: Props) {
 
   if (embed) {
     return (
-      <div className="min-h-0 bg-[#F4F1EA] px-2 py-4 font-inviteBody">
+      <div className="min-h-0 bg-invite-sand px-2 py-4 font-inviteBody">
         <SoftAviationTicket
           invitado={demo.invitado}
           evento={demo.evento}
@@ -76,16 +76,16 @@ export function DemoInvitacionShell({ embed = false }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0f172a] via-[#0b1120] to-[#020617] font-sans text-white">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-[#0b1120] to-[#020617] font-sans text-white">
       <header className="border-b border-white/10 bg-black/20 px-4 py-3 backdrop-blur-md">
         <div className="mx-auto flex max-w-lg items-center justify-between gap-3">
           <Link href="/" className="text-xs font-medium text-slate-400 hover:text-white">
             ← Inicio
           </Link>
-          <span className="rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#D4AF37]">
+          <span className="rounded-full border border-invite-gold/30 bg-invite-gold/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-invite-gold">
             Vista previa
           </span>
-          <Link href="/onboarding" className="text-xs font-medium text-[#D4AF37] hover:underline">
+          <Link href="/onboarding" className="text-xs font-medium text-invite-gold hover:underline">
             Editar datos
           </Link>
         </div>
@@ -93,7 +93,7 @@ export function DemoInvitacionShell({ embed = false }: Props) {
 
       <main className="mx-auto max-w-lg px-4 py-8 pb-28">
         <p className="text-center text-sm text-slate-400">Así verán tu invitación tus invitados</p>
-        <div className="mt-6 rounded-xl border border-white/10 bg-[#F4F1EA]/95 p-3 shadow-xl">
+        <div className="mt-6 rounded-xl border border-white/10 bg-invite-sand/95 p-3 shadow-xl">
           <SoftAviationTicket
             invitado={demo.invitado}
             evento={demo.evento}
@@ -107,7 +107,7 @@ export function DemoInvitacionShell({ embed = false }: Props) {
           <button
             type="button"
             onClick={share}
-            className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/10 px-6 py-3 text-sm font-semibold text-[#D4AF37] transition hover:bg-[#D4AF37]/20"
+            className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-invite-gold/40 bg-invite-gold/10 px-6 py-3 text-sm font-semibold text-invite-gold transition hover:bg-invite-gold/20"
           >
             Compartir invitación
           </button>

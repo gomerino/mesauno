@@ -1,5 +1,7 @@
 import { createClient, createStrictServiceClient } from "@/lib/supabase/server";
+import { loadInvitacionSeoByToken } from "@/lib/invitacion-seo.server";
 import { LegacyTheme } from "@/components/themes/LegacyTheme";
+import { JurnexAviationTheme } from "@/components/themes/JurnexAviationTheme";
 import { SoftAviationTheme } from "@/components/themes/SoftAviationTheme";
 import type { InvitacionThemePageProps } from "@/components/themes/invitacion-theme-props";
 import {
@@ -23,6 +25,7 @@ import {
   spotifyGetCredentials,
 } from "@/lib/spotify-credentials";
 import type { EventoFoto, EventoProgramaHito, Invitado } from "@/types/database";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -31,6 +34,33 @@ type Props = {
 };
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { token } = await params;
+  const seo = await loadInvitacionSeoByToken(token);
+  if (!seo.ok) {
+    return { title: "Invitación" };
+  }
+  return {
+    title: seo.title,
+    description: seo.description,
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      url: seo.pageUrl,
+      siteName: "Jurnex",
+      type: "website",
+      images: [
+        { url: seo.ogImage, width: 1024, height: 1024, alt: "Jurnex" },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seo.title,
+      description: seo.description,
+    },
+  };
+}
 
 export default async function InvitacionPage({ params, searchParams }: Props) {
   const { token } = await params;
@@ -113,6 +143,10 @@ export default async function InvitacionPage({ params, searchParams }: Props) {
   };
 
   const themeId = resolveInvitacionThemeId({ evento, invitado }, themeQuery);
+
+  if (themeId === "jurnex-aviation") {
+    return <JurnexAviationTheme {...themeProps} />;
+  }
 
   if (themeId === "soft-aviation") {
     return <SoftAviationTheme {...themeProps} />;

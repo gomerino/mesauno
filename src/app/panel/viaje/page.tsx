@@ -2,9 +2,9 @@ import { EventoCentroTabProvider, type EventoCentroTabId } from "@/components/pa
 import { EventoConfigCompleteNote, EventoConfigPrimaryCta } from "@/components/panel/evento/EventoConfigPrimaryCta";
 import { EventoMobileStickyCta } from "@/components/panel/evento/EventoMobileStickyCta";
 import { EventoTabs } from "@/components/panel/evento/EventoTabs";
+import { ViajeExperienciaTabSync } from "@/components/panel/viaje/ViajeExperienciaTabSync";
 import { ViajeMisionBlock } from "@/components/panel/viaje/ViajeMisionBlock";
 import { PanelLayout } from "@/components/panel/ds";
-import { JourneyPrimaryCta } from "@/components/panel/journey/JourneyPrimaryCta";
 import { EventoForm } from "@/components/panel/EventoForm";
 import {
   PANEL_VIAJE_SUBTITLE,
@@ -15,9 +15,9 @@ import {
 } from "@/lib/panel-section-copy";
 import { getEventoConfigCTA } from "@/lib/evento-config-cta";
 import { selectEventoForMember } from "@/lib/evento-membership";
-import { resolveJourneyPhase } from "@/lib/journey-phases";
 import { isEventBasicsComplete } from "@/lib/panel-setup-progress";
 import { getViajeMisionMicroFromBundle } from "@/lib/viaje-mission";
+import { eventoTienePlanExperienciaProducto, eventoTienePlanPagado } from "@/lib/evento-plan-access";
 import { loadPanelProgressBundle } from "@/lib/panel-progress-load";
 import { spotifyGetPanelPublicState } from "@/lib/spotify-credentials";
 import { createClient, createStrictServiceClient } from "@/lib/supabase/server";
@@ -70,22 +70,13 @@ export default async function PanelViajePage({
 
   const eventoForProgress = (evento ?? null) as Evento | null;
   const basicsDone = isEventBasicsComplete(eventoForProgress);
-  const journeyPhase = resolveJourneyPhase(eventoForProgress?.fecha_boda, eventoForProgress?.fecha_evento);
 
-  const invitadosCount = bundle.invitados.length;
-  const invitacionesEnviadas = bundle.invitados.filter((r) => r.email_enviado === true).length;
-  const planStatus = eventoForProgress?.plan_status ?? null;
-  const hasAccess = planStatus === "paid";
-  let canCheckout = false;
-  let prefillNombre = "";
+  const tienePlanProducto = eventoTienePlanPagado(eventoForProgress);
+  const planExperienciaProducto = eventoTienePlanExperienciaProducto(eventoForProgress);
   let isAdmin = false;
   if (eventoForProgress?.id) {
     const { data: admin } = await supabase.rpc("user_is_evento_admin", { p_evento_id: eventoForProgress.id });
     isAdmin = Boolean(admin);
-    canCheckout = planStatus !== "paid" && isAdmin;
-    const n1 = eventoForProgress.nombre_novio_1?.trim() ?? "";
-    const n2 = eventoForProgress.nombre_novio_2?.trim() ?? "";
-    prefillNombre = [n1, n2].filter(Boolean).join(" & ");
   }
 
   const eventoId = eventoForProgress?.id ?? null;
@@ -129,11 +120,11 @@ export default async function PanelViajePage({
 
   const strictDb = await createStrictServiceClient();
   let spotifyState = { connected: false as boolean, playlistId: null as string | null };
-  if (strictDb && eventoId && isAdmin && hasAccess) {
+  if (strictDb && eventoId && planExperienciaProducto) {
     spotifyState = await spotifyGetPanelPublicState(strictDb, eventoId);
   }
 
-  const spotifySectionAvailable = Boolean(strictDb && eventoId && isAdmin && hasAccess);
+  const spotifySectionAvailable = Boolean(strictDb && eventoId && isAdmin && planExperienciaProducto);
 
   const configCta = getEventoConfigCTA({
     evento: eventoForProgress,
@@ -141,14 +132,13 @@ export default async function PanelViajePage({
       programaHitosCount: bundle.programaHitosCount,
       steps: bundle.steps,
     },
-    hasAccess,
     isAdmin,
     spotifyConnected: spotifyState.connected,
     spotifySectionAvailable,
   });
 
   const mainBottomPad =
-    hasAccess && configCta.status === "pending" ? "pb-28 md:pb-4" : "pb-4 md:pb-4";
+    tienePlanProducto && configCta.status === "pending" ? "pb-28 md:pb-4" : "pb-4 md:pb-4";
 
   return (
     <PanelLayout>
@@ -163,23 +153,8 @@ export default async function PanelViajePage({
           </div>
         ) : null}
 
-        {!hasAccess ? (
-          <div className="mb-4">
-          <JourneyPrimaryCta
-            invitados_count={invitadosCount}
-            plan_status={planStatus}
-            payment_status={bundle.mockPaymentStatus}
-            invitaciones_enviadas={invitacionesEnviadas}
-            canCheckout={canCheckout}
-            eventoId={eventoForProgress?.id ?? null}
-            userEmail={user?.email ?? ""}
-            prefillNombre={prefillNombre || "Mi evento"}
-            phase={journeyPhase}
-          />
-          </div>
-        ) : null}
-
         <EventoCentroTabProvider initialTab={initialCentroTab}>
+          <ViajeExperienciaTabSync />
           <div className={`space-y-4 md:space-y-5 ${mainBottomPad}`}>
             <header className="space-y-1">
               <h1 className={panelSectionTitleClass}>{PANEL_VIAJE_TITLE}</h1>
@@ -193,13 +168,13 @@ export default async function PanelViajePage({
               />
             ) : null}
 
-            {hasAccess && configCta.status === "pending" ? (
+            {tienePlanProducto && configCta.status === "pending" ? (
               <div className="hidden md:block">
                 <EventoConfigPrimaryCta result={configCta} />
               </div>
             ) : null}
 
-            {hasAccess && configCta.status === "complete" ? <EventoConfigCompleteNote /> : null}
+            {tienePlanProducto && configCta.status === "complete" ? <EventoConfigCompleteNote /> : null}
 
             {!basicsDone ? (
               <p className="text-[11px] text-white/50" role="status">
@@ -226,19 +201,21 @@ export default async function PanelViajePage({
                 equipoMiembros={equipoMiembros}
                 isEventoAdmin={isAdmin}
                 spotify={
-                  hasAccess && isAdmin && eventoId
+                  eventoId
                     ? {
                         eventoId,
+                        hasAccess: planExperienciaProducto,
                         connected: spotifyState.connected,
                         playlistId: spotifyState.playlistId,
                         strictDb: Boolean(strictDb),
+                        planExperienciaProducto,
                       }
                     : null
                 }
               />
             </div>
 
-            {hasAccess ? <EventoMobileStickyCta result={configCta} /> : null}
+            {tienePlanProducto ? <EventoMobileStickyCta result={configCta} /> : null}
           </div>
         </EventoCentroTabProvider>
       </div>

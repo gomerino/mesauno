@@ -47,7 +47,7 @@ export function InvitacionMetricasCard({
 
   async function run(mode: "unsent" | "pending_rsvp") {
     const t = toast.loading(
-      mode === "unsent" ? "Enviando invitaciones…" : "Reenviando confirmaciones…",
+      mode === "unsent" ? "Llevando la invitación por correo…" : "Tocando de nuevo a quien aún duda en la asistencia…",
       { duration: 60_000 }
     );
     startTransition(async () => {
@@ -59,15 +59,15 @@ export function InvitacionMetricasCard({
           return;
         }
         const extra =
-          res.errors.length > 0 ? ` · Avisos: ${res.errors.slice(0, 2).join("; ")}` : "";
+          res.errors.length > 0 ? ` · Detalles: ${res.errors.slice(0, 2).join("; ")}` : "";
         toast.success(
-          `${res.sent} invitaciones enviadas${res.skipped ? ` · ${res.skipped} omitidas` : ""}${extra}`,
+          `${res.sent} carta${res.sent === 1 ? "" : "s"} al correo${res.skipped ? ` · ${res.skipped} sin pista de correo, sin envío` : ""}${extra}`,
           { duration: 4000 }
         );
         router.refresh();
       } catch {
         toast.dismiss(t);
-        toast.error("No se pudo completar el envío. Intenta nuevamente.", { duration: 4000 });
+        toast.error("No alcanzó a salir todo. Revisa nombres y correos, e inténtalo otra vez.", { duration: 4000 });
       }
     });
   }

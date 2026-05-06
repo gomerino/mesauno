@@ -2,8 +2,12 @@
 
 import { JurnexOrbitIcon } from "@/components/brand/JurnexOrbitIcon";
 import { PANEL_MOBILE_TABS } from "@/components/panel/panel-nav-config";
+import { Lock } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+const RECUERDOS_LOCKED =
+  "Activa el plan Experiencia para usar Recuerdos / Aterrizaje.";
 
 function pathMatches(pathname: string, href: string, end?: boolean): boolean {
   if (end) {
@@ -14,7 +18,7 @@ function pathMatches(pathname: string, href: string, end?: boolean): boolean {
 
 export function PanelMobileHeader({ userEmail }: { userEmail: string }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#070b14]/40 px-4 py-2.5 backdrop-blur-xl md:hidden">
+    <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-jurnexPanel-dock/40 px-4 py-2.5 backdrop-blur-xl md:hidden">
       <div className="flex items-center justify-between gap-3">
         <Link
           href="/panel"
@@ -31,17 +35,35 @@ export function PanelMobileHeader({ userEmail }: { userEmail: string }) {
   );
 }
 
-export function PanelMobileBottomNav() {
+export function PanelMobileBottomNav({ experienciaPlanActive }: { experienciaPlanActive: boolean }) {
   const pathname = usePathname();
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-[500] border-t border-white/[0.08] bg-[#070b14]/95 pb-[env(safe-area-inset-bottom)] pt-1 backdrop-blur-xl md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-panel-mobile-500 border-t border-white/[0.08] bg-jurnexPanel-dock/95 pb-[env(safe-area-inset-bottom)] pt-1 backdrop-blur-xl md:hidden"
       aria-label="Navegación del viaje"
     >
       <div className="mx-auto flex h-14 max-w-lg items-center justify-between gap-1 px-1">
         {PANEL_MOBILE_TABS.map(({ href, label, icon: Icon, end }) => {
           const active = pathMatches(pathname, href, end);
+          const recuerdosLocked = href === "/panel/recuerdos" && !experienciaPlanActive;
+          if (recuerdosLocked) {
+            return (
+              <span
+                key={href}
+                aria-disabled="true"
+                aria-label={`${label}. ${RECUERDOS_LOCKED}`}
+                title={RECUERDOS_LOCKED}
+                className="flex min-w-0 flex-1 cursor-not-allowed flex-col items-center justify-center gap-0.5 rounded-lg py-0.5 text-white/25"
+              >
+                <span className="relative inline-flex">
+                  <Icon className="h-[1.15rem] w-[1.15rem] shrink-0 opacity-70" strokeWidth={2} aria-hidden />
+                  <Lock className="absolute -bottom-0.5 -right-1 h-2.5 w-2.5 text-white/40" strokeWidth={2.5} aria-hidden />
+                </span>
+                <span className="max-w-full truncate px-0.5 text-[11px] font-semibold leading-tight">{label}</span>
+              </span>
+            );
+          }
           return (
             <Link
               key={href}

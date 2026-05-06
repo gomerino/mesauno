@@ -5,6 +5,7 @@ import { RECUERDOS_ALBUM_EVENTO_ID, RECUERDOS_SIN_MOMENTO_HITO_ID } from "@/lib/
 import { type ProgramaConFotosHitoParsed, type ProgramaHitoFotoPublic } from "@/lib/programa-con-fotos-publica";
 import { loadProgramaConFotosHubForRecuerdos } from "@/lib/recuerdos-programa-con-fotos";
 import type { EventoProgramaHito } from "@/types/database";
+import { eventoTienePlanExperienciaProducto } from "@/lib/evento-plan-access";
 import { loadPanelProgressBundle } from "@/lib/panel-progress-load";
 import {
   PANEL_RECUERDOS_EYEBROW,
@@ -17,6 +18,7 @@ import {
 } from "@/lib/panel-section-copy";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +51,10 @@ export default async function PanelRecuerdosPage() {
   } = await supabase.auth.getUser();
   const bundle = await loadPanelProgressBundle(user!.id);
   const evento = bundle.evento;
+
+  if (!eventoTienePlanExperienciaProducto(evento)) {
+    redirect("/panel");
+  }
 
   const bloques: RecuerdosFotoBloque[] = [];
   let totalFotos = 0;

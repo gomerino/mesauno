@@ -8,8 +8,14 @@ import { NextResponse } from "next/server";
  * No usa el token OAuth del novio, así que no depende de su sesión ni de sus scopes.
  */
 export async function spotifySearchRouteGET(request: Request): Promise<Response> {
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q")?.trim() ?? "";
+  if (q.length < 2) {
+    return NextResponse.json({ tracks: [] });
+  }
+
   if (!getSpotifyClientId() || !getSpotifyClientSecret()) {
-    return NextResponse.json({ error: "Búsqueda no disponible." }, { status: 503 });
+    return NextResponse.json({ tracks: [] });
   }
 
   const ip =
@@ -18,18 +24,12 @@ export async function spotifySearchRouteGET(request: Request): Promise<Response>
     "unknown";
 
   if (!rateLimitSpotifySearch(ip)) {
-    return NextResponse.json({ error: "Demasiadas búsquedas. Espera un momento." }, { status: 429 });
-  }
-
-  const url = new URL(request.url);
-  const q = url.searchParams.get("q")?.trim() ?? "";
-  if (q.length < 2) {
     return NextResponse.json({ tracks: [] });
   }
 
   const token = await spotifyClientCredentialsAccessToken();
   if (!token) {
-    return NextResponse.json({ error: "No se pudo autenticar con Spotify." }, { status: 502 });
+    return NextResponse.json({ tracks: [] });
   }
 
   const first = await spotifySearchTracksDetailed(token, q, 8);
@@ -37,7 +37,6 @@ export async function spotifySearchRouteGET(request: Request): Promise<Response>
     return NextResponse.json({ tracks: first.tracks });
   }
 
-  // Recuperación defensiva ante 401 intermitente de Spotify (token recién emitido inválido/expirado).
   if (first.status === 401) {
     const retryToken = await spotifyClientCredentialsAccessToken();
     if (retryToken) {
@@ -46,5 +45,5 @@ export async function spotifySearchRouteGET(request: Request): Promise<Response>
     }
   }
 
-  return NextResponse.json({ error: "No pudimos consultar Spotify ahora. Intenta en unos segundos." }, { status: 502 });
+  return NextResponse.json({ tracks: [] });
 }

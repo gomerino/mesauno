@@ -1,5 +1,6 @@
 "use client";
 
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import {
   defaultJourneyState,
   loadJourneyFromStorage,
@@ -86,7 +87,7 @@ export function GuestForm() {
   if (!eventId || !state) {
     return (
       <p className="text-center text-sm text-slate-400">
-        <Link href="/onboarding" className="text-[#D4AF37] hover:underline">
+        <Link href="/onboarding" className="text-invite-gold hover:underline">
           Empezar de nuevo
         </Link>
       </p>
@@ -100,40 +101,40 @@ export function GuestForm() {
         className="space-y-4 rounded-2xl border border-white/10 bg-white/[0.04] p-6"
       >
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">Nombre</label>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">Nombre</label>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
             placeholder="Nombre del invitado"
-            className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/80 px-4 py-3 text-sm text-white"
+            className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/80 px-4 py-3 text-sm text-white"
           />
         </div>
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
             Email (opcional)
           </label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/80 px-4 py-3 text-sm text-white"
+            className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/80 px-4 py-3 text-sm text-white"
           />
         </div>
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
             Teléfono (opcional)
           </label>
           <input
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/80 px-4 py-3 text-sm text-white"
+            className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/80 px-4 py-3 text-sm text-white"
           />
         </div>
         <button
           type="submit"
           disabled={busy || !name.trim()}
-          className="w-full rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] py-3 text-sm font-semibold text-[#0f172a] disabled:opacity-50"
+          className={panelCtaJurnexPrimary + " w-full justify-center py-3 disabled:opacity-50"}
         >
           {busy ? "Añadiendo…" : "Añadir a la lista"}
         </button>

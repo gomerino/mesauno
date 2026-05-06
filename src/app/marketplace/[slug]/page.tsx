@@ -1,3 +1,4 @@
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -200,7 +201,7 @@ export default async function MarketplaceProveedorPage({ params }: Props) {
                 href={wa}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-400"
+                className={panelCtaJurnexPrimary + " items-center justify-center px-5 py-2.5"}
               >
                 WhatsApp
               </a>

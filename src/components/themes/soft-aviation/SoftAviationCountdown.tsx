@@ -1,5 +1,6 @@
 "use client";
 
+import { useAviationInvitacionVariant } from "@/components/themes/AviationInvitacionContext";
 import { useEffect, useMemo, useState } from "react";
 
 function pad2(n: number) {
@@ -34,6 +35,10 @@ type Props = {
   prominent?: boolean;
 };
 
+/**
+ * Cuenta regresiva: el instante "ahora" solo se fija en el cliente tras el primer mount.
+ * Así el HTML de SSR y el primer paint del cliente coinciden (evita 38d vs 37d y errores de hidratación).
+ */
 export function SoftAviationCountdown({
   fechaEvento,
   horaEmbarque,
@@ -41,10 +46,13 @@ export function SoftAviationCountdown({
   dense = false,
   prominent = false,
 }: Props) {
+  const av = useAviationInvitacionVariant();
+  const isJx = av === "jurnex";
   const target = useMemo(() => parseTargetMs(fechaEvento, horaEmbarque), [fechaEvento, horaEmbarque]);
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
+    setNow(Date.now());
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
   }, []);
@@ -62,15 +70,129 @@ export function SoftAviationCountdown({
     if (variant === "headerMono") {
       return (
         <p
-          className={`max-w-full font-mono text-[#1A2B48]/65 ${dense ? "mt-0.5 text-[9px] sm:text-[10px]" : "mt-1.5 text-[10px] sm:text-[11px]"}`}
+          className={`max-w-full font-mono ${
+            isJx ? "text-inviteJurnex-navy/65" : "text-invite-navy/65"
+          } ${dense ? "mt-0.5 text-[9px] sm:text-[10px]" : "mt-1.5 text-[10px] sm:text-[11px]"}`}
         >
           Fecha de aterrizaje por confirmar
         </p>
       );
     }
     return (
-      <div className="mt-2 rounded-xl border border-[#1A2B48]/10 bg-white px-3 py-2 text-center text-xs text-[#1A2B48]/70">
+      <div
+        className={`mt-2 rounded-xl border px-3 py-2 text-center text-xs ${
+          isJx
+            ? "border-inviteJurnex-navy/10 bg-white text-inviteJurnex-navy/70"
+            : "border-invite-navy/10 bg-white text-invite-navy/70"
+        }`}
+      >
         Pronto la fecha exacta del aterrizaje.
+      </div>
+    );
+  }
+
+  if (now === null) {
+    if (variant === "jurnexPanel") {
+      return (
+        <p
+          className={`max-w-full whitespace-normal break-words font-mono tabular-nums tracking-tight text-teal-100/90 ${
+            prominent
+              ? "mt-6 text-sm md:text-base"
+              : dense
+                ? "mt-1 text-[9px] sm:text-[10px]"
+                : "mt-1.5 text-[10px] sm:text-[11px]"
+          }`}
+          aria-live="off"
+          aria-busy="true"
+        >
+          <span className="text-teal-200/65">Faltan</span>{" "}
+          <span className="font-semibold text-white">--</span>
+          <span className="text-teal-400/55">d</span>
+          <span className="text-white/25"> : </span>
+          <span className="font-semibold text-white">--</span>
+          <span className="text-teal-400/55">h</span>
+          <span className="text-white/25"> : </span>
+          <span className="font-semibold text-white">--</span>
+          <span className="text-teal-400/55">m</span>
+          <span className="text-white/25"> : </span>
+          <span className="font-semibold text-white">--</span>
+          <span className="text-teal-400/55">s</span>
+        </p>
+      );
+    }
+    if (variant === "headerMono") {
+      const ink = isJx ? "text-inviteJurnex-navy" : "text-invite-navy";
+      const m60 = isJx ? "text-inviteJurnex-navy/60" : "text-invite-navy/60";
+      const m45 = isJx ? "text-inviteJurnex-navy/45" : "text-invite-navy/45";
+      const m40 = isJx ? "text-inviteJurnex-navy/40" : "text-invite-navy/40";
+      return (
+        <p
+          className={`max-w-full whitespace-normal break-words font-mono tabular-nums tracking-tight ${ink} ${
+            dense ? "mt-0.5 text-[9px] sm:text-[10px]" : "mt-1.5 text-[10px] sm:text-[11px]"
+          }`}
+          aria-live="off"
+          aria-busy="true"
+        >
+          <span className={m60}>Faltan</span>{" "}
+          <span className="font-semibold">--</span>
+          <span className={m45}>d</span>
+          <span className={m40}> : </span>
+          <span className="font-semibold">--</span>
+          <span className={m45}>h</span>
+          <span className={m40}> : </span>
+          <span className="font-semibold">--</span>
+          <span className={m45}>m</span>
+          <span className={m40}> : </span>
+          <span className="font-semibold">--</span>
+          <span className={m45}>s</span>
+        </p>
+      );
+    }
+    if (variant === "inlineLight") {
+      return (
+        <div className="mt-3 border-t border-invite-navy/10 pt-3">
+          <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-invite-navy/45">Embarque en</p>
+            <div className="flex items-baseline gap-1 tabular-nums text-invite-navy" aria-live="off" aria-busy="true">
+              {(
+                [
+                  { label: "D", v: "--" },
+                  { label: "H", v: "--" },
+                  { label: "M", v: "--" },
+                  { label: "S", v: "--" },
+                ] as const
+              ).map((c, i) => (
+                <span key={c.label} className="flex items-baseline gap-1">
+                  {i > 0 ? <span className="text-invite-navy/25">:</span> : null}
+                  <span className="text-lg font-semibold tracking-tight sm:text-xl">{c.v}</span>
+                  <span className="text-[10px] font-medium text-invite-navy/50">{c.label}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+    const cells = [
+      { label: "Días", v: "--" },
+      { label: "Horas", v: "--" },
+      { label: "Min", v: "--" },
+      { label: "Seg", v: "--" },
+    ];
+    return (
+      <div className="mt-6" aria-live="off" aria-busy="true">
+        <p className="text-center text-[10px] font-semibold uppercase tracking-widest text-invite-navy/50">Embarque en</p>
+        <div className="mt-2 grid grid-cols-4 gap-2 sm:gap-3">
+          {cells.map((c) => (
+            <div
+              key={c.label}
+              className="rounded-2xl border border-invite-navy/10 bg-invite-navy px-1 py-3 text-center shadow-sm sm:py-4"
+            >
+              <p className="text-xl font-semibold tabular-nums tracking-tight text-white sm:text-2xl">{c.v}</p>
+              <p className="mt-1 text-[9px] font-medium uppercase tracking-wide text-invite-gold/95">{c.label}</p>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -147,23 +269,29 @@ export function SoftAviationCountdown({
   const s = totalSec % 60;
 
   if (variant === "headerMono") {
+    const ink = isJx ? "text-inviteJurnex-navy" : "text-invite-navy";
+    const m60 = isJx ? "text-inviteJurnex-navy/60" : "text-invite-navy/60";
+    const m45 = isJx ? "text-inviteJurnex-navy/45" : "text-invite-navy/45";
+    const m40 = isJx ? "text-inviteJurnex-navy/40" : "text-invite-navy/40";
     return (
       <p
-        className={`max-w-full whitespace-normal break-words font-mono tabular-nums tracking-tight text-[#1A2B48] ${dense ? "mt-0.5 text-[9px] sm:text-[10px]" : "mt-1.5 text-[10px] sm:text-[11px]"}`}
+        className={`max-w-full whitespace-normal break-words font-mono tabular-nums tracking-tight ${ink} ${
+          dense ? "mt-0.5 text-[9px] sm:text-[10px]" : "mt-1.5 text-[10px] sm:text-[11px]"
+        }`}
         aria-live="polite"
       >
-        <span className="text-[#1A2B48]/60">Faltan</span>{" "}
+        <span className={m60}>Faltan</span>{" "}
         <span className="font-semibold">{pad2(d)}</span>
-        <span className="text-[#1A2B48]/45">d</span>
-        <span className="text-[#1A2B48]/40"> : </span>
+        <span className={m45}>d</span>
+        <span className={m40}> : </span>
         <span className="font-semibold">{pad2(h)}</span>
-        <span className="text-[#1A2B48]/45">h</span>
-        <span className="text-[#1A2B48]/40"> : </span>
+        <span className={m45}>h</span>
+        <span className={m40}> : </span>
         <span className="font-semibold">{pad2(m)}</span>
-        <span className="text-[#1A2B48]/45">m</span>
-        <span className="text-[#1A2B48]/40"> : </span>
+        <span className={m45}>m</span>
+        <span className={m40}> : </span>
         <span className="font-semibold">{pad2(s)}</span>
-        <span className="text-[#1A2B48]/45">s</span>
+        <span className={m45}>s</span>
       </p>
     );
   }
@@ -176,15 +304,15 @@ export function SoftAviationCountdown({
       { label: "S", v: pad2(s) },
     ];
     return (
-      <div className="mt-3 border-t border-[#1A2B48]/10 pt-3">
+      <div className="mt-3 border-t border-invite-navy/10 pt-3">
         <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#1A2B48]/45">Embarque en</p>
-          <div className="flex items-baseline gap-1 tabular-nums text-[#1A2B48]" aria-live="polite">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-invite-navy/45">Embarque en</p>
+          <div className="flex items-baseline gap-1 tabular-nums text-invite-navy" aria-live="polite">
             {parts.map((c, i) => (
               <span key={c.label} className="flex items-baseline gap-1">
-                {i > 0 ? <span className="text-[#1A2B48]/25">:</span> : null}
+                {i > 0 ? <span className="text-invite-navy/25">:</span> : null}
                 <span className="text-lg font-semibold tracking-tight sm:text-xl">{c.v}</span>
-                <span className="text-[10px] font-medium text-[#1A2B48]/50">{c.label}</span>
+                <span className="text-[10px] font-medium text-invite-navy/50">{c.label}</span>
               </span>
             ))}
           </div>
@@ -202,17 +330,17 @@ export function SoftAviationCountdown({
 
   return (
     <div className="mt-6">
-      <p className="text-center text-[10px] font-semibold uppercase tracking-widest text-[#1A2B48]/50">
+      <p className="text-center text-[10px] font-semibold uppercase tracking-widest text-invite-navy/50">
         Embarque en
       </p>
       <div className="mt-2 grid grid-cols-4 gap-2 sm:gap-3">
         {cells.map((c) => (
           <div
             key={c.label}
-            className="rounded-2xl border border-[#1A2B48]/10 bg-[#1A2B48] px-1 py-3 text-center shadow-sm sm:py-4"
+            className="rounded-2xl border border-invite-navy/10 bg-invite-navy px-1 py-3 text-center shadow-sm sm:py-4"
           >
             <p className="text-xl font-semibold tabular-nums tracking-tight text-white sm:text-2xl">{c.v}</p>
-            <p className="mt-1 text-[9px] font-medium uppercase tracking-wide text-[#D4AF37]/95">{c.label}</p>
+            <p className="mt-1 text-[9px] font-medium uppercase tracking-wide text-invite-gold/95">{c.label}</p>
           </div>
         ))}
       </div>

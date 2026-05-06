@@ -7,6 +7,7 @@ import {
   resolvePreferenceOrigin,
   validateMercadoPagoPreferenceOrigin,
 } from "@/lib/mercadopago-server";
+import { eventoTienePlanPagado, type EventoPlanGate } from "@/lib/evento-plan-access";
 import { Preference } from "mercadopago";
 import { NextResponse } from "next/server";
 
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
 
   const { data: evento, error: evErr } = await supabase
     .from("eventos")
-    .select("id, nombre_novio_1, nombre_novio_2, nombre_evento, plan_status")
+    .select("id, nombre_novio_1, nombre_novio_2, nombre_evento, plan, plan_status")
     .eq("id", eventoId)
     .maybeSingle();
 
@@ -57,8 +58,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Evento no encontrado." }, { status: 404 });
   }
 
-  if (evento.plan_status === "paid") {
-    return NextResponse.json({ error: "Este evento ya tiene suscripción activa." }, { status: 400 });
+  if (eventoTienePlanPagado(evento as EventoPlanGate)) {
+    return NextResponse.json({ error: "Este evento ya tiene un plan contratado." }, { status: 400 });
   }
 
   const origin = resolvePreferenceOrigin(request);

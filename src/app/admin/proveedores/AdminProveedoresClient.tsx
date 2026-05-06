@@ -1,5 +1,6 @@
 "use client";
 
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -191,7 +192,7 @@ export function AdminProveedoresClient({
                       type="button"
                       disabled={loadingId === p.id || pending}
                       onClick={() => accion(p.id, "aprobar")}
-                      className="rounded-full bg-emerald-400 px-4 py-2 text-xs font-semibold text-slate-950 hover:bg-emerald-300 disabled:opacity-60"
+                      className={panelCtaJurnexPrimary + " justify-center px-4 py-2 text-xs disabled:opacity-60"}
                     >
                       {loadingId === p.id ? "…" : "Aprobar"}
                     </button>

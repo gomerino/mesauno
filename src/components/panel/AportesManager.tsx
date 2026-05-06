@@ -1,5 +1,6 @@
 "use client";
 
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import type { AporteRegalo } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
 import { useMemo, useState } from "react";
@@ -136,7 +137,7 @@ export function AportesManager({
             <button
               type="submit"
               disabled={saving}
-              className="rounded-full bg-teal-500 px-6 py-2.5 text-sm font-semibold text-white hover:bg-teal-400 disabled:opacity-50"
+              className={panelCtaJurnexPrimary + " justify-center px-6 py-2.5 disabled:opacity-50"}
             >
               {saving ? "Guardando…" : "Registrar aporte"}
             </button>

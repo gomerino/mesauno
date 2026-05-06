@@ -99,11 +99,14 @@ export function getJourneyProgress(
     | "motivo_viaje"
   > | null,
   programaHitosCount: number,
-  spotifyConnected: boolean
+  spotifyConnected: boolean,
+  /** Producto Experiencia: la pestaña Experiencia exige Spotify conectado; con Esencial basta el programa. */
+  spotifyRequeridoParaTabExperiencia: boolean
 ): JourneyProgress {
   const tripulacionOk = isEventBasicsComplete(evento) && isEventUbicacionHoraComplete(evento);
   const invitacionOk = Boolean(evento?.motivo_viaje?.trim());
-  const experienciaOk = programaHitosCount > 0 && spotifyConnected;
+  const experienciaOk =
+    programaHitosCount > 0 && (!spotifyRequeridoParaTabExperiencia || spotifyConnected);
 
   const steps: Record<JourneyStepId, boolean> = {
     tab_tripulacion: tripulacionOk,
@@ -133,8 +136,14 @@ export function getJourneyProgress(
 export function getPanelSetupProgress(
   evento: Parameters<typeof getJourneyProgress>[0],
   programaHitosCount: number,
-  spotifyConnected: boolean
+  spotifyConnected: boolean,
+  spotifyRequeridoParaTabExperiencia: boolean
 ): { pct: number; steps: Record<JourneyStepId, boolean> } {
-  const j = getJourneyProgress(evento, programaHitosCount, spotifyConnected);
+  const j = getJourneyProgress(
+    evento,
+    programaHitosCount,
+    spotifyConnected,
+    spotifyRequeridoParaTabExperiencia
+  );
   return { pct: j.pct, steps: j.steps };
 }

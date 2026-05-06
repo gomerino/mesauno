@@ -1,6 +1,7 @@
 "use client";
 
 import { addMemberToEvent, removeMemberFromEvent, type EquipoRol } from "@/app/panel/actions/equipo";
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -48,8 +49,8 @@ export function EquipoPageClient({ eventoId, initialMiembros, isAdmin }: Props) 
       }
       toast.success(
         res.mode === "invited"
-          ? "Le enviamos un correo para unirse al equipo"
-          : "Ya puede acceder y editar contigo"
+          ? "Listo, le estamos dejando un correo para que vuele con ustedes en el evento"
+          : "Puede abrir y ayudar en el evento, sin más pasos"
       );
       setEmail("");
       router.refresh();
@@ -65,7 +66,7 @@ export function EquipoPageClient({ eventoId, initialMiembros, isAdmin }: Props) 
       toast.error(res.error);
       return;
     }
-    toast.success("Ya no tiene acceso a este evento");
+    toast.success("Listo, ya no forma parte del equipo de este evento");
     router.refresh();
   }
 
@@ -107,7 +108,7 @@ export function EquipoPageClient({ eventoId, initialMiembros, isAdmin }: Props) 
             <button
               type="submit"
               disabled={pending}
-              className="rounded-full bg-teal-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-teal-900/30 hover:bg-teal-400 disabled:opacity-50"
+              className={panelCtaJurnexPrimary + " justify-center px-6 py-2.5 disabled:opacity-50"}
             >
               {pending ? "Enviando…" : "Invitar"}
             </button>

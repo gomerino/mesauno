@@ -1,6 +1,7 @@
 "use client";
 
 import { staffRegistrarEntradaAction, staffResolveQrAction } from "@/app/staff/actions";
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import { QRScanner } from "@/components/staff/QRScanner";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -33,7 +34,7 @@ export function StaffCheckInClient({ eventoId }: Props) {
       }
       const p = res.payload;
       if (p.ok !== true || typeof p.invitado_id !== "string") {
-        toast.error("Código no reconocido");
+        toast.error("Ese código no encaja. Compruébalo o prueba a escanear otra vez.");
         return;
       }
       setPreview({
@@ -44,7 +45,7 @@ export function StaffCheckInClient({ eventoId }: Props) {
         rsvp_estado: (p.rsvp_estado as string | null) ?? null,
         asistencia_confirmada: Boolean(p.asistencia_confirmada),
       });
-      toast.success("Invitado encontrado");
+      toast.success("En el listado, a la vista. Sigue con el pase o la confirmación.");
     },
     [eventoId]
   );
@@ -58,7 +59,7 @@ export function StaffCheckInClient({ eventoId }: Props) {
       toast.error(res.error);
       return;
     }
-    toast.success("Entrada registrada");
+    toast.success("Listo, anotada la asistencia en vuestro pase");
     setPreview((p) => (p ? { ...p, asistencia_confirmada: true } : null));
   }
 
@@ -127,7 +128,7 @@ export function StaffCheckInClient({ eventoId }: Props) {
                 type="button"
                 disabled={loading}
                 onClick={() => void registrar()}
-                className="flex-1 rounded-xl bg-teal-500 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-900/30 disabled:opacity-50"
+                className={panelCtaJurnexPrimary + " flex-1 justify-center py-3 disabled:opacity-50"}
               >
                 Registrar entrada
               </button>

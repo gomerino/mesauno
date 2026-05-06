@@ -1,5 +1,6 @@
 "use client";
 
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import { createClient } from "@/lib/supabase/client";
 import { PRICING_PLANS, type PricingPlanId } from "@/lib/pricing-plans";
 import { Check } from "lucide-react";
@@ -141,13 +142,13 @@ export function PaywallModal({
 
   return (
     <div
-      className="fixed inset-0 z-[6000] flex items-end justify-center p-4 sm:items-center"
+      className="fixed inset-0 z-paywall-6000 flex items-end justify-center p-4 sm:items-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby="paywall-title"
     >
       <button type="button" className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" aria-label="Cerrar" onClick={onClose} />
-      <div className="relative w-full max-w-md animate-fadeIn rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-b from-[#0f172a] to-[#020617] p-6 shadow-2xl sm:p-8">
+      <div className="relative w-full max-w-md animate-fadeIn rounded-2xl border border-invite-gold/30 bg-gradient-to-b from-slate-900 to-[#020617] p-6 shadow-2xl sm:p-8">
         <p className="text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-jurnex-secondary/85">
           Jurnex
         </p>
@@ -178,12 +179,12 @@ export function PaywallModal({
                 "rounded-xl border px-3 py-2.5 text-left text-xs transition-all duration-200",
                 selectedPlan === id
                   ? id === "experiencia"
-                    ? "border-[#D4AF37] bg-[#D4AF37]/15 text-white shadow-[0_0_28px_rgba(212,175,55,0.28)] ring-1 ring-[#D4AF37]/50"
-                    : "border-[#D4AF37] bg-[#D4AF37]/15 text-white shadow-[0_0_24px_rgba(212,175,55,0.15)]"
+                    ? "border-invite-gold bg-invite-gold/15 text-white shadow-[0_0_28px_rgba(212,175,55,0.28)] ring-1 ring-invite-gold/50"
+                    : "border-invite-gold bg-invite-gold/15 text-white shadow-[0_0_24px_rgba(212,175,55,0.15)]"
                   : "border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/20",
               ].join(" ")}
             >
-              <span className="block font-semibold text-[#D4AF37]">
+              <span className="block font-semibold text-invite-gold">
                 {id === "experiencia" ? "Experiencia ✨" : "Básico ✈️"}
               </span>
               <span className="mt-0.5 block text-[11px] text-slate-500">{PRICING_PLANS[id].priceLabel}</span>
@@ -193,7 +194,7 @@ export function PaywallModal({
 
         <div className="mt-4 space-y-3">
           <div>
-            <label htmlFor="paywall-nombre" className="block text-[11px] font-semibold uppercase tracking-wider text-[#D4AF37]/85">
+            <label htmlFor="paywall-nombre" className="block text-[11px] font-semibold uppercase tracking-wider text-invite-gold/85">
               Nombre
             </label>
             <input
@@ -201,12 +202,12 @@ export function PaywallModal({
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               autoComplete="name"
-              className="mt-1.5 w-full rounded-lg border border-white/15 bg-[#0f172a]/90 px-3 py-2.5 text-sm text-white placeholder:text-slate-600"
+              className="mt-1.5 w-full rounded-lg border border-white/15 bg-slate-900/90 px-3 py-2.5 text-sm text-white placeholder:text-slate-600"
               placeholder="Tu nombre o pareja"
             />
           </div>
           <div>
-            <label htmlFor="paywall-email" className="block text-[11px] font-semibold uppercase tracking-wider text-[#D4AF37]/85">
+            <label htmlFor="paywall-email" className="block text-[11px] font-semibold uppercase tracking-wider text-invite-gold/85">
               Email
             </label>
             <input
@@ -215,7 +216,7 @@ export function PaywallModal({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="email"
-              className="mt-1.5 w-full rounded-lg border border-white/15 bg-[#0f172a]/90 px-3 py-2.5 text-sm text-white placeholder:text-slate-600"
+              className="mt-1.5 w-full rounded-lg border border-white/15 bg-slate-900/90 px-3 py-2.5 text-sm text-white placeholder:text-slate-600"
               placeholder="tu@email.com"
             />
           </div>
@@ -230,7 +231,7 @@ export function PaywallModal({
         <button
           type="button"
           disabled={busy}
-          className="mt-5 w-full rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] py-3 text-sm font-semibold text-[#0f172a] transition hover:brightness-110 active:scale-[0.99] disabled:opacity-60"
+          className={panelCtaJurnexPrimary + " mt-5 w-full justify-center py-3 disabled:opacity-60"}
           onClick={() => void handleCheckout()}
         >
           {busy ? "Abriendo Mercado Pago…" : ctaPrimary}

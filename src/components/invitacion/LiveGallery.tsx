@@ -95,7 +95,7 @@ export function LiveGallery({ eventoId, fotos, setFotos }: Props) {
 
       {lightbox ? (
         <div
-          className="fixed inset-0 z-[260] flex flex-col bg-black/92 p-2 sm:p-4"
+          className="fixed inset-0 z-gallery-260 flex flex-col bg-black/92 p-2 sm:p-4"
           role="dialog"
           aria-modal="true"
           aria-label="Foto en pantalla completa"

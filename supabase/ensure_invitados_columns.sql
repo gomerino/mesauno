@@ -28,6 +28,15 @@ alter table public.invitados add column if not exists token_acceso uuid default 
 alter table public.invitados add column if not exists qr_code_token text;
 alter table public.invitados add column if not exists asistencia_confirmada boolean not null default false;
 
+-- Envío / estado de invitación (useEnvioInvitaciones, panel pasajeros)
+alter table public.invitados add column if not exists canal_envio text
+  check (canal_envio is null or canal_envio in ('correo', 'whatsapp', 'ambos'));
+alter table public.invitados add column if not exists estado_envio text not null default 'pendiente'
+  check (estado_envio in ('pendiente', 'enviado', 'abierto', 'confirmado'));
+alter table public.invitados add column if not exists fecha_apertura timestamptz;
+alter table public.invitados add column if not exists fecha_confirmacion timestamptz;
+-- Reutilizar lógica de backfill/RLS: supabase/migration_evento_configuracion_envio_y_estado_invitados.sql (una sola vez)
+
 update public.invitados set token_acceso = gen_random_uuid() where token_acceso is null;
 alter table public.invitados alter column token_acceso set not null;
 alter table public.invitados alter column token_acceso set default gen_random_uuid();

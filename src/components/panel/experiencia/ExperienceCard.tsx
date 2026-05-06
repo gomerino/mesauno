@@ -22,7 +22,7 @@ export function ExperienceCard({ title, description, icon, status, children }: P
       className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 ease-out ${
         isLocked
           ? "border-white/[0.07] bg-white/[0.03]"
-          : "border-white/[0.1] bg-white/[0.06] shadow-[0_12px_48px_rgba(0,0,0,0.35)] hover:-translate-y-1 hover:border-[#D4AF37]/25 hover:shadow-[0_20px_56px_rgba(212,175,55,0.12)]"
+          : "border-white/[0.1] bg-white/[0.06] shadow-[0_12px_48px_rgba(0,0,0,0.35)] hover:-translate-y-1 hover:border-invite-gold/25 hover:shadow-[0_20px_56px_rgba(212,175,55,0.12)]"
       } backdrop-blur-xl`}
     >
       <div className={`relative p-5 sm:p-6 ${isLocked ? "pointer-events-none select-none" : ""}`}>
@@ -39,7 +39,7 @@ export function ExperienceCard({ title, description, icon, status, children }: P
 
       {isLocked ? (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl bg-[#050810]/75 px-6 text-center backdrop-blur-md">
-          <Lock className="h-7 w-7 text-[#D4AF37]/75" strokeWidth={1.75} aria-hidden />
+          <Lock className="h-7 w-7 text-invite-gold/75" strokeWidth={1.75} aria-hidden />
           <p className="max-w-[220px] text-sm font-medium leading-snug text-slate-200">
             Disponible al activar tu viaje
           </p>

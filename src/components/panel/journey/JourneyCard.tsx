@@ -57,7 +57,7 @@ export function JourneyCard({
     status === "completed"
       ? "border-emerald-400/30 hover:border-emerald-300/45"
       : status === "active"
-        ? "border-[#D4AF37]/25 hover:border-[#D4AF37]/40"
+        ? "border-invite-gold/25 hover:border-invite-gold/40"
         : "border-slate-600/40";
 
   const phaseFocus =
@@ -101,8 +101,8 @@ export function JourneyCard({
           }
         : {
             label: "text-[#E6C86B] group-hover:text-[#F5D97A]",
-            arrow: "text-[#D4AF37]",
-            divider: "border-[#D4AF37]/15",
+            arrow: "text-invite-gold",
+            divider: "border-invite-gold/15",
           };
 
   const inner = (
@@ -176,7 +176,7 @@ export function JourneyCard({
       href={href}
       onClick={onNavigate}
       className={`${shellClass} focus:outline-none focus-visible:ring-2 ${
-        phaseHighlight ? "focus-visible:ring-teal-400/35" : "focus-visible:ring-[#D4AF37]/40"
+        phaseHighlight ? "focus-visible:ring-teal-400/35" : "focus-visible:ring-invite-gold/40"
       }`}
     >
       {inner}

@@ -1,6 +1,6 @@
 import type { Evento, Invitado } from "@/types/database";
 
-export const INVITACION_THEME_IDS = ["legacy", "soft-aviation"] as const;
+export const INVITACION_THEME_IDS = ["legacy", "soft-aviation", "jurnex-aviation"] as const;
 export type InvitacionThemeId = (typeof INVITACION_THEME_IDS)[number];
 
 export const INVITACION_THEMES: Array<{
@@ -18,12 +18,18 @@ export const INVITACION_THEMES: Array<{
     name: "Premium Aviation",
     tagline: "Boarding pass editorial con detalles aeronáuticos.",
   },
+  {
+    id: "jurnex-aviation",
+    name: "Jurnex Aviation",
+    tagline: "Mismo viaje aéreo, colores de marca Jurnex (oro y marino).",
+  },
 ];
 
 function normalize(raw: unknown): InvitacionThemeId | null {
   if (typeof raw !== "string") return null;
   const v = raw.trim().toLowerCase();
   if (v === "soft-aviation" || v === "premium") return "soft-aviation";
+  if (v === "jurnex-aviation" || v === "jurnex" || v === "jurnex-av" || v === "marca") return "jurnex-aviation";
   if (v === "legacy") return "legacy";
   return null;
 }

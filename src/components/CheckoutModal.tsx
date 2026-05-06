@@ -1,5 +1,6 @@
 "use client";
 
+import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import type { PricingPlanId } from "@/lib/pricing-plans";
 import { PRICING_PLANS } from "@/lib/pricing-plans";
 import { X } from "lucide-react";
@@ -90,19 +91,19 @@ export function CheckoutModal({ open, planId, onClose }: Props) {
   const plan = PRICING_PLANS[planId];
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center sm:p-4" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-checkout flex items-end justify-center sm:items-center sm:p-4" role="dialog" aria-modal="true">
       <button
         type="button"
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         aria-label="Cerrar"
         onClick={handleClose}
       />
-      <div className="relative z-[71] w-full max-w-md rounded-t-2xl border border-white/15 bg-gradient-to-b from-[#162032] to-[#0f172a] p-6 shadow-2xl sm:rounded-2xl sm:border-[#D4AF37]/25">
+      <div className="relative z-checkout-panel w-full max-w-md rounded-t-2xl border border-white/15 bg-gradient-to-b from-jurnexPanel-checkout-from to-jurnexPanel-checkout-to p-6 shadow-2xl sm:rounded-2xl sm:border-invite-gold/25">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]/90">Checkout</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-invite-gold/90">Checkout</p>
             <h2 className="mt-1 font-display text-xl font-bold text-white">{plan.name}</h2>
-            <p className="mt-1 text-sm text-[#D4AF37]">{plan.priceLabel}</p>
+            <p className="mt-1 text-sm text-invite-gold">{plan.priceLabel}</p>
           </div>
           <button
             type="button"
@@ -116,7 +117,7 @@ export function CheckoutModal({ open, planId, onClose }: Props) {
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
           <div>
-            <label htmlFor="checkout_nombre" className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+            <label htmlFor="checkout_nombre" className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
               Nombre <span className="text-red-400">*</span>
             </label>
             <input
@@ -129,12 +130,12 @@ export function CheckoutModal({ open, planId, onClose }: Props) {
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               disabled={busy}
-              className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/90 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/40"
+              className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/90 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-invite-gold/50 focus:outline-none focus:ring-1 focus:ring-invite-gold/40"
               placeholder="Tu nombre o el del evento"
             />
           </div>
           <div>
-            <label htmlFor="checkout_email" className="block text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/90">
+            <label htmlFor="checkout_email" className="block text-xs font-semibold uppercase tracking-wider text-invite-gold/90">
               Email <span className="text-red-400">*</span>
             </label>
             <input
@@ -146,7 +147,7 @@ export function CheckoutModal({ open, planId, onClose }: Props) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={busy}
-              className="mt-2 w-full rounded-lg border border-white/15 bg-[#0f172a]/90 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/40"
+              className="mt-2 w-full rounded-lg border border-white/15 bg-slate-900/90 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-invite-gold/50 focus:outline-none focus:ring-1 focus:ring-invite-gold/40"
               placeholder="tu@email.com"
             />
           </div>
@@ -160,7 +161,7 @@ export function CheckoutModal({ open, planId, onClose }: Props) {
           <button
             type="submit"
             disabled={busy}
-            className="flex w-full min-h-[48px] items-center justify-center rounded-full bg-gradient-to-r from-[#D4AF37] to-[#b8941f] py-3 text-sm font-semibold text-[#0f172a] shadow-lg transition hover:brightness-110 disabled:opacity-60"
+            className={panelCtaJurnexPrimary + " w-full min-h-[48px] justify-center py-3 disabled:opacity-60"}
           >
             {busy ? (bypassUi ? "Continuando…" : "Abriendo Mercado Pago…") : bypassUi ? "Continuar (sin cobro — prueba)" : "Continuar al pago"}
           </button>

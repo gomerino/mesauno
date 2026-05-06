@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Home, Image, Plane, Settings, Users } from "lucide-react";
+import { Home, Image, Plane, Users } from "lucide-react";
 
 export type PanelSidebarItem = {
   id: string;
@@ -30,15 +30,8 @@ const aterrizaje: PanelSidebarItem = {
   label: "Aterrizaje",
   icon: Image,
 };
-const ajustes: PanelSidebarItem = {
-  id: "ajustes",
-  href: "/panel/ajustes",
-  label: "Ajustes",
-  icon: Settings,
-};
-
-/** Grupos del sidebar: control · viaje+pasajeros+aterrizaje · ajustes */
-export const PANEL_SIDEBAR_GROUPS: PanelSidebarItem[][] = [[panel], [viaje, pasajeros, aterrizaje], [ajustes]];
+/** Grupos del sidebar: control · viaje+pasajeros+aterrizaje */
+export const PANEL_SIDEBAR_GROUPS: PanelSidebarItem[][] = [[panel], [viaje, pasajeros, aterrizaje]];
 
 export const PANEL_SIDEBAR_ITEMS: PanelSidebarItem[] = PANEL_SIDEBAR_GROUPS.flat();
 
@@ -53,5 +46,4 @@ export const PANEL_MOBILE_TABS: PanelMobileTab[] = [
   { href: "/panel/viaje", label: "Viaje", icon: Plane },
   { href: "/panel/pasajeros", label: "Pasajeros", icon: Users },
   { href: "/panel/recuerdos", label: "Recuerdos", icon: Image },
-  { href: "/panel/ajustes", label: "Ajustes", icon: Settings },
 ];

@@ -126,7 +126,11 @@ export function CopyInviteLinkButton({
     iconOnly ? "h-5 w-5" : size === "md" ? "h-4 w-4" : "h-3.5 w-3.5";
 
   const ariaForIcon =
-    copied ? "Copiado al portapapeles" : error ? "Error al copiar, reintenta" : "Copiar enlace de invitación";
+    copied
+      ? "Listo, en el portapapeles"
+      : error
+        ? "No alcanzó a copiarse, tócalo otra vez"
+        : "Copiar enlace de invitación";
 
   const stateCls = copied
     ? "border-emerald-600/50 bg-emerald-900/40 text-emerald-200 hover:bg-emerald-900/55"
@@ -140,7 +144,7 @@ export function CopyInviteLinkButton({
       onClick={handleClick}
       aria-live="polite"
       aria-label={iconOnly ? ariaForIcon : undefined}
-      title={copied ? "Link copiado al portapapeles" : "Copiar link de invitación"}
+      title={copied ? "Enlace copiado" : "Copiar enlace de la invitación"}
       className={[
         "inline-flex items-center gap-1.5 rounded-full border font-semibold shadow-sm transition",
         iconOnly ? "rounded-xl" : "",

@@ -9,7 +9,7 @@ type Props = {
   invitadoId: string;
   invitadoNombre?: string | null;
   /** Forzar un tema vía querystring (override visual sin tocar la DB). */
-  previewThemeId?: "legacy" | "soft-aviation" | null;
+  previewThemeId?: "legacy" | "soft-aviation" | "jurnex-aviation" | null;
 };
 
 /**

@@ -4,6 +4,7 @@ import { Button, Chip, Textarea } from "@/components/jurnex-ui";
 import { trackEvent } from "@/lib/analytics";
 import { parseBulkInvitados, type BulkParsedRow, type ExistingGuest } from "@/lib/invitados-bulk";
 import { createClient } from "@/lib/supabase/client";
+import { JX } from "@/lib/jurnex-voz";
 import { supabaseErrorMessage } from "@/lib/supabase-error";
 import { Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -68,7 +69,7 @@ export function BulkImportInvitados({ open, onClose, eventoId, existing, onImpor
     setInsertedCount(null);
     setFailedCount(0);
 
-    const loadToast = toast.loading("Importando invitados…", { duration: 120_000 });
+    const loadToast = toast.loading("Sumando a tu lista de pasajeros…", { duration: 120_000 });
 
     const {
       data: { user },
@@ -77,7 +78,7 @@ export function BulkImportInvitados({ open, onClose, eventoId, existing, onImpor
     if (authErr || !user) {
       toast.dismiss(loadToast);
       setSubmitting(false);
-      const msg = "Sesión inválida. Inicia sesión nuevamente para importar.";
+      const msg = JX.iniciaSesion;
       setErrorMsg(msg);
       toast.error(msg, { duration: 4000 });
       return;
@@ -121,14 +122,14 @@ export function BulkImportInvitados({ open, onClose, eventoId, existing, onImpor
 
     if (ok > 0) {
       toast.success(
-        `Se agregaron ${ok} invitado${ok === 1 ? "" : "s"} correctamente`,
+        `Listo: ${ok} ${ok === 1 ? "persona" : "personas"} añadida${ok === 1 ? "" : "s"} a la lista de pasajeros.`,
         { duration: 4000 }
       );
       onImported();
     }
     if (fail > 0) {
       toast.error(
-        firstErrorMsg ?? "Algunos invitados no se pudieron guardar. Revisa e intenta nuevamente.",
+        firstErrorMsg ?? "A algunas filas no les pudimos dar cabida. Revisa nombres y duplicados e inténtalo otra vez.",
         { duration: 4000 }
       );
       if (firstErrorMsg) setErrorMsg(firstErrorMsg);

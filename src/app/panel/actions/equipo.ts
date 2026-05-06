@@ -37,7 +37,7 @@ export async function addMemberToEvent(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    return { ok: false, error: "No autenticado" };
+    return { ok: false, error: "Hace falta iniciar sesión." };
   }
 
   const { data: isAdmin, error: eAdmin } = await supabase.rpc("user_is_evento_admin", {
@@ -168,7 +168,7 @@ export async function removeMemberFromEvent(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    return { ok: false, error: "No autenticado" };
+    return { ok: false, error: "Hace falta iniciar sesión." };
   }
 
   const { data: raw, error } = await supabase.rpc("evento_equipo_remove_member", {

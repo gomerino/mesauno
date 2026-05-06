@@ -63,7 +63,7 @@ export default async function SuccessPage({
             <code className="text-slate-400">MP_CHECKOUT_BYPASS=1</code>, o <code className="text-slate-400">MP_ALLOW_CLIENT_BYPASS=1</code> con{" "}
             <code className="text-slate-400">/pricing?bypass=1</code>.
           </p>
-          <Link href="/pricing" className="mt-6 inline-block text-[#D4AF37] hover:underline">
+          <Link href="/pricing" className="mt-6 inline-block text-invite-gold hover:underline">
             Volver a planes
           </Link>
         </ResultShell>
@@ -73,7 +73,7 @@ export default async function SuccessPage({
       return (
         <ResultShell>
           <p className="text-slate-300">Sesión de checkout inválida.</p>
-          <Link href="/pricing" className="mt-6 inline-block text-[#D4AF37] hover:underline">
+          <Link href="/pricing" className="mt-6 inline-block text-invite-gold hover:underline">
             Volver a planes
           </Link>
         </ResultShell>
@@ -85,7 +85,7 @@ export default async function SuccessPage({
       return (
         <ResultShell>
           <p className="text-slate-300">Servidor sin SUPABASE_SERVICE_ROLE_KEY.</p>
-          <Link href="/pricing" className="mt-6 inline-block text-[#D4AF37] hover:underline">
+          <Link href="/pricing" className="mt-6 inline-block text-invite-gold hover:underline">
             Volver a planes
           </Link>
         </ResultShell>
@@ -113,7 +113,7 @@ export default async function SuccessPage({
       return (
         <ResultShell>
           <p className="text-slate-300">No pudimos activar tu cuenta ({provision.reason}).</p>
-          <Link href="/pricing" className="mt-6 inline-block text-[#D4AF37] hover:underline">
+          <Link href="/pricing" className="mt-6 inline-block text-invite-gold hover:underline">
             Volver a planes
           </Link>
         </ResultShell>
@@ -132,7 +132,7 @@ export default async function SuccessPage({
         <p className="text-slate-300">
           Bypass sin magic link. Entra con{" "}
           <strong className="text-white">{provision.email}</strong> en{" "}
-          <Link href="/login" className="text-[#D4AF37] hover:underline">
+          <Link href="/login" className="text-invite-gold hover:underline">
             /login
           </Link>
           .
@@ -150,12 +150,12 @@ export default async function SuccessPage({
         <p className="text-slate-300">No encontramos el comprobante de pago en la URL.</p>
         <p className="mt-3 text-xs text-slate-500">
           Si estás probando sin Mercado Pago, usa el flujo con <code className="text-slate-400">MP_CHECKOUT_BYPASS=1</code> desde{" "}
-          <Link href="/pricing" className="text-[#D4AF37] hover:underline">
+          <Link href="/pricing" className="text-invite-gold hover:underline">
             /pricing
           </Link>
           .
         </p>
-        <Link href="/pricing" className="mt-6 inline-block text-[#D4AF37] hover:underline">
+        <Link href="/pricing" className="mt-6 inline-block text-invite-gold hover:underline">
           Volver a planes
         </Link>
       </ResultShell>
@@ -166,7 +166,7 @@ export default async function SuccessPage({
     return (
       <ResultShell>
         <p className="text-slate-300">Mercado Pago no está configurado en el servidor.</p>
-        <Link href="/pricing" className="mt-6 inline-block text-[#D4AF37] hover:underline">
+        <Link href="/pricing" className="mt-6 inline-block text-invite-gold hover:underline">
           Volver a planes
         </Link>
       </ResultShell>
@@ -181,7 +181,7 @@ export default async function SuccessPage({
     return (
       <ResultShell>
         <p className="text-slate-300">No pudimos validar el pago con Mercado Pago.</p>
-        <Link href="/pricing" className="mt-6 inline-block text-[#D4AF37] hover:underline">
+        <Link href="/pricing" className="mt-6 inline-block text-invite-gold hover:underline">
           Volver a planes
         </Link>
       </ResultShell>
@@ -194,7 +194,7 @@ export default async function SuccessPage({
         <p className="text-slate-300">
           El pago no está aprobado todavía (estado: {String(payment.status)}).
         </p>
-        <Link href="/pricing" className="mt-6 inline-block text-[#D4AF37] hover:underline">
+        <Link href="/pricing" className="mt-6 inline-block text-invite-gold hover:underline">
           Volver a planes
         </Link>
       </ResultShell>
@@ -213,7 +213,7 @@ export default async function SuccessPage({
       <ResultShell>
         <p className="text-slate-300">No pudimos activar tu cuenta ({provision.reason}).</p>
         <p className="mt-4 text-xs text-slate-500">Si ya pagaste, escríbenos con el ID de pago: {paymentId}</p>
-        <Link href="/pricing" className="mt-6 inline-block text-[#D4AF37] hover:underline">
+        <Link href="/pricing" className="mt-6 inline-block text-invite-gold hover:underline">
           Volver a planes
         </Link>
       </ResultShell>
@@ -233,7 +233,7 @@ export default async function SuccessPage({
         Tu evento está listo. Abre el enlace que te enviamos a <strong className="text-white">{provision.email}</strong>{" "}
         para entrar (magic link).
       </p>
-      <Link href="/login" className="mt-6 inline-block text-[#D4AF37] hover:underline">
+      <Link href="/login" className="mt-6 inline-block text-invite-gold hover:underline">
         Ir a iniciar sesión
       </Link>
     </ResultShell>

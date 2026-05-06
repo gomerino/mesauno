@@ -81,7 +81,7 @@ export function InvitacionAlbumSection({
             <LiveGallery eventoId={eventoId} fotos={fotos} setFotos={setFotos} />
           </div>
         ) : (
-          <p className="mt-3 text-center text-xs text-[#1A2B48]/55">
+          <p className="mt-3 text-center text-xs text-invite-navy/55">
             Desliza la bitácora de arriba o sube una foto con el botón flotante.
           </p>
         )}

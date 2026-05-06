@@ -1,4 +1,4 @@
-import { CreditCard, MapPin, Plane, Users2 } from "lucide-react";
+import { CheckCircle2, CreditCard, MapPin, Plane } from "lucide-react";
 
 const blocks = [
   {
@@ -12,9 +12,9 @@ const blocks = [
     Icon: Plane,
   },
   {
-    title: "Descubre proveedores",
-    body: "Listado con filtros, favoritos y un camino claro a contacto cuando tú elijas, sin llenar la pantalla de jerga: solo tú, tu evento y buenas fichas.",
-    Icon: Users2,
+    title: "Boarding pass real y validado",
+    body: "Muestras la misma experiencia que vive tu invitado: ticket, RSVP y navegación final, con contraste y jerarquía cuidada para que se sienta premium.",
+    Icon: CheckCircle2,
   },
   {
     title: "Pago con Mercado Pago",

@@ -46,9 +46,9 @@ function circleClassesFor(state: PhaseState): string {
     "relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-300 md:h-11 md:w-11";
   switch (state) {
     case "past":
-      return `${base} border-transparent bg-[#D4AF37] text-[#0f172a] shadow-[0_4px_14px_rgba(212,175,55,0.30)]`;
+      return `${base} border-transparent bg-invite-gold text-slate-900 shadow-[0_4px_14px_rgba(212,175,55,0.30)]`;
     case "current":
-      return `${base} border-[#D4AF37] bg-[rgba(212,175,55,0.10)] text-[#D4AF37] shadow-[0_0_26px_rgba(212,175,55,0.35)]`;
+      return `${base} border-invite-gold bg-[rgba(212,175,55,0.10)] text-invite-gold shadow-[0_0_26px_rgba(212,175,55,0.35)]`;
     case "locked":
       return `${base} border-dashed border-[rgba(212,175,55,0.40)] bg-transparent text-[rgba(212,175,55,0.55)]`;
     case "future":
@@ -73,7 +73,7 @@ function ConnectorSegment({ from, to }: { from: PhaseState; to: PhaseState }) {
   if (isFoil) {
     return (
       <span
-        className="block h-[2.5px] w-full rounded-full bg-gradient-to-r from-[#8B6F1F] via-[#D4AF37] to-[#E8C547]"
+        className="block h-[2.5px] w-full rounded-full bg-gradient-to-r from-[#8B6F1F] via-invite-gold to-[#E8C547]"
         aria-hidden
       />
     );
@@ -131,7 +131,7 @@ export function JourneyPhasesBar({
       <div
         className={`relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[radial-gradient(ellipse_60%_60%_at_50%_-20%,rgba(212,175,55,0.08),transparent_70%)] bg-white/[0.03] px-3 pb-3 pt-4 md:px-5 md:pb-4 md:pt-5 ${
           accentPremium
-            ? "shadow-[0_0_36px_-10px_rgba(212,175,55,0.28)] ring-1 ring-[#D4AF37]/30"
+            ? "shadow-[0_0_36px_-10px_rgba(212,175,55,0.28)] ring-1 ring-invite-gold/30"
             : ""
         }`}
       >
@@ -141,7 +141,7 @@ export function JourneyPhasesBar({
         >
           {/* Avión animado — transiciona horizontalmente entre fases. */}
           <span
-            className="pointer-events-none absolute -top-2 z-20 -translate-x-1/2 text-[#D4AF37] transition-[left,transform] duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none md:-top-2.5"
+            className="pointer-events-none absolute -top-2 z-20 -translate-x-1/2 text-invite-gold transition-[left,transform] duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none md:-top-2.5"
             style={{ left: `${planeLeftPct}%` }}
             aria-hidden
           >
@@ -189,7 +189,7 @@ export function JourneyPhasesBar({
                       });
                     }
                   }}
-                  className="group relative flex w-full flex-col items-center gap-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050810]"
+                  className="group relative flex w-full flex-col items-center gap-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-invite-gold/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050810]"
                   aria-current={isCurrent ? "step" : undefined}
                 >
                   <span className={circleClassesFor(p.state)}>
@@ -197,8 +197,8 @@ export function JourneyPhasesBar({
                       <Check className="h-4 w-4 md:h-[18px] md:w-[18px]" strokeWidth={3} />
                     ) : isCurrent ? (
                       <span className="relative flex h-2.5 w-2.5">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D4AF37] opacity-60" />
-                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#D4AF37]" />
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-invite-gold opacity-60" />
+                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-invite-gold" />
                       </span>
                     ) : isLocked ? (
                       <Lock className="h-3.5 w-3.5 md:h-4 md:w-4" strokeWidth={2} />
@@ -207,7 +207,7 @@ export function JourneyPhasesBar({
                     )}
                   </span>
 
-                  <span className="mt-1.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-[#D4AF37]/75 md:text-[10px] md:tracking-[0.22em]">
+                  <span className="mt-1.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-invite-gold/75 md:text-[10px] md:tracking-[0.22em]">
                     {journeyPhaseEyebrow(p.id as JourneyPhaseId)}
                   </span>
                   <span
