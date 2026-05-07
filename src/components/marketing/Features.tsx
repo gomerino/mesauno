@@ -1,4 +1,5 @@
-import { LandingBoardingPassMockup } from "@/components/marketing/LandingBoardingPassMockup";
+import { BoardingPass } from "@/components/invitacion/BoardingPass";
+import { landingBoardingPassDemo } from "@/components/marketing/boarding-pass-demo";
 import { CreditCard, MapPin, Plane, type LucideIcon } from "lucide-react";
 
 type IconBlock = {
@@ -61,7 +62,7 @@ export function Features() {
                   </span>
                   <h3 className="mt-4 font-display text-base font-semibold text-jurnex-text-primary sm:text-lg">{title}</h3>
                   <div className="mt-3 min-h-0 flex-1">
-                    <LandingBoardingPassMockup density="compact" className="w-full" />
+                    <BoardingPass variant="jurnex" {...landingBoardingPassDemo} />
                   </div>
                   <p className="mt-4 text-sm leading-relaxed text-jurnex-text-primary/82 sm:text-[15px]">{body}</p>
                 </li>

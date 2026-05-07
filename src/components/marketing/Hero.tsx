@@ -1,25 +1,25 @@
+import { BoardingPass } from "@/components/invitacion/BoardingPass";
 import { JurnexMark } from "@/components/brand/JurnexMark";
 import { CrearMiEventoLink } from "@/components/marketing/CrearMiEventoLink";
-import { LandingBoardingPassMockup, LANDING_BOARDING_NAVY } from "@/components/marketing/LandingBoardingPassMockup";
+import { landingBoardingPassDemo } from "@/components/marketing/boarding-pass-demo";
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
 
+const HERO_BOARDING_FOOTER_NAVY = "#0a1128";
+
 /**
- * Vista previa marketing del pase real (cabecera navy + cuerpo blanco), sin iframe.
+ * Mismo pase que la invitación (`BoardingPass`), con datos demo.
  */
 function HeroTicketFrame() {
   return (
-    <div className="relative w-full max-w-sm animate-ticketPrintIn">
+    <div className="relative w-full max-w-sm">
       <div
         className="absolute -inset-0.5 rounded-2xl bg-gradient-to-br from-teal-400/25 via-transparent to-jurnex-secondary/15 opacity-80 blur-sm"
         aria-hidden
       />
       <div className="relative overflow-hidden rounded-2xl shadow-jurnex-card ring-1 ring-jurnex-secondary/25 backdrop-blur-md">
-        <LandingBoardingPassMockup flushBottom density="comfortable" className="w-full border-x-0 border-t-0 border-white/10" />
-        <div
-          className="border-t border-white/12 px-4 py-3"
-          style={{ backgroundColor: LANDING_BOARDING_NAVY }}
-        >
+        <BoardingPass variant="jurnex" {...landingBoardingPassDemo} />
+        <div className="border-t border-white/12 px-4 py-3" style={{ backgroundColor: HERO_BOARDING_FOOTER_NAVY }}>
           <p className="text-center text-[10px] leading-relaxed text-white/92 sm:text-[11px]">
             Cada invitado, su pase. El mismo cuidado que conduces desde el panel.
           </p>
