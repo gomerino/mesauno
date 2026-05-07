@@ -1,23 +1,11 @@
 import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import { Card } from "@/components/jurnex-ui";
-import { DEMO_URL, tieneUrlInvitacionDemo } from "@/lib/demo-invitation-public-url";
+import { DEMO_URL, tieneUrlInvitacionDemo, withJurnexTheme } from "@/lib/demo-invitation-public-url";
 
 function invitationUrlLabel(url: string): string {
   try {
     const u = new URL(url);
     return `${u.host}${u.pathname}`;
-  } catch {
-    return url;
-  }
-}
-
-function withJurnexTheme(url: string): string {
-  try {
-    const u = new URL(url);
-    if (!u.searchParams.get("theme")) {
-      u.searchParams.set("theme", "jurnex");
-    }
-    return u.toString();
   } catch {
     return url;
   }

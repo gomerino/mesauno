@@ -43,7 +43,7 @@ export function SiteHeader({ compact = false, prominentLogo = false }: Props) {
             Crea tu viaje
           </Link>
           <Link
-            href="/#invitacion-jurnex"
+            href="/invitacion/demo"
             className="hidden whitespace-nowrap rounded-md px-1 py-1.5 hover:text-white sm:inline sm:px-0"
           >
             Ver invitación real
