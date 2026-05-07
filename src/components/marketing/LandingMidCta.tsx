@@ -6,10 +6,12 @@ export function LandingMidCta() {
     <section className="border-b border-white/[0.08] bg-white/[0.06] px-4 py-12 sm:py-14">
       <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
         <p className="text-sm font-medium leading-relaxed text-jurnex-text-primary/90">
-          Empieza hoy y tendrás tu boarding pass con look premium listo para compartir en minutos.
+          Tu boarding pass listo en minutos. Cuando actives un plan, pagás con Mercado Pago sin vueltas.
         </p>
         <div className="flex w-full max-w-md flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">
-          <CrearMiEventoLink className="w-full sm:w-auto" withEmoji />
+          <CrearMiEventoLink className="w-full sm:w-auto" withEmoji>
+            Crear mi invitación
+          </CrearMiEventoLink>
         </div>
       </div>
     </section>

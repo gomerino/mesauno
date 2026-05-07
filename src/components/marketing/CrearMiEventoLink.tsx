@@ -1,12 +1,14 @@
 import { panelCtaJurnexPrimary } from "@/components/panel/ds";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 type Props = {
   className?: string;
   withEmoji?: boolean;
+  children?: ReactNode;
 };
 
-export function CrearMiEventoLink({ className = "", withEmoji = false }: Props) {
+export function CrearMiEventoLink({ className = "", withEmoji = false, children }: Props) {
   return (
     <Link
       href="/onboarding"
@@ -14,7 +16,7 @@ export function CrearMiEventoLink({ className = "", withEmoji = false }: Props) 
         .filter(Boolean)
         .join(" ")}
     >
-      Crea tu viaje
+      {children ?? "Crea tu viaje"}
       {withEmoji ? (
         <span className="jurnex-cta-emoji ml-2 inline-block" aria-hidden>
           ✨

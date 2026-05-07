@@ -104,6 +104,11 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(10px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        /** Landing hero: entrada suave (menos de 500ms) */
+        landingHeroIn: {
+          from: { opacity: "0", transform: "translateY(10px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
         /** JUR-28 · microceremonia post-pago (candado → ✦) */
         unlockLockExit: {
           "0%": { opacity: "1", transform: "translateY(0)" },
@@ -137,6 +142,7 @@ const config: Config = {
         journeyGlowPulse: "journeyGlowPulse 2.5s ease-in-out infinite",
         planCtaSync: "planCtaSync 0.18s ease-out both",
         postPayReveal: "postPayReveal 0.5s ease-out both",
+        landingHeroIn: "landingHeroIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both",
         unlockLockExit: "unlockLockExit 0.45s ease-in forwards",
         unlockGlowOnce: "unlockGlowOnce 1.15s ease-out forwards",
         unlockSparkleIn: "unlockSparkleIn 1s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both",
