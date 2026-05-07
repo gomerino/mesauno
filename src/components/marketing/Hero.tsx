@@ -1,9 +1,10 @@
 import { HeroMobileBoarding } from "@/components/marketing/HeroMobileBoarding";
 import { panelCtaJurnexPrimary } from "@/components/panel/ds";
+import { Plane } from "lucide-react";
 import Link from "next/link";
 
 /**
- * Server Component: h1, subtítulo y CTAs en HTML inicial. Marco demo (iframe) a la derecha es isla cliente.
+ * Server Component: h1, subtítulo y CTA en HTML inicial. BoardingPass a la derecha (cliente).
  */
 export function Hero() {
   return (
@@ -13,32 +14,27 @@ export function Hero() {
         aria-hidden
       />
       <div className="relative isolate mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
-        <div className="order-2 min-w-0 text-center lg:order-1 lg:z-0 lg:max-w-xl lg:text-left">
+        <div className="order-1 min-w-0 text-center lg:z-0 lg:max-w-xl lg:text-left">
           <h1 className="font-display text-[clamp(1.85rem,5vw,2.85rem)] font-bold leading-[1.12] tracking-tight text-jurnex-text-primary">
             Organiza tu matrimonio sin caos
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-jurnex-text-primary/88 sm:text-lg lg:mx-0">
             Invitaciones, invitados y experiencia en un solo lugar
           </p>
-          <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center lg:justify-start">
-            <Link
-              href="/invitacion/demo"
-              className={
-                panelCtaJurnexPrimary +
-                " jurnex-cta-pulse inline-flex min-h-[52px] w-full items-center justify-center px-8 py-3.5 text-base font-bold tracking-wide sm:w-auto sm:px-10"
-              }
-            >
-              Ver invitación en vivo
-            </Link>
+          <div className="mt-8 flex flex-col items-stretch justify-center sm:flex-row sm:flex-wrap sm:justify-center lg:justify-start">
             <Link
               href="/onboarding"
-              className="inline-flex min-h-[52px] w-full items-center justify-center rounded-full border border-white/18 bg-white/[0.06] px-8 py-3.5 text-base font-semibold text-jurnex-text-primary transition hover:border-white/28 hover:bg-white/[0.1] sm:w-auto"
+              className={
+                panelCtaJurnexPrimary +
+                " jurnex-cta-pulse inline-flex min-h-[52px] w-full items-center justify-center gap-2 px-8 py-3.5 text-base font-bold tracking-wide sm:w-auto sm:px-10"
+              }
             >
-              Crear mi invitación
+              Crear mi viaje
+              <Plane className="h-5 w-5 shrink-0 stroke-[2.25]" aria-hidden />
             </Link>
           </div>
         </div>
-        <div className="order-1 flex w-full justify-center lg:relative lg:order-2 lg:z-10 lg:justify-end">
+        <div className="order-2 flex w-full justify-center lg:relative lg:z-10 lg:justify-end">
           <HeroMobileBoarding />
         </div>
       </div>

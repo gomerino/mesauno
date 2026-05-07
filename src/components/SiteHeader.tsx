@@ -1,4 +1,5 @@
 import { JURNEX_BRAND } from "@/components/brand/jurnex-assets";
+import { Plane } from "lucide-react";
 import Link from "next/link";
 
 type Props = {
@@ -39,14 +40,12 @@ export function SiteHeader({ compact = false, prominentLogo = false }: Props) {
           />
         </Link>
         <nav className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-2 gap-y-1.5 text-[13px] font-medium leading-tight text-teal-50 sm:flex-none sm:gap-x-5 sm:text-sm">
-          <Link href="/onboarding" className="whitespace-nowrap rounded-md px-1 py-1.5 hover:text-white sm:px-0">
-            Crea tu viaje
-          </Link>
           <Link
-            href="/invitacion/demo"
-            className="hidden whitespace-nowrap rounded-md px-1 py-1.5 hover:text-white sm:inline sm:px-0"
+            href="/onboarding"
+            className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-1 py-1.5 hover:text-white sm:px-0"
           >
-            Ver invitación real
+            Crear mi viaje
+            <Plane className="h-3.5 w-3.5 shrink-0 opacity-90" strokeWidth={2} aria-hidden />
           </Link>
           <Link
             href="/login"

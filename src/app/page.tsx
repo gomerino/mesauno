@@ -1,4 +1,5 @@
 import { Hero } from "@/components/marketing/Hero";
+import { LandingHomeJsonLd } from "@/components/marketing/LandingHomeJsonLd";
 import { LandingStickyCta } from "@/components/marketing/LandingStickyCta";
 import { SiteHeader } from "@/components/SiteHeader";
 import type { Metadata } from "next";
@@ -9,16 +10,49 @@ export const dynamic = "force-static";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://www.jurnex.cl";
 
+const titleDefault = "Jurnex — Organiza tu matrimonio sin caos";
+const descriptionDefault =
+  "Invitaciones digitales, lista de invitados y experiencia del gran día en un solo lugar. Menos caos, más claridad para tu matrimonio.";
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Jurnex — Organiza tu matrimonio sin caos",
-  description: "Invitaciones, invitados y experiencia en un solo lugar",
+  title: titleDefault,
+  description: descriptionDefault,
+  keywords: [
+    "Jurnex",
+    "matrimonio",
+    "boda",
+    "invitaciones digitales",
+    "lista de invitados",
+    "RSVP",
+    "planificación de eventos",
+    "Chile",
+    "LATAM",
+  ],
+  authors: [{ name: "Jurnex", url: siteUrl }],
+  creator: "Jurnex",
+  publisher: "Jurnex",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "Jurnex",
-    description: "Organiza tu matrimonio sin caos",
+    title: titleDefault,
+    description: descriptionDefault,
     url: "/",
     siteName: "Jurnex",
     locale: "es_CL",
+    alternateLocale: ["es_LA"],
     type: "website",
     images: [
       {
@@ -26,13 +60,14 @@ export const metadata: Metadata = {
         width: 1200,
         height: 630,
         alt: "Jurnex — tu boda, tu viaje",
+        type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Jurnex",
-    description: "Organiza tu matrimonio sin caos",
+    title: titleDefault,
+    description: descriptionDefault,
     images: ["/og-image.png"],
   },
 };
@@ -65,22 +100,19 @@ const CTALazy = nextDynamic(() => import("@/components/marketing/CTA").then((m) 
 export default function HomePage() {
   return (
     <div className="jurnex-brand-layers min-h-screen bg-jurnex-bg pb-[5.5rem] md:pb-0">
-      <SiteHeader />
-      <Hero />
-      <HowItWorksLazy />
-      <LandingDemoFlujoLazy />
-      <LandingDiferencialLazy />
-      <CTALazy />
+      <LandingHomeJsonLd siteUrl={siteUrl} />
+      <SiteHeader prominentLogo />
+      <main id="contenido-principal">
+        <Hero />
+        <HowItWorksLazy />
+        <LandingDemoFlujoLazy />
+        <LandingDiferencialLazy />
+        <CTALazy />
+      </main>
       <footer className="border-t border-white/12 bg-jurnex-bg px-4 py-10 text-center text-xs text-jurnex-text-primary/88">
         <div className="mx-auto flex max-w-xl flex-wrap items-center justify-center gap-x-4 gap-y-2 font-medium">
           <Link href="/login" className="text-teal-100 underline-offset-2 hover:text-white hover:underline">
             Panel novios
-          </Link>
-          <span className="text-teal-200/75" aria-hidden>
-            ·
-          </span>
-          <Link href="/invitacion/demo" className="text-teal-100 underline-offset-2 hover:text-white hover:underline">
-            Demo invitación
           </Link>
         </div>
         <p className="mt-4 text-jurnex-text-secondary">© {new Date().getFullYear()} Jurnex</p>

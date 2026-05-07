@@ -19,8 +19,8 @@ export function LandingDemoFlujo() {
       title: "Invitación",
       body: "Pase de abordaje, RSVP y mapa como lo ve tu invitado.",
       Icon: Plane,
-      href: "/invitacion/demo",
-      cta: "Ver invitación",
+      href: "/onboarding",
+      cta: "Crear mi viaje",
     },
     {
       title: "Programa",

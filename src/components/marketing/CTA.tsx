@@ -7,11 +7,11 @@ export function CTA() {
       <div className="mx-auto max-w-3xl rounded-2xl border border-white/12 bg-white/[0.07] p-10 text-center shadow-jurnex-card backdrop-blur-sm sm:p-14">
         <h2 className="font-display text-2xl font-bold text-jurnex-text-primary sm:text-3xl">Empieza tu viaje hoy</h2>
         <p className="mt-4 text-sm leading-relaxed text-jurnex-text-primary/88 sm:text-base">
-          En minutos tenés tu evento y tu invitación lista para compartir.
+          En minutos tienes tu evento y tu invitación lista para compartir.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
-          <CrearMiEventoLink className="w-full max-w-sm sm:w-auto sm:px-12" withEmoji>
-            Crear mi invitación
+          <CrearMiEventoLink className="w-full max-w-sm sm:w-auto sm:px-12" withEmoji planeIcon>
+            Crear mi viaje
           </CrearMiEventoLink>
           <Link
             href="/login"
