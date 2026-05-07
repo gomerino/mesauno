@@ -80,8 +80,10 @@ export function PanelSetupSection({ pct, rows, hideIntroOnMobile = false }: Prop
                 href={row.href}
                 className={
                   row.done
-                    ? "inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full border border-white/15 bg-transparent px-4 py-2.5 text-sm font-semibold text-slate-200 hover:bg-white/5 sm:min-h-0"
-                    : [panelCtaJurnexPrimary, "min-h-[44px] shrink-0 justify-center px-4 py-2.5 sm:min-h-0"].join(" ")
+                    ? "inline-flex min-h-[44px] w-full shrink-0 items-center justify-center rounded-full border border-white/15 bg-transparent px-4 py-2.5 text-center text-sm font-semibold text-slate-200 hover:bg-white/5 sm:w-auto sm:min-h-0"
+                    : [panelCtaJurnexPrimary, "min-h-[44px] w-full shrink-0 justify-center px-4 py-2.5 text-center sm:w-auto sm:min-h-0"].join(
+                        " "
+                      )
                 }
               >
                 {row.ctaLabel}

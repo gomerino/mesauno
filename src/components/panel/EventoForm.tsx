@@ -33,6 +33,10 @@ const input =
 
 const summaryText = "text-sm text-white/70";
 
+/** Oro del panel sin padding propio: en footers de card alineamos con el secundario. */
+const panelFormPrimaryBtn = `${panelBtnPrimary} min-h-[44px] justify-center px-5 py-2.5 text-center sm:min-h-[48px] sm:px-6 sm:py-3`;
+const panelFormSecondaryBtn = `${panelBtnSecondary} min-h-[44px] justify-center px-4 py-2.5 sm:min-h-[48px]`;
+
 function canalEnvioLabel(c: CanalEnvioInvitacion): string {
   switch (c) {
     case "correo":
@@ -507,14 +511,14 @@ export function EventoForm({
 
   const footerActions = (section: SectionId) => (
     <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-white/10 pt-4">
-      <button type="button" onClick={() => setExpanded(null)} className={panelBtnSecondary}>
+      <button type="button" onClick={() => setExpanded(null)} className={panelFormSecondaryBtn}>
         Cancelar
       </button>
       <button
         type="button"
         onClick={() => void persistSection(section)}
         disabled={saving || (section === "estilo" && !initial?.id)}
-        className={panelBtnPrimary}
+        className={panelFormPrimaryBtn}
       >
         {saving
           ? "Guardando…"
@@ -615,7 +619,7 @@ export function EventoForm({
                 isAdmin={isEventoAdmin}
               />
               <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-white/10 pt-4">
-                <button type="button" onClick={() => cardSetOpen("cabina", false)} className={panelBtnSecondary}>
+                <button type="button" onClick={() => cardSetOpen("cabina", false)} className={panelFormSecondaryBtn}>
                   Cerrar
                 </button>
               </div>
@@ -667,14 +671,14 @@ export function EventoForm({
               </p>
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-white/10 pt-4">
-              <button type="button" onClick={() => setExpanded(null)} className={panelBtnSecondary} disabled={saving}>
+              <button type="button" onClick={() => setExpanded(null)} className={panelFormSecondaryBtn} disabled={saving}>
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={() => void persistRegalosInvitacion()}
                 disabled={saving || !initial?.id}
-                className={panelBtnPrimary}
+                className={panelFormPrimaryBtn}
               >
                 Guardar
               </button>
@@ -1038,14 +1042,14 @@ export function EventoForm({
               </fieldset>
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-white/10 pt-4">
-              <button type="button" onClick={() => setExpanded(null)} className={panelBtnSecondary} disabled={saving}>
+              <button type="button" onClick={() => setExpanded(null)} className={panelFormSecondaryBtn} disabled={saving}>
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={() => void persistCanalEnvio()}
                 disabled={saving || !initial?.id}
-                className={panelBtnPrimary}
+                className={panelFormPrimaryBtn}
               >
                 Guardar
               </button>
@@ -1072,7 +1076,7 @@ export function EventoForm({
                   </p>
                   <Link
                     href="/pricing"
-                    className={panelBtnPrimary + " inline-flex min-h-[44px] items-center justify-center px-5"}
+                    className={panelFormPrimaryBtn + " inline-flex w-full sm:w-auto"}
                   >
                     Ver planes
                   </Link>
@@ -1167,7 +1171,7 @@ export function EventoForm({
                     viene con el{" "}
                     <strong className="font-semibold text-white/90">plan Experiencia</strong>.
                   </p>
-                  <Link href="/pricing" className={panelBtnPrimary + " inline-flex min-h-[44px] items-center justify-center px-5"}>
+                  <Link href="/pricing" className={panelFormPrimaryBtn + " inline-flex w-full sm:w-auto"}>
                     Ver planes y opciones
                   </Link>
                 </div>

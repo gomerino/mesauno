@@ -122,23 +122,23 @@ export function JourneyCard({
 
         {ctaLabel && status !== "locked" && href ? (
           <div
-            className={`mt-auto flex items-center justify-between border-t border-dashed ${ctaTone.divider} pt-2.5 max-sm:pt-2`}
+            className={`mt-auto flex items-start justify-between gap-3 border-t border-dashed ${ctaTone.divider} pt-3 max-sm:pt-2.5`}
           >
-          <span
-            className={`min-w-0 flex-1 pr-2 text-left font-display text-[10px] font-semibold uppercase leading-snug tracking-[0.18em] transition-colors max-sm:tracking-[0.14em] ${ctaTone.label}`}
-          >
-            {ctaLabel}
-          </span>
-          <span
-            className={`flex h-6 w-6 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] transition-all duration-300 group-hover:translate-x-0.5 group-hover:border-white/25 group-hover:bg-white/[0.12] ${ctaTone.arrow}`}
-            aria-hidden
-          >
-            <ArrowRight
-              className={primaryIntent ? "h-3.5 w-3.5" : "h-3 w-3"}
-              strokeWidth={2.25}
-            />
-          </span>
-        </div>
+            <span
+              className={`min-w-0 flex-1 text-balance text-left font-display text-[11px] font-semibold uppercase leading-snug tracking-[0.12em] transition-colors sm:text-[10px] sm:tracking-[0.16em] ${ctaTone.label}`}
+            >
+              {ctaLabel}
+            </span>
+            <span
+              className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/12 bg-white/[0.06] transition-all duration-300 group-hover:translate-x-0.5 group-hover:border-white/28 group-hover:bg-white/[0.12] sm:h-8 sm:w-8 ${ctaTone.arrow}`}
+              aria-hidden
+            >
+              <ArrowRight
+                className={primaryIntent ? "h-3.5 w-3.5" : "h-3 w-3"}
+                strokeWidth={2.25}
+              />
+            </span>
+          </div>
         ) : null}
       </div>
 

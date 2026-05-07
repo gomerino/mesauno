@@ -16,9 +16,9 @@ export const tokens = {
     /** Oro claro — highlight secundario, gradientes con primary */
     secondary: "#E4CE5A",
     textPrimary: "#EAF0F7",
-    /** Gris suave — texto secundario (frío para contrastar con el oro) */
-    textSecondary: "#94A3B8",
-    textMuted: "#64748B",
+    /** Texto secundario sobre navy — legible también en pie / disclaimers */
+    textSecondary: "#C5D4E2",
+    textMuted: "#9EADC0",
     success: "#22C55E",
     error: "#EF4444",
     warning: "#F59E0B",

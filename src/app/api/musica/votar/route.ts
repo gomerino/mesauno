@@ -1,4 +1,5 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { musicaFiestaRecalcularSiActivo } from "@/lib/musica-fiesta-en-vivo";
 import {
   musicaInvitadoPuedeAgregar,
   musicaRegistrarVoto,
@@ -47,6 +48,7 @@ export async function POST(request: Request) {
       }
       return NextResponse.json({ code: res.code, message: "No se pudo registrar el voto." }, { status: 400 });
     }
+    await musicaFiestaRecalcularSiActivo(db, eventoId);
     return NextResponse.json({
       ok: true,
       votos: res.votos,
@@ -79,6 +81,7 @@ export async function POST(request: Request) {
     }
     return NextResponse.json({ code: res.code, message: "No se pudo registrar el voto." }, { status: 400 });
   }
+  await musicaFiestaRecalcularSiActivo(db, eventoId);
   return NextResponse.json({
     ok: true,
     votos: res.votos,

@@ -8,10 +8,11 @@ import {
   updateProgramaHito,
 } from "@/app/panel/actions/programa";
 import {
-  PROGRAMA_ICONOS,
   ProgramaIconoLucide,
-  programaIconoLabel,
-  type ProgramaIconoId,
+  TIPO_MOMENTO_OPCIONES_FORM,
+  getIconoMomento,
+  normalizarTipoMomento,
+  type TipoMomentoId,
 } from "@/lib/programa-icons";
 import type { EventoProgramaHito } from "@/types/database";
 import { ChevronDown, ChevronUp, Pencil, Trash2 } from "lucide-react";
@@ -33,7 +34,7 @@ type FormState = {
   descripcion_corta: string;
   lugar_nombre: string;
   ubicacion_url: string;
-  icono: ProgramaIconoId;
+  tipo_momento: Exclude<TipoMomentoId, "otro">;
 };
 
 const emptyForm: FormState = {
@@ -42,11 +43,16 @@ const emptyForm: FormState = {
   descripcion_corta: "",
   lugar_nombre: "",
   ubicacion_url: "",
-  icono: "Music",
+  tipo_momento: "fiesta",
 };
 
 function sortHitos(list: EventoProgramaHito[]) {
   return [...list].sort((a, b) => a.orden - b.orden || a.hora.localeCompare(b.hora));
+}
+
+function tipoFormDesdeHito(h: EventoProgramaHito): Exclude<TipoMomentoId, "otro"> {
+  const tipo = normalizarTipoMomento((h as EventoProgramaHito & { tipo_momento?: string | null }).tipo_momento);
+  return tipo === "otro" ? "momento_especial" : (tipo as Exclude<TipoMomentoId, "otro">);
 }
 
 export function ProgramaHitosManager({ eventoId, initialHitos }: Props) {
@@ -70,9 +76,7 @@ export function ProgramaHitosManager({ eventoId, initialHitos }: Props) {
       descripcion_corta: h.descripcion_corta ?? "",
       lugar_nombre: h.lugar_nombre ?? "",
       ubicacion_url: h.ubicacion_url ?? "",
-      icono: (PROGRAMA_ICONOS as readonly string[]).includes(h.icono)
-        ? (h.icono as (typeof PROGRAMA_ICONOS)[number])
-        : "Music",
+      tipo_momento: tipoFormDesdeHito(h),
     });
     setMsg(null);
     setErr(null);
@@ -88,7 +92,7 @@ export function ProgramaHitosManager({ eventoId, initialHitos }: Props) {
     setErr(null);
     setMsg(null);
     startTransition(async () => {
-      const r = await createProgramaHito(eventoId, { ...form, icono: form.icono });
+      const r = await createProgramaHito(eventoId, { ...form, tipo_momento: form.tipo_momento });
       if (!r.ok) {
         setErr(r.error);
         return;
@@ -105,7 +109,7 @@ export function ProgramaHitosManager({ eventoId, initialHitos }: Props) {
     setErr(null);
     setMsg(null);
     startTransition(async () => {
-      const r = await updateProgramaHito(eventoId, editingId, { ...form, icono: form.icono });
+      const r = await updateProgramaHito(eventoId, editingId, { ...form, tipo_momento: form.tipo_momento });
       if (!r.ok) {
         setErr(r.error);
         return;
@@ -181,7 +185,7 @@ export function ProgramaHitosManager({ eventoId, initialHitos }: Props) {
               required
               value={form.titulo}
               onChange={(e) => setForm((f) => ({ ...f, titulo: e.target.value }))}
-              placeholder="Recepción, Ceremonia…"
+              placeholder="Ej: Despegue, Zona de turbulencias, Servicio a bordo"
               className="mt-1 w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-slate-500"
             />
           </div>
@@ -215,27 +219,34 @@ export function ProgramaHitosManager({ eventoId, initialHitos }: Props) {
             />
           </div>
           <div className="sm:col-span-2">
-            <span className="block text-xs font-medium text-slate-400">Icono</span>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {PROGRAMA_ICONOS.map((id) => (
+            <span className="block text-xs font-medium text-slate-400">Tipo de momento</span>
+            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+              {TIPO_MOMENTO_OPCIONES_FORM.map((op) => (
                 <label
-                  key={id}
+                  key={op.id}
                   className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-xs transition ${
-                    form.icono === id
-                      ? "border-teal-400 bg-teal-500/20 text-white"
+                    form.tipo_momento === op.id
+                      ? "border-teal-400 bg-teal-500/20 text-white shadow-[0_0_0_1px_rgba(45,212,191,0.45),0_0_18px_rgba(20,184,166,0.35)]"
                       : "border-white/10 bg-black/20 text-slate-300 hover:border-white/20"
                   }`}
                 >
                   <input
                     type="radio"
-                    name="icono"
-                    value={id}
-                    checked={form.icono === id}
-                    onChange={() => setForm((f) => ({ ...f, icono: id }))}
+                    required
+                    name="tipo_momento"
+                    value={op.id}
+                    checked={form.tipo_momento === op.id}
+                    onChange={() => setForm((f) => ({ ...f, tipo_momento: op.id }))}
                     className="sr-only"
                   />
-                  <ProgramaIconoLucide nombre={id} className="h-4 w-4 shrink-0" />
-                  {programaIconoLabel(id)}
+                  <span aria-hidden className="text-sm">
+                    {op.emoji}
+                  </span>
+                  <ProgramaIconoLucide
+                    nombre={getIconoMomento(op.id)}
+                    className={`h-4 w-4 shrink-0 ${form.tipo_momento === op.id ? "text-teal-100" : ""}`}
+                  />
+                  {op.label}
                 </label>
               ))}
             </div>
@@ -277,7 +288,14 @@ export function ProgramaHitosManager({ eventoId, initialHitos }: Props) {
               >
                 <div className="flex min-w-0 flex-1 gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white">
-                    <ProgramaIconoLucide nombre={h.icono} className="h-5 w-5" />
+                    <ProgramaIconoLucide
+                      nombre={
+                        (h as EventoProgramaHito & { tipo_momento?: string | null }).tipo_momento
+                          ? getIconoMomento((h as EventoProgramaHito & { tipo_momento?: string | null }).tipo_momento)
+                          : h.icono
+                      }
+                      className="h-5 w-5"
+                    />
                   </div>
                   <div className="min-w-0">
                     <p className="font-mono text-sm font-semibold text-teal-300">{horaInputValue(h.hora)}</p>

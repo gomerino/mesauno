@@ -11,7 +11,7 @@ test.describe("Login", () => {
 
     await page.getByRole("button", { name: "Entrar con contraseña" }).click();
 
-    const aviso = page.getByRole("alert");
+    const aviso = page.locator("p[role=\"alert\"]");
     await expect(aviso).toBeVisible({ timeout: 15_000 });
     const texto = await aviso.innerText();
     expect(texto.trim().length).toBeGreaterThan(3);

@@ -6,6 +6,7 @@ import {
   saveSpotifyPlaylistIdAction,
 } from "@/app/panel/actions/spotify";
 import { InvitacionMusicaColaborativa } from "@/components/invitacion/InvitacionMusicaColaborativa";
+import { MusicaFiestaPanel } from "@/components/panel/MusicaFiestaPanel";
 import { panelBtnGhost, panelBtnSecondary } from "@/components/panel/ds";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -190,6 +191,7 @@ export function SpotifyPlaylistConnect({ eventoId, spotifyConnected, initialPlay
           <strong className="text-white/75">rechazar</strong> cada canción; luego usa{" "}
           <strong className="text-white/75">Sincronizar con Spotify</strong> para volcar las aprobadas a la playlist.
         </p>
+        <MusicaFiestaPanel eventoId={eventoId} />
         <InvitacionMusicaColaborativa
           eventoId={eventoId}
           invitacionConfirmada={true}

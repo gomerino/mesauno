@@ -1,4 +1,5 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { musicaFiestaRecalcularSiActivo } from "@/lib/musica-fiesta-en-vivo";
 import { musicaActualizarEstadoAporte, musicaUsuarioPuedeModerarPlaylist } from "@/lib/musica-colaborativa";
 import { NextResponse } from "next/server";
 
@@ -42,6 +43,8 @@ export async function POST(request: Request) {
   if (!ok) {
     return NextResponse.json({ code: "update", message: "No se pudo actualizar." }, { status: 500 });
   }
+
+  await musicaFiestaRecalcularSiActivo(db, eventoId);
 
   return NextResponse.json({ ok: true });
 }

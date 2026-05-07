@@ -135,7 +135,31 @@ export type EventoProgramaHito = {
   descripcion_corta: string | null;
   lugar_nombre: string | null;
   ubicacion_url: string | null;
-  icono: "Church" | "Beer" | "Utensils" | "Music";
+  tipo_momento?:
+    | "llegada"
+    | "ceremonia"
+    | "recepcion"
+    | "comida"
+    | "fiesta"
+    | "foto"
+    | "mensaje"
+    | "momento_especial"
+    | "regalo"
+    | "cierre"
+    | "otro";
+  icono:
+    | "DoorOpen"
+    | "Church"
+    | "GlassWater"
+    | "UtensilsCrossed"
+    | "Music"
+    | "Camera"
+    | "Mic"
+    | "Gift"
+    | "ShoppingBag"
+    | "PlaneLanding"
+    | "Beer"
+    | "Utensils";
   orden: number;
   created_at?: string | null;
 };
@@ -318,6 +342,16 @@ export type PlaylistEvento = {
   evento_id: string;
   spotify_playlist_id: string | null;
   estado: PlaylistEventoEstado;
+  modo_fiesta_activo?: boolean;
+  dj_aporte_actual_id?: string | null;
+  dj_reproduciendo?: boolean;
+  dj_inicio_reproduccion_at?: string | null;
+  dj_segundos_acumulados?: number;
+  dj_auto?: boolean;
+  dj_sincronizar_cola_con_votos?: boolean;
+  dj_token_acceso?: string | null;
+  spotify_device_id?: string | null;
+  spotify_access_token?: string | null;
   created_at: string;
 };
 
@@ -345,6 +379,14 @@ export type AporteCancion = {
 };
 
 export type VotoCancion = {
+  id: string;
+  aporte_id: string;
+  usuario_id: string | null;
+  invitado_id: string | null;
+  created_at: string;
+};
+
+export type VotoEnVivo = {
   id: string;
   aporte_id: string;
   usuario_id: string | null;

@@ -22,7 +22,7 @@ export default function HomePage() {
     <div className="jurnex-brand-layers min-h-screen bg-jurnex-bg pb-[5.5rem] md:pb-0">
       <SiteHeader />
       <Hero />
-      <div className="border-b border-jurnex-border bg-jurnex-surface/50">
+      <div className="border-b border-white/[0.08] bg-white/[0.06]">
         <LandingSocialProof />
       </div>
       <Features />
@@ -30,17 +30,24 @@ export default function HomePage() {
       <LandingMidCta />
       <HowItWorks />
       <CTA />
-      <footer className="border-t border-jurnex-secondary/25 bg-jurnex-bg px-4 py-10 text-center text-xs text-jurnex-text-secondary">
-        <div className="mx-auto flex max-w-xl flex-wrap items-center justify-center gap-x-4 gap-y-2">
-          <Link href="/login" className="hover:text-jurnex-text-primary">
+      <footer className="border-t border-white/12 bg-jurnex-bg px-4 py-10 text-center text-xs text-jurnex-text-primary/88">
+        <div className="mx-auto flex max-w-xl flex-wrap items-center justify-center gap-x-4 gap-y-2 font-medium">
+          <Link href="/login" className="text-teal-100 underline-offset-2 hover:text-white hover:underline">
             Panel novios
           </Link>
-          <span className="text-jurnex-secondary/60">·</span>
-          <a href={DEMO_URL} target="_blank" rel="noopener noreferrer" className="hover:text-jurnex-text-primary">
+          <span className="text-teal-200/75" aria-hidden>
+            ·
+          </span>
+          <a
+            href={DEMO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-teal-100 underline-offset-2 hover:text-white hover:underline"
+          >
             Ejemplo de invitación
           </a>
         </div>
-        <p className="mt-4">© {new Date().getFullYear()} Jurnex</p>
+        <p className="mt-4 text-jurnex-text-secondary">© {new Date().getFullYear()} Jurnex</p>
       </footer>
       <LandingStickyCta />
     </div>

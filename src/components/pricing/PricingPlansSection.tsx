@@ -62,8 +62,8 @@ function PlanCard({
           onClick={() => onSelect(planId)}
           className={
             featured
-              ? panelCtaJurnexPrimary + " min-h-[52px] w-full justify-center px-6"
-              : "flex min-h-[52px] w-full items-center justify-center rounded-full border border-white/20 bg-white/5 px-6 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10 active:scale-[0.98]"
+              ? panelCtaJurnexPrimary + " min-h-[52px] w-full justify-center px-5 text-center leading-snug sm:px-6"
+              : "flex min-h-[52px] w-full items-center justify-center rounded-full border border-white/20 bg-white/5 px-5 text-center text-sm font-semibold leading-snug text-white backdrop-blur-sm transition hover:bg-white/10 active:scale-[0.98] sm:px-6"
           }
         >
           {plan.cta}

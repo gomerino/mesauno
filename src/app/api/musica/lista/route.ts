@@ -10,6 +10,7 @@ import {
   musicaUsuarioMiembroEvento,
   musicaUsuarioPuedeModerarPlaylist,
 } from "@/lib/musica-colaborativa";
+import { musicaFiestaLeerModoActivo } from "@/lib/musica-fiesta-en-vivo";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -96,12 +97,15 @@ export async function GET(request: Request) {
     sugerencias_usadas = await musicaContarSugerenciasActivasUsuarioMiembro(db, eventoId, usuarioIdLista);
   }
 
+  const modo_fiesta_activo = await musicaFiestaLeerModoActivo(db, eventoId);
+
   return NextResponse.json(
     {
       items,
       puedeModerar,
       sugerencias_usadas,
       sugerencias_max: MUSICA_LIMITE_SUGERENCIAS_POR_PERSONA,
+      modo_fiesta_activo,
     },
     { headers: SIN_CACHE }
   );

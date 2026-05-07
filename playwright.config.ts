@@ -26,9 +26,9 @@ export default defineConfig({
     video: "retain-on-failure",
     actionTimeout: 15_000,
     navigationTimeout: 45_000,
-    ...devices["iPhone 12"],
+    // Pixel 5 = Chromium (móvil). iPhone 12 requiere WebKit (`playwright install webkit`).
+    ...devices["Pixel 5"],
   },
-  projects: [{ name: "chromium-mobile", use: { ...devices["iPhone 12"] } }],
   webServer: process.env.PLAYWRIGHT_SKIP_WEBSERVER
     ? undefined
     : {

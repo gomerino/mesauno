@@ -21,7 +21,7 @@ export function HowItWorks() {
     <section className="border-b border-jurnex-border bg-jurnex-bg/90 px-4 py-20 sm:py-24">
       <div className="mx-auto max-w-6xl">
         <h2 className="text-center font-display text-2xl font-bold text-jurnex-text-primary sm:text-3xl">Cómo se arma el vuelo</h2>
-        <p className="mx-auto mt-3 max-w-xl text-center text-sm text-jurnex-text-secondary">Tres etapas. Un solo tablero.</p>
+        <p className="mx-auto mt-3 max-w-xl text-center text-sm font-medium text-jurnex-text-primary/88">Tres etapas. Un solo tablero.</p>
         <ol className="mx-auto mt-14 grid max-w-4xl gap-10 sm:grid-cols-3 sm:gap-8">
           {steps.map((s, i) => (
             <li key={s.n} className="relative text-center sm:text-left">
@@ -35,7 +35,7 @@ export function HowItWorks() {
                 {s.n}
               </span>
               <h3 className="mt-4 font-semibold text-jurnex-text-primary">{s.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-jurnex-text-secondary">{s.body}</p>
+              <p className="mt-2 text-sm leading-relaxed text-jurnex-text-primary/82">{s.body}</p>
             </li>
           ))}
         </ol>

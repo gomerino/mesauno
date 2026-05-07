@@ -198,6 +198,7 @@ export function SoftAviationCountdown({
   }
 
   const rawDiff = target - now;
+  const mismoDiaCalendarioEvento = localDayKey(now) === localDayKey(target);
 
   if (variant === "jurnexPanel") {
     const marginClass = prominent ? "mt-6" : dense ? "mt-1" : "mt-1.5";
@@ -211,6 +212,15 @@ export function SoftAviationCountdown({
       : dense
         ? "mt-0.5 text-[9px] leading-relaxed text-teal-200/75 sm:text-[10px]"
         : "mt-1 text-[10px] leading-relaxed text-teal-200/75 sm:text-[11px]";
+
+    if (mismoDiaCalendarioEvento) {
+      return (
+        <div className={`max-w-full ${marginClass}`} aria-live="polite">
+          <p className={titleSizeClass}>Hoy es el gran día ✨</p>
+          <p className={subSizeClass}>Disfruta cada momento del viaje</p>
+        </div>
+      );
+    }
 
     if (rawDiff > 0) {
       const totalSec = Math.floor(rawDiff / 1000);
@@ -245,14 +255,6 @@ export function SoftAviationCountdown({
       );
     }
 
-    if (localDayKey(now) === localDayKey(target)) {
-      return (
-        <div className={`max-w-full ${marginClass}`} aria-live="polite">
-          <p className={titleSizeClass}>Hoy es el gran día ✨</p>
-          <p className={subSizeClass}>Disfruta cada momento del viaje</p>
-        </div>
-      );
-    }
     return (
       <div className={`max-w-full ${marginClass}`} aria-live="polite">
         <p className={titleSizeClass}>El viaje ya comenzó ✨</p>
@@ -273,6 +275,18 @@ export function SoftAviationCountdown({
     const m60 = isJx ? "text-inviteJurnex-navy/60" : "text-invite-navy/60";
     const m45 = isJx ? "text-inviteJurnex-navy/45" : "text-invite-navy/45";
     const m40 = isJx ? "text-inviteJurnex-navy/40" : "text-invite-navy/40";
+    if (mismoDiaCalendarioEvento) {
+      return (
+        <p
+          className={`max-w-full font-semibold leading-snug ${ink} ${
+            dense ? "mt-0.5 text-[10px] sm:text-[11px]" : "mt-1.5 text-[11px] sm:text-xs"
+          }`}
+          aria-live="polite"
+        >
+          Hoy es el gran día ✨
+        </p>
+      );
+    }
     return (
       <p
         className={`max-w-full whitespace-normal break-words font-mono tabular-nums tracking-tight ${ink} ${
@@ -297,6 +311,15 @@ export function SoftAviationCountdown({
   }
 
   if (variant === "inlineLight") {
+    if (mismoDiaCalendarioEvento) {
+      return (
+        <div className="mt-3 border-t border-invite-navy/10 pt-3">
+          <p className="text-center text-sm font-semibold leading-snug text-invite-navy" aria-live="polite">
+            Hoy es el gran día ✨
+          </p>
+        </div>
+      );
+    }
     const parts = [
       { label: "D", v: pad2(d) },
       { label: "H", v: pad2(h) },
@@ -327,6 +350,20 @@ export function SoftAviationCountdown({
     { label: "Min", v: pad2(m) },
     { label: "Seg", v: pad2(s) },
   ];
+
+  if (mismoDiaCalendarioEvento) {
+    return (
+      <div className="mt-6" aria-live="polite">
+        <p
+          className={`text-center text-sm font-semibold leading-snug sm:text-base ${
+            isJx ? "text-inviteJurnex-navy" : "text-invite-navy"
+          }`}
+        >
+          Hoy es el gran día ✨
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-6">

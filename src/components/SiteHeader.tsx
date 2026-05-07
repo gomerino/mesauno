@@ -38,7 +38,7 @@ export function SiteHeader({ compact = false, prominentLogo = false }: Props) {
             aria-hidden
           />
         </Link>
-        <nav className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-2 gap-y-1.5 text-[13px] font-medium leading-tight text-teal-100/95 sm:flex-none sm:gap-x-5 sm:text-sm">
+        <nav className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-2 gap-y-1.5 text-[13px] font-medium leading-tight text-teal-50 sm:flex-none sm:gap-x-5 sm:text-sm">
           <Link href="/onboarding" className="whitespace-nowrap rounded-md px-1 py-1.5 hover:text-white sm:px-0">
             Crea tu viaje
           </Link>

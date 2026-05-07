@@ -1,5 +1,6 @@
 "use client";
 
+import { InvitacionMusicaFiestaEnVivo } from "@/components/invitacion/InvitacionMusicaFiestaEnVivo";
 import {
   MUSICA_LIMITE_SUGERENCIAS_POR_PERSONA,
   type MusicaListaItem,
@@ -60,6 +61,7 @@ export function InvitacionMusicaColaborativa({
   const [listaErr, setListaErr] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [modoDj, setModoDj] = useState(false);
+  const [modoFiestaActivo, setModoFiestaActivo] = useState(false);
   const [votandoId, setVotandoId] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -86,6 +88,7 @@ export function InvitacionMusicaColaborativa({
         message?: string;
         sugerencias_usadas?: number;
         sugerencias_max?: number;
+        modo_fiesta_activo?: boolean;
       };
       if (!res.ok) {
         setListaErr(data.message ?? "No pudimos cargar la lista de sugerencias.");
@@ -102,6 +105,7 @@ export function InvitacionMusicaColaborativa({
         }))
       );
       setPuedeModerar(data.puedeModerar === true);
+      setModoFiestaActivo(data.modo_fiesta_activo === true);
       if (typeof data.sugerencias_usadas === "number") setSugerenciasUsadas(data.sugerencias_usadas);
       if (typeof data.sugerencias_max === "number") setSugerenciasMax(data.sugerencias_max);
     } catch {
@@ -393,6 +397,15 @@ export function InvitacionMusicaColaborativa({
         >
           {msg.text}
         </p>
+      ) : null}
+
+      {invitacionConfirmada && modoFiestaActivo && esInvitacion ? (
+        <InvitacionMusicaFiestaEnVivo
+          eventoId={eventoId}
+          invitationAccessToken={invitationAccessToken}
+          modoFiestaActivo={modoFiestaActivo}
+          surface={surface}
+        />
       ) : null}
 
       {!invitacionConfirmada ? (

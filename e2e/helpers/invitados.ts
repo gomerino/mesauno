@@ -18,8 +18,9 @@ export async function guardarInvitadoDePrueba(
   nombre: string
 ): Promise<void> {
   await abrirModalAnadirInvitado(page);
-  await page.getByLabel(/titular de la invitación/).fill(nombre);
-  await page.getByRole("button", { name: "Guardar" }).click();
+  const dialogo = page.getByRole("dialog");
+  await dialogo.getByRole("textbox").first().fill(nombre);
+  await dialogo.getByRole("button", { name: "Guardar" }).click();
   await expect(page.getByText(nombre).first()).toBeVisible({ timeout: 30_000 });
 }
 

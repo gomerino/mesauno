@@ -7,18 +7,24 @@ function fechaEventoFutura(): string {
 }
 
 test.describe("Registro (onboarding)", () => {
-  test("muestra error de validación con correo inválido", async ({ page }) => {
+  test("muestra error de validación si falta la fecha del evento", async ({ page }) => {
     await page.goto("/onboarding");
     await expect(page.getByRole("heading", { name: /Creá tu viaje/i })).toBeVisible();
 
-    await page.getByLabel(/^Email/i).fill("correo-invalido");
+    await page.getByLabel(/^Email/i).fill(`validacion-${Date.now()}@ejemplo.com`);
     await page.getByLabel(/Nombre novio\/a 1/i).fill("NombreUno");
     await page.getByLabel(/Nombre novio\/a 2/i).fill("NombreDos");
-    await page.locator("#ob_fecha").fill(fechaEventoFutura());
+
+    const fecha = page.locator("#ob_fecha");
+    await fecha.fill(fechaEventoFutura());
+    await fecha.evaluate((el: HTMLInputElement) => {
+      el.removeAttribute("required");
+    });
+    await fecha.fill("");
 
     await page.getByRole("button", { name: /Crear mi viaje/ }).click();
 
-    await expect(page.getByRole("alert")).toContainText(/correo válido/i);
+    await expect(page.locator("form p[role=\"alert\"]")).toContainText(/fecha del evento/i);
   });
 
   test("registro: cuenta + evento → panel o mensaje de confirmación de correo", async ({ page }) => {

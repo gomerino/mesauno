@@ -35,13 +35,13 @@ export function InvitacionShowcase() {
       className="relative z-10 scroll-mt-24 border-b border-jurnex-border bg-jurnex-bg/95 px-4 py-20 sm:scroll-mt-28 sm:py-24"
     >
       <div className="mx-auto max-w-6xl">
-        <p className="text-center text-[11px] font-semibold uppercase tracking-[0.28em] text-jurnex-secondary/90">
+        <p className="text-center text-[11px] font-semibold uppercase tracking-[0.28em] text-teal-100">
           Boarding pass real
         </p>
         <h2 className="mt-2 text-center font-display text-3xl font-bold text-jurnex-text-primary sm:text-4xl">
           Así se ve la invitación real que reciben tus invitados
         </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-center text-base leading-relaxed text-jurnex-text-secondary sm:text-lg">
+        <p className="mx-auto mt-4 max-w-2xl text-center text-base leading-relaxed text-jurnex-text-primary/88 sm:text-lg">
           Misma lógica que cuidas en Jurnex: pase, RSVP, mapa, programa y el tono cálido del gran día, listo en web.
         </p>
 
@@ -66,7 +66,7 @@ export function InvitacionShowcase() {
               <span className="h-2 w-2 rounded-full bg-teal-400/85" />
             </div>
             <p
-              className="hidden min-w-0 truncate text-[10px] font-medium text-jurnex-text-secondary sm:block sm:max-w-[55%]"
+              className="hidden min-w-0 truncate text-[10px] font-medium text-white/78 sm:block sm:max-w-[55%]"
               title={showcaseUrl}
             >
               {urlLabel}
@@ -88,7 +88,7 @@ export function InvitacionShowcase() {
               href={showcaseUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-semibold text-jurnex-primary underline-offset-2 hover:text-jurnex-secondary hover:underline"
+              className="text-sm font-semibold text-teal-100 underline-offset-2 hover:text-white hover:underline"
             >
               Si tu navegador bloquea el iframe, ábrela en otra ventana
             </a>

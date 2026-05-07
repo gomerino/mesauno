@@ -1,7 +1,11 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { PROGRAMA_ICONOS, type ProgramaIconoId } from "@/lib/programa-icons";
+import {
+  getIconoMomento,
+  normalizarTipoMomento,
+  type TipoMomentoId,
+} from "@/lib/programa-icons";
 import { revalidatePath } from "next/cache";
 
 function normalizeHora(hora: string): string {
@@ -11,9 +15,8 @@ function normalizeHora(hora: string): string {
   return t;
 }
 
-function assertIcono(s: string): ProgramaIconoId {
-  if ((PROGRAMA_ICONOS as readonly string[]).includes(s)) return s as ProgramaIconoId;
-  return "Music";
+function assertTipoMomento(s: string): TipoMomentoId {
+  return normalizarTipoMomento(s);
 }
 
 async function requireEditor(eventoId: string) {
@@ -43,7 +46,7 @@ export async function createProgramaHito(
     descripcion_corta: string;
     lugar_nombre: string;
     ubicacion_url: string;
-    icono: string;
+    tipo_momento: string;
   }
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const { supabase, error } = await requireEditor(eventoId);
@@ -71,7 +74,8 @@ export async function createProgramaHito(
     descripcion_corta: input.descripcion_corta.trim() || null,
     lugar_nombre: input.lugar_nombre.trim() || null,
     ubicacion_url: ubicacion ? ubicacion : null,
-    icono: assertIcono(input.icono),
+    tipo_momento: assertTipoMomento(input.tipo_momento),
+    icono: getIconoMomento(input.tipo_momento),
     orden: nextOrden,
   });
 
@@ -89,7 +93,7 @@ export async function updateProgramaHito(
     descripcion_corta: string;
     lugar_nombre: string;
     ubicacion_url: string;
-    icono: string;
+    tipo_momento: string;
   }
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const { supabase, error } = await requireEditor(eventoId);
@@ -107,7 +111,8 @@ export async function updateProgramaHito(
       descripcion_corta: input.descripcion_corta.trim() || null,
       lugar_nombre: input.lugar_nombre.trim() || null,
       ubicacion_url: ubicacion ? ubicacion : null,
-      icono: assertIcono(input.icono),
+      tipo_momento: assertTipoMomento(input.tipo_momento),
+      icono: getIconoMomento(input.tipo_momento),
     })
     .eq("id", id)
     .eq("evento_id", eventoId);
