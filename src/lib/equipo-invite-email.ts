@@ -1,33 +1,29 @@
+import { buildJurnexEmailShell, escapeHtml, jurnexEmailCta, JURNEX_EMAIL } from "@/lib/email-jurnex-brand";
+
 export function buildEquipoInviteEmailHtml(params: {
   actionLink: string;
   eventoLabel: string;
   rolLabel: string;
 }): string {
   const { actionLink, eventoLabel, rolLabel } = params;
-  return `
-<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8" /></head>
-<body style="font-family: system-ui, sans-serif; background: #f0f0f0; margin: 0; padding: 24px;">
-  <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
-    <table width="560" cellpadding="0" cellspacing="0" style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
-      <tr><td style="background: #001d66; padding: 20px 24px;">
-        <p style="margin: 0; color: #fff; font-size: 14px; letter-spacing: 0.12em; font-weight: 700;">MESA UNO</p>
-        <p style="margin: 8px 0 0; color: #c7d4ff; font-size: 13px;">Invitación al equipo del evento</p>
-      </td></tr>
-      <tr><td style="padding: 28px 24px;">
-        <p style="margin: 0 0 12px; font-size: 18px; color: #111;">Has sido invitado/a</p>
-        <p style="margin: 0 0 20px; color: #444; line-height: 1.5;">
-          <strong>${eventoLabel}</strong> te añade al equipo con el rol: <strong>${rolLabel}</strong>.
-          Crea tu cuenta o entra con el enlace para unirte.
+  const ev = escapeHtml(eventoLabel);
+  const rol = escapeHtml(rolLabel);
+
+  const bodyHtml = `
+        <p style="margin:0 0 14px;font-size:18px;font-weight:600;color:${JURNEX_EMAIL.textTitle};">Te invitan al equipo del evento</p>
+        <p style="margin:0 0 22px;color:${JURNEX_EMAIL.textBody};">
+          <strong>${ev}</strong> te suma con el rol <strong>${rol}</strong>. Usa el enlace para crear tu cuenta o entrar y unirte al equipo en Jurnex.
         </p>
-        <p style="margin: 0 0 24px;">
-          <a href="${actionLink}" style="display: inline-block; background: #001d66; color: #fff; text-decoration: none; padding: 14px 28px; border-radius: 999px; font-weight: 600;">Aceptar invitación</a>
-        </p>
-        <p style="margin: 0; font-size: 12px; color: #888; word-break: break-all;">Si el botón no funciona: ${actionLink}</p>
-      </td></tr>
-    </table>
-  </td></tr></table>
-</body>
-</html>`;
+        <p style="margin:0 0 22px;">${jurnexEmailCta(actionLink, "Aceptar invitación")}</p>
+        <p style="margin:0;font-size:13px;color:${JURNEX_EMAIL.textMuted};line-height:1.55;word-break:break-word;">
+          Si el botón no funciona:<br />
+          <a href="${escapeHtml(actionLink)}" style="color:${JURNEX_EMAIL.linkOnLight};font-weight:600;">${escapeHtml(actionLink)}</a>
+        </p>`;
+
+  return buildJurnexEmailShell({
+    metaTitle: "Invitación al equipo — Jurnex",
+    headerBadge: "JURNEX",
+    headerSubtitle: "Equipo del evento · Tu boda, tu viaje",
+    bodyHtml,
+  });
 }

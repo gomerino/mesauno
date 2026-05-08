@@ -2,34 +2,32 @@ import { Hero } from "@/components/marketing/Hero";
 import { LandingHomeJsonLd } from "@/components/marketing/LandingHomeJsonLd";
 import { LandingStickyCta } from "@/components/marketing/LandingStickyCta";
 import { SiteHeader } from "@/components/SiteHeader";
+import {
+  DEFAULT_SITE_ORIGIN,
+  JURNEX_HOME_DESCRIPTION,
+  JURNEX_HOME_KEYWORDS,
+  JURNEX_HOME_TITLE,
+  JURNEX_OG_IMAGE_ALT,
+  JURNEX_OG_IMAGE_PATH,
+} from "@/lib/seo-jurnex-home";
 import type { Metadata } from "next";
 import nextDynamic from "next/dynamic";
 import Link from "next/link";
 
 export const dynamic = "force-static";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://www.jurnex.cl";
-
-const titleDefault = "Jurnex — Organiza tu matrimonio sin caos";
-const descriptionDefault =
-  "Invitaciones digitales, lista de invitados y experiencia del gran día en un solo lugar. Menos caos, más claridad para tu matrimonio.";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || DEFAULT_SITE_ORIGIN;
+const canonicalOrigin = new URL(siteUrl).origin;
+const ogImageAbsoluteUrl = `${canonicalOrigin}${JURNEX_OG_IMAGE_PATH}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: titleDefault,
-  description: descriptionDefault,
-  keywords: [
-    "Jurnex",
-    "matrimonio",
-    "boda",
-    "invitaciones digitales",
-    "lista de invitados",
-    "RSVP",
-    "planificación de eventos",
-    "Chile",
-    "LATAM",
-  ],
-  authors: [{ name: "Jurnex", url: siteUrl }],
+  title: {
+    absolute: JURNEX_HOME_TITLE,
+  },
+  description: JURNEX_HOME_DESCRIPTION,
+  keywords: [...JURNEX_HOME_KEYWORDS],
+  authors: [{ name: "Jurnex", url: canonicalOrigin }],
   creator: "Jurnex",
   publisher: "Jurnex",
   robots: {
@@ -44,31 +42,30 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "/",
+    canonical: canonicalOrigin,
   },
   openGraph: {
-    title: titleDefault,
-    description: descriptionDefault,
-    url: "/",
+    type: "website",
+    url: canonicalOrigin,
+    title: JURNEX_HOME_TITLE,
+    description: JURNEX_HOME_DESCRIPTION,
     siteName: "Jurnex",
     locale: "es_CL",
     alternateLocale: ["es_LA"],
-    type: "website",
     images: [
       {
-        url: "/og-image.png",
+        url: ogImageAbsoluteUrl,
         width: 1200,
         height: 630,
-        alt: "Jurnex — tu boda, tu viaje",
-        type: "image/png",
+        alt: JURNEX_OG_IMAGE_ALT,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: titleDefault,
-    description: descriptionDefault,
-    images: ["/og-image.png"],
+    title: JURNEX_HOME_TITLE,
+    description: JURNEX_HOME_DESCRIPTION,
+    images: [ogImageAbsoluteUrl],
   },
 };
 

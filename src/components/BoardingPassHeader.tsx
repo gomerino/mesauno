@@ -65,13 +65,13 @@ export function BoardingPassHeader({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={logoSrc}
-              alt=""
+              alt="Dreams Airlines — Concepto visual de Jurnex"
               className="h-full w-full object-contain object-left"
             />
           ) : (
             <Image
               src={logoSrc}
-              alt="Dreams Airlines"
+              alt="Dreams Airlines — Concepto visual de Jurnex"
               fill
               sizes="(max-width: 379px) 92px, 100px"
               className="object-contain object-left"

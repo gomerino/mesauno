@@ -1,0 +1,191 @@
+<!--
+  Jurnex — plantillas para Supabase Auth (Authentication → Email templates)
+
+  Cómo usar:
+  1. Supabase Dashboard → Authentication → Email templates
+  2. Elige la plantilla (Confirm signup, Magic link, Reset password, etc.)
+  3. Copia SOLO el bloque HTML correspondiente (entre <!-- INICIO --> y <!-- FIN -->)
+  4. Pégalo en el cuerpo del correo. Las variables {{ ... }} las interpreta Supabase; no las cambies.
+
+  Asuntos sugeridos (Subject): van en el mismo editor, campo separado.
+
+  Referencia variables: https://supabase.com/docs/guides/auth/auth-email-templates
+-->
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     ASUNTO SUGERIDO: Confirma tu correo — Jurnex
+     Plantilla Supabase: "Confirm signup"
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
+<body style="margin:0;padding:24px;background:#eef2f7;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#334155;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
+    <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 8px 32px rgba(2,24,42,0.12);">
+      <tr><td style="background:#02182a;padding:22px 24px;border-bottom:3px solid #e89a1e;">
+        <p style="margin:0;color:#ffffff;font-size:15px;font-weight:700;letter-spacing:0.06em;">JURNEX</p>
+        <p style="margin:10px 0 0;color:#e2e8f0;font-size:14px;line-height:1.5;">Tu boda, tu viaje · Confirma tu correo</p>
+      </td></tr>
+      <tr><td style="padding:28px 24px;color:#334155;font-size:16px;line-height:1.55;">
+        <p style="margin:0 0 14px;font-size:18px;font-weight:600;color:#0f172a;">Un paso más para activar tu cuenta</p>
+        <p style="margin:0 0 22px;">Toca el botón para confirmar que este correo es tuyo y seguir con Jurnex.</p>
+        <p style="margin:0 0 22px;">
+          <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#02182a;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:999px;font-weight:600;font-size:15px;line-height:1.3;">Confirmar correo</a>
+        </p>
+        <p style="margin:0;font-size:13px;color:#475569;line-height:1.55;">Si no fuiste tú, puedes ignorar este mensaje.</p>
+      </td></tr>
+      <tr><td style="padding:18px 24px;background:#f1f5f9;font-size:13px;line-height:1.5;text-align:center;color:#475569;">
+        Jurnex · Tu boda, tu viaje
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body>
+</html>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     ASUNTO SUGERIDO: Tu código de acceso — Jurnex
+     Plantilla Supabase: "Magic link"
+     Prioridad: OTP ({{ .Token }}). Si el proyecto no envía OTP, el {{ else }} muestra solo el enlace.
+     En Authentication → Providers → Email: habilita "Confirm email" / flujo OTP según tu proyecto.
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
+<body style="margin:0;padding:24px;background:#eef2f7;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#334155;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
+    <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 8px 32px rgba(2,24,42,0.12);">
+      <tr><td style="background:#02182a;padding:22px 24px;border-bottom:3px solid #e89a1e;">
+        <p style="margin:0;color:#ffffff;font-size:15px;font-weight:700;letter-spacing:0.06em;">JURNEX</p>
+        <p style="margin:10px 0 0;color:#e2e8f0;font-size:14px;line-height:1.5;">Código de acceso · Un solo uso</p>
+      </td></tr>
+      <tr><td style="padding:28px 24px;color:#334155;font-size:16px;line-height:1.55;">
+        {{ if .Token }}
+        <p style="margin:0 0 10px;font-size:18px;font-weight:600;color:#0f172a;">Ingresa este código en Jurnex</p>
+        <p style="margin:0 0 20px;color:#334155;">Es válido solo unos minutos. No lo compartas con nadie.</p>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 22px;">
+          <tr><td align="center" style="padding:20px 16px;background:#f8fafc;border:2px solid #02182a;border-radius:12px;">
+            <p style="margin:0 0 6px;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#475569;">Tu código</p>
+            <p style="margin:0;font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:34px;font-weight:700;letter-spacing:0.35em;color:#02182a;line-height:1.2;">{{ .Token }}</p>
+          </td></tr>
+        </table>
+        <p style="margin:0 0 18px;font-size:14px;color:#475569;line-height:1.5;">Abre la app o la web, escribe tu correo y pega el código cuando te lo pida.</p>
+        <p style="margin:0 0 20px;padding-top:16px;border-top:1px solid #e2e8f0;font-size:14px;color:#475569;line-height:1.5;">
+          ¿Prefieres un enlace? <a href="{{ .ConfirmationURL }}" style="color:#0f766e;font-weight:600;text-decoration:underline;">Abrir sesión en el navegador</a>
+        </p>
+        {{ else }}
+        <p style="margin:0 0 14px;font-size:18px;font-weight:600;color:#0f172a;">Entra a Jurnex</p>
+        <p style="margin:0 0 22px;">Tu proyecto está usando solo enlace mágico (sin código). Pulsa el botón para iniciar sesión.</p>
+        <p style="margin:0 0 22px;">
+          <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#02182a;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:999px;font-weight:600;font-size:15px;line-height:1.3;">Entrar a Jurnex</a>
+        </p>
+        {{ end }}
+        <p style="margin:0;font-size:13px;color:#475569;line-height:1.55;">Si no intentaste entrar, ignora este correo.</p>
+      </td></tr>
+      <tr><td style="padding:18px 24px;background:#f1f5f9;font-size:13px;line-height:1.5;text-align:center;color:#475569;">
+        Jurnex · Tu boda, tu viaje
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body>
+</html>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     ASUNTO SUGERIDO: Restablece tu acceso — Jurnex
+     Plantilla Supabase: "Reset password"
+     NOTA: Si tu proyecto usa OTP en lugar de enlace, {{ .Token }} puede estar disponible según tu configuración.
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
+<body style="margin:0;padding:24px;background:#eef2f7;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#334155;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
+    <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 8px 32px rgba(2,24,42,0.12);">
+      <tr><td style="background:#02182a;padding:22px 24px;border-bottom:3px solid #e89a1e;">
+        <p style="margin:0;color:#ffffff;font-size:15px;font-weight:700;letter-spacing:0.06em;">JURNEX</p>
+        <p style="margin:10px 0 0;color:#e2e8f0;font-size:14px;line-height:1.5;">Recuperación de acceso</p>
+      </td></tr>
+      <tr><td style="padding:28px 24px;color:#334155;font-size:16px;line-height:1.55;">
+        <p style="margin:0 0 14px;font-size:18px;font-weight:600;color:#0f172a;">Restablece tu contraseña</p>
+        <p style="margin:0 0 22px;">Recibimos una solicitud para cambiar la contraseña de <strong style="color:#0f172a;">{{ .Email }}</strong>. Toca el botón para continuar.</p>
+        <p style="margin:0 0 22px;">
+          <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#02182a;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:999px;font-weight:600;font-size:15px;line-height:1.3;">Elegir nueva contraseña</a>
+        </p>
+        {{ if .Token }}
+        <p style="margin:0 0 16px;padding:14px 16px;background:#fffbeb;border-left:4px solid #e89a1e;color:#334155;font-size:15px;line-height:1.5;">
+          Código de verificación: <strong style="letter-spacing:0.12em;">{{ .Token }}</strong>
+        </p>
+        {{ end }}
+        <p style="margin:0;font-size:13px;color:#475569;line-height:1.55;">Si no pediste este cambio, puedes ignorar este mensaje.</p>
+      </td></tr>
+      <tr><td style="padding:18px 24px;background:#f1f5f9;font-size:13px;line-height:1.5;text-align:center;color:#475569;">
+        Jurnex · Tu boda, tu viaje
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body>
+</html>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     ASUNTO SUGERIDO: Confirma tu nuevo correo — Jurnex
+     Plantilla Supabase: "Change email address"
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
+<body style="margin:0;padding:24px;background:#eef2f7;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#334155;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
+    <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 8px 32px rgba(2,24,42,0.12);">
+      <tr><td style="background:#02182a;padding:22px 24px;border-bottom:3px solid #e89a1e;">
+        <p style="margin:0;color:#ffffff;font-size:15px;font-weight:700;letter-spacing:0.06em;">JURNEX</p>
+        <p style="margin:10px 0 0;color:#e2e8f0;font-size:14px;line-height:1.5;">Cambio de correo</p>
+      </td></tr>
+      <tr><td style="padding:28px 24px;color:#334155;font-size:16px;line-height:1.55;">
+        <p style="margin:0 0 14px;font-size:18px;font-weight:600;color:#0f172a;">Confirma tu nuevo correo</p>
+        <p style="margin:0 0 22px;">Para usar tu nueva dirección en Jurnex, confirma con el botón.</p>
+        <p style="margin:0 0 22px;">
+          <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#02182a;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:999px;font-weight:600;font-size:15px;line-height:1.3;">Confirmar nuevo correo</a>
+        </p>
+        <p style="margin:0;font-size:13px;color:#475569;line-height:1.55;">Si no hiciste este cambio, ignora este mensaje y tu correo actual seguirá vigente.</p>
+      </td></tr>
+      <tr><td style="padding:18px 24px;background:#f1f5f9;font-size:13px;line-height:1.5;text-align:center;color:#475569;">
+        Jurnex · Tu boda, tu viaje
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body>
+</html>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     ASUNTO SUGERIDO: Tienes una invitación — Jurnex
+     Plantilla Supabase: "Invite user" (si la usas)
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
+<body style="margin:0;padding:24px;background:#eef2f7;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#334155;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
+    <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 8px 32px rgba(2,24,42,0.12);">
+      <tr><td style="background:#02182a;padding:22px 24px;border-bottom:3px solid #e89a1e;">
+        <p style="margin:0;color:#ffffff;font-size:15px;font-weight:700;letter-spacing:0.06em;">JURNEX</p>
+        <p style="margin:10px 0 0;color:#e2e8f0;font-size:14px;line-height:1.5;">Invitación a la plataforma</p>
+      </td></tr>
+      <tr><td style="padding:28px 24px;color:#334155;font-size:16px;line-height:1.55;">
+        <p style="margin:0 0 14px;font-size:18px;font-weight:600;color:#0f172a;">Te han invitado</p>
+        <p style="margin:0 0 22px;">Usa el enlace para crear tu cuenta o acceder y completar el registro.</p>
+        <p style="margin:0 0 22px;">
+          <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#02182a;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:999px;font-weight:600;font-size:15px;line-height:1.3;">Aceptar invitación</a>
+        </p>
+        <p style="margin:0;font-size:13px;color:#475569;line-height:1.55;">Si no esperabas este correo, puedes ignorarlo.</p>
+      </td></tr>
+      <tr><td style="padding:18px 24px;background:#f1f5f9;font-size:13px;line-height:1.5;text-align:center;color:#475569;">
+        Jurnex · Tu boda, tu viaje
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body>
+</html>

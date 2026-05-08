@@ -19,7 +19,7 @@ export function Hero() {
             Organiza tu matrimonio sin caos
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-jurnex-text-primary/88 sm:text-lg lg:mx-0">
-            Invitaciones, invitados y experiencia en un solo lugar
+            Invitaciones digitales para matrimonios en Chile: invitados, RSVP y experiencia en un solo lugar
           </p>
           <div className="mt-8 flex flex-col items-stretch justify-center sm:flex-row sm:flex-wrap sm:justify-center lg:justify-start">
             <Link

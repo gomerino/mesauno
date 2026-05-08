@@ -20,7 +20,7 @@ export function HeroMobileBoarding() {
     <div
       className="group relative mx-auto w-full max-w-[380px] rounded-[1.85rem] bg-[#050f1c] p-[3px] shadow-[0_16px_48px_-14px_rgba(0,0,0,0.65)] ring-1 ring-white/12 transition duration-300 ease-out hover:scale-[1.02] hover:shadow-[0_24px_56px_-16px_rgba(232,154,30,0.2)] lg:mx-0 lg:ml-auto"
       role="figure"
-      aria-label="Vista previa de la invitación demo"
+      aria-label="Ejemplo de invitación de matrimonio estilo boarding pass de Jurnex"
     >
       <div
         className="pointer-events-none absolute -inset-1 rounded-[2rem] bg-gradient-to-br from-teal-400/15 via-transparent to-jurnex-secondary/10 opacity-70 blur-md transition-opacity duration-300 group-hover:opacity-90"
@@ -28,7 +28,7 @@ export function HeroMobileBoarding() {
       />
       <div className="relative z-[1] overflow-hidden rounded-[1.65rem] bg-jurnex-bg">
         <iframe
-          title="Demo invitación Jurnex en vista móvil"
+          title="Ejemplo de invitación de matrimonio estilo boarding pass de Jurnex"
           src={iframeSrc}
           className="pointer-events-auto block h-[min(520px,68svh)] w-full border-0 sm:h-[560px]"
           loading="eager"

@@ -31,12 +31,11 @@ export function SiteHeader({ compact = false, prominentLogo = false }: Props) {
         >
           <img
             src={JURNEX_BRAND.logos.fullPng}
-            alt=""
+            alt="Jurnex — Plataforma de matrimonios digitales"
             width={1024}
             height={1024}
             className="h-full w-auto max-w-full object-contain object-left"
             decoding="async"
-            aria-hidden
           />
         </Link>
         <nav className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-2 gap-y-1.5 text-[13px] font-medium leading-tight text-teal-50 sm:flex-none sm:gap-x-5 sm:text-sm">

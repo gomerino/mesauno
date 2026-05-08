@@ -6,8 +6,8 @@ const steps = [
   },
   {
     n: "2",
-    title: "Invita y confirma",
-    body: "Envía invitaciones y recibe respuestas",
+    title: "Invita y confirma asistencia",
+    body: "Envía tu invitación digital y recibe confirmaciones de asistencia (RSVP) por cada invitado",
   },
   {
     n: "3",

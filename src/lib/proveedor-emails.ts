@@ -1,21 +1,13 @@
 import { Resend } from "resend";
+import { buildJurnexEmailShell, escapeHtml, jurnexEmailCta, JURNEX_EMAIL } from "@/lib/email-jurnex-brand";
 
 /**
  * Plantillas y envío de correos del flujo de proveedor (M02).
- *
- * Paleta brand:
- * - Navy #001d66 (idéntico a invitaciones).
- * - Dorado premium #c8a15a para acentos.
- *
- * Convención: cada template es una función pura `build*Html(params)` que
- * devuelve el HTML. El wrapper `enviarEmailProveedor` hace el send con Resend.
+ * Marca Jurnex y contraste legible (tokens en `email-jurnex-brand`).
  *
  * Si no hay RESEND_API_KEY/FROM, el send devuelve `{ ok: false, motivo: "sin-config" }`
  * sin lanzar — el caller decide si degrada o logs.
  */
-
-const NAVY = "#001d66";
-const GOLD = "#c8a15a";
 
 type Firma = {
   nombreNegocio: string;
@@ -23,39 +15,13 @@ type Firma = {
 };
 
 function layout(titulo: string, eyebrow: string, bodyHtml: string): string {
-  return `
-<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8" /><title>${escapar(titulo)}</title></head>
-<body style="font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: #f6f5f1; margin: 0; padding: 24px; color: #111;">
-  <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
-    <table width="560" cellpadding="0" cellspacing="0" style="background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 6px 32px rgba(0,0,0,0.08);">
-      <tr><td style="background: ${NAVY}; padding: 22px 24px; border-bottom: 3px solid ${GOLD};">
-        <p style="margin: 0; color: #fff; font-size: 13px; letter-spacing: 0.14em; font-weight: 700;">JURNEX · PROVEEDORES</p>
-        <p style="margin: 8px 0 0; color: #dfe4f5; font-size: 13px;">${escapar(eyebrow)}</p>
-      </td></tr>
-      <tr><td style="padding: 28px 26px;">
-        ${bodyHtml}
-      </td></tr>
-      <tr><td style="padding: 18px 26px; background: #f6f5f1; color: #777; font-size: 12px; text-align: center;">
-        Jurnex · Marketplace de matrimonios — Chile.
-      </td></tr>
-    </table>
-  </td></tr></table>
-</body>
-</html>`;
-}
-
-function cta(href: string, texto: string): string {
-  return `<a href="${escapar(href)}" style="display: inline-block; background: ${NAVY}; color: #fff; text-decoration: none; padding: 13px 26px; border-radius: 999px; font-weight: 600; font-size: 15px;">${escapar(texto)}</a>`;
-}
-
-function escapar(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+  return buildJurnexEmailShell({
+    metaTitle: titulo,
+    headerBadge: "JURNEX · PROVEEDORES",
+    headerSubtitle: escapeHtml(eyebrow),
+    bodyHtml,
+    footerHtml: `<span style="color:${JURNEX_EMAIL.footerText};">Jurnex · Marketplace de matrimonios · LATAM</span>`,
+  });
 }
 
 export function buildBienvenidaPendienteHtml(params: Firma): string {
@@ -64,15 +30,15 @@ export function buildBienvenidaPendienteHtml(params: Firma): string {
     "Recibimos tu solicitud",
     "Solicitud recibida",
     `
-      <p style="margin: 0 0 10px; font-size: 20px; font-weight: 600;">¡Bienvenido, ${escapar(nombreNegocio)}!</p>
-      <p style="margin: 0 0 16px; color: #444; line-height: 1.55;">
+      <p style="margin: 0 0 10px; font-size: 20px; font-weight: 600; color: ${JURNEX_EMAIL.textTitle};">¡Bienvenido, ${escapeHtml(nombreNegocio)}!</p>
+      <p style="margin: 0 0 16px; color: ${JURNEX_EMAIL.textBody}; line-height: 1.55;">
         Recibimos tu solicitud para unirte al marketplace. Nuestro equipo la está revisando y te avisaremos por este correo en un <strong>máximo de 48 horas</strong>.
       </p>
-      <p style="margin: 0 0 20px; color: #444; line-height: 1.55;">
+      <p style="margin: 0 0 20px; color: ${JURNEX_EMAIL.textBody}; line-height: 1.55;">
         Mientras tanto, puedes ver cómo quedó tu perfil y completar información extra si lo deseas.
       </p>
-      <p style="margin: 0 0 8px;">${cta(panelUrl, "Ver mi perfil")}</p>
-      <p style="margin: 18px 0 0; font-size: 12px; color: #888; word-break: break-all;">Si el botón no funciona, copia este enlace: ${escapar(panelUrl)}</p>
+      <p style="margin: 0 0 8px;">${jurnexEmailCta(panelUrl, "Ver mi perfil")}</p>
+      <p style="margin: 18px 0 0; font-size: 13px; color: ${JURNEX_EMAIL.textMuted}; line-height: 1.55; word-break: break-all;">Si el botón no funciona, copia este enlace:<br /><a href="${escapeHtml(panelUrl)}" style="color: ${JURNEX_EMAIL.linkOnLight}; font-weight: 600;">${escapeHtml(panelUrl)}</a></p>
     `,
   );
 }
@@ -83,20 +49,20 @@ export function buildAprobadoHtml(params: Firma & { perfilPublicoUrl: string }):
     "Tu perfil está visible",
     "¡Estás listo para despegar!",
     `
-      <p style="margin: 0 0 10px; font-size: 20px; font-weight: 600;">${escapar(nombreNegocio)}, tu perfil ya es visible ✈️</p>
-      <p style="margin: 0 0 16px; color: #444; line-height: 1.55;">
+      <p style="margin: 0 0 10px; font-size: 20px; font-weight: 600; color: ${JURNEX_EMAIL.textTitle};">${escapeHtml(nombreNegocio)}, tu perfil ya es visible ✈️</p>
+      <p style="margin: 0 0 16px; color: ${JURNEX_EMAIL.textBody}; line-height: 1.55;">
         Las parejas que están organizando su boda ya pueden descubrirte en el marketplace. Queremos ayudarte a convertir esos contactos en experiencias inolvidables.
       </p>
-      <p style="margin: 0 0 8px;">${cta(perfilPublicoUrl, "Ver mi perfil público")}</p>
-      <p style="margin: 18px 0 10px; color: #444; line-height: 1.55;">
+      <p style="margin: 0 0 8px;">${jurnexEmailCta(perfilPublicoUrl, "Ver mi perfil público")}</p>
+      <p style="margin: 0 0 10px; color: ${JURNEX_EMAIL.textBody}; line-height: 1.55;">
         Para maximizar tus contactos, te recomendamos:
       </p>
-      <ul style="margin: 0 0 20px 20px; color: #444; line-height: 1.55;">
+      <ul style="margin: 0 0 20px 20px; color: ${JURNEX_EMAIL.textBody}; line-height: 1.55;">
         <li>Subir al menos 3 fotos de trabajos recientes.</li>
         <li>Completar tu biografía con tu propuesta diferencial.</li>
         <li>Configurar el precio desde para cada servicio.</li>
       </ul>
-      <p style="margin: 0 0 8px;"><a href="${escapar(panelUrl)}" style="color: ${NAVY}; font-weight: 600;">Ir a mi panel →</a></p>
+      <p style="margin: 0 0 8px;"><a href="${escapeHtml(panelUrl)}" style="color: ${JURNEX_EMAIL.linkOnLight}; font-weight: 600;">Ir a mi panel →</a></p>
     `,
   );
 }
@@ -117,20 +83,22 @@ export function buildSuspendidoHtml(
     "Una info más para activar tu perfil",
     "Necesitamos algo más",
     `
-      <p style="margin: 0 0 10px; font-size: 20px; font-weight: 600;">Hola ${escapar(nombreNegocio)},</p>
-      <p style="margin: 0 0 16px; color: #444; line-height: 1.55;">
-        Revisamos tu solicitud y <strong>${escapar(titulo)}</strong>.
+      <p style="margin: 0 0 10px; font-size: 20px; font-weight: 600; color: ${JURNEX_EMAIL.textTitle};">Hola ${escapeHtml(nombreNegocio)},</p>
+      <p style="margin: 0 0 16px; color: ${JURNEX_EMAIL.textBody}; line-height: 1.55;">
+        Revisamos tu solicitud y <strong>${escapeHtml(titulo)}</strong>.
       </p>
       ${
         detalle
-          ? `<p style="margin: 0 0 16px; padding: 12px 14px; background: #fff8e9; border-left: 3px solid ${GOLD}; color: #444; line-height: 1.55;">${escapar(detalle)}</p>`
+          ? `<p style="margin: 0 0 16px; padding: 14px 16px; background: ${JURNEX_EMAIL.noticeBg}; border-left: 4px solid ${JURNEX_EMAIL.noticeBorder}; color: ${JURNEX_EMAIL.noticeText}; line-height: 1.55;">${escapeHtml(detalle)}</p>`
           : ""
       }
-      <p style="margin: 0 0 20px; color: #444; line-height: 1.55;">
+      <p style="margin: 0 0 20px; color: ${JURNEX_EMAIL.textBody}; line-height: 1.55;">
         Puedes editar tu perfil desde el panel y responder a este correo para que lo revisemos nuevamente.
       </p>
-      <p style="margin: 0 0 8px;">${cta(panelUrl, "Editar mi perfil")}</p>
-      <p style="margin: 18px 0 0; font-size: 12px; color: #888;">¿Tienes dudas? Responde a este correo o escríbenos a <a href="mailto:hola@jurnex.cl" style="color: ${NAVY};">hola@jurnex.cl</a>.</p>
+      <p style="margin: 0 0 8px;">${jurnexEmailCta(panelUrl, "Editar mi perfil")}</p>
+      <p style="margin: 18px 0 0; font-size: 13px; color: ${JURNEX_EMAIL.textMuted}; line-height: 1.55;">
+        ¿Tienes dudas? Responde a este correo o escríbenos a <a href="mailto:hola@jurnex.cl" style="color: ${JURNEX_EMAIL.linkOnLight}; font-weight: 600;">hola@jurnex.cl</a>.
+      </p>
     `,
   );
 }
@@ -147,15 +115,15 @@ export function buildAdminNuevoProveedorHtml(params: {
     "Nuevo proveedor pendiente",
     "Admin · Revisión requerida",
     `
-      <p style="margin: 0 0 10px; font-size: 18px; font-weight: 600;">Nuevo proveedor esperando aprobación</p>
+      <p style="margin: 0 0 10px; font-size: 18px; font-weight: 600; color: ${JURNEX_EMAIL.textTitle};">Nuevo proveedor esperando aprobación</p>
       <table cellpadding="0" cellspacing="0" style="margin: 16px 0; border-collapse: collapse;">
-        <tr><td style="padding: 6px 12px 6px 0; color: #888; font-size: 13px;">Negocio</td><td style="padding: 6px 0; font-weight: 600;">${escapar(nombreNegocio)}</td></tr>
-        <tr><td style="padding: 6px 12px 6px 0; color: #888; font-size: 13px;">Contacto</td><td style="padding: 6px 0;">${escapar(email)}</td></tr>
-        <tr><td style="padding: 6px 12px 6px 0; color: #888; font-size: 13px;">Categoría</td><td style="padding: 6px 0;">${escapar(categoria)}</td></tr>
-        <tr><td style="padding: 6px 12px 6px 0; color: #888; font-size: 13px;">Región</td><td style="padding: 6px 0;">${escapar(region)}</td></tr>
+        <tr><td style="padding: 6px 12px 6px 0; color: ${JURNEX_EMAIL.textMuted}; font-size: 13px;">Negocio</td><td style="padding: 6px 0; font-weight: 600; color: ${JURNEX_EMAIL.textBody};">${escapeHtml(nombreNegocio)}</td></tr>
+        <tr><td style="padding: 6px 12px 6px 0; color: ${JURNEX_EMAIL.textMuted}; font-size: 13px;">Contacto</td><td style="padding: 6px 0; color: ${JURNEX_EMAIL.textBody};">${escapeHtml(email)}</td></tr>
+        <tr><td style="padding: 6px 12px 6px 0; color: ${JURNEX_EMAIL.textMuted}; font-size: 13px;">Categoría</td><td style="padding: 6px 0; color: ${JURNEX_EMAIL.textBody};">${escapeHtml(categoria)}</td></tr>
+        <tr><td style="padding: 6px 12px 6px 0; color: ${JURNEX_EMAIL.textMuted}; font-size: 13px;">Región</td><td style="padding: 6px 0; color: ${JURNEX_EMAIL.textBody};">${escapeHtml(region)}</td></tr>
       </table>
-      <p style="margin: 0 0 8px;">${cta(panelAdminUrl, "Revisar en el panel")}</p>
-      <p style="margin: 18px 0 0; font-size: 12px; color: #888;">SLA objetivo: 48 horas.</p>
+      <p style="margin: 0 0 8px;">${jurnexEmailCta(panelAdminUrl, "Revisar en el panel")}</p>
+      <p style="margin: 18px 0 0; font-size: 13px; color: ${JURNEX_EMAIL.textMuted};">SLA objetivo: 48 horas.</p>
     `,
   );
 }
