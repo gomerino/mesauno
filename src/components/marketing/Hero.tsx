@@ -16,10 +16,10 @@ export function Hero() {
       <div className="relative isolate mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
         <div className="order-1 min-w-0 text-center lg:z-0 lg:max-w-xl lg:text-left">
           <h1 className="font-display text-[clamp(1.85rem,5vw,2.85rem)] font-bold leading-[1.12] tracking-tight text-jurnex-text-primary">
-            Organiza tu matrimonio sin caos
+            Invitaciones digitales para matrimonios con RSVP, programa y experiencia interactiva
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-jurnex-text-primary/88 sm:text-lg lg:mx-0">
-            Invitaciones digitales para matrimonios en Chile: invitados, RSVP y experiencia en un solo lugar
+            Organiza tu matrimonio sin caos
           </p>
           <div className="mt-8 flex flex-col items-stretch justify-center sm:flex-row sm:flex-wrap sm:justify-center lg:justify-start">
             <Link

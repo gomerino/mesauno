@@ -14,7 +14,7 @@ import { formatFechaDDMMMYY } from "@/lib/format-fecha-evento";
 
 type Rsvp = "confirmado" | "declinado" | "pendiente";
 
-const SOFT_RSVP_STEPS = ["Asistencia", "Catering", "Música", "Revisar"] as const;
+const SOFT_RSVP_STEPS = ["Confirmar asistencia", "Catering", "Música", "Revisar"] as const;
 
 type Props = {
   invitadoId: string;
@@ -168,14 +168,14 @@ export function SoftAviationCheckInFlow({
   }, [buildRestricciones, invitadoId, onRsvpSaved, router, rsvp]);
 
   const tituloHeader = done
-    ? "Asistencia guardada"
+    ? "Confirmación de asistencia guardada"
     : isDetailsMode
       ? "Preferencias alimenticias"
-    : flowMode === "edit"
-      ? "Editar asistencia"
-      : "Confirmar asistencia";
+      : flowMode === "edit"
+        ? "Editar confirmación de asistencia (RSVP)"
+        : "Confirmar asistencia (RSVP)";
 
-  const steps = isJurnex ? ["Asistencia"] : SOFT_RSVP_STEPS;
+  const steps = isJurnex ? ["Confirmar asistencia"] : SOFT_RSVP_STEPS;
   const totalSteps = steps.length;
   const stepLabelJx = isDetailsMode ? "Catering" : "Sellar pase";
   const goNext = useCallback(() => {
@@ -470,7 +470,7 @@ export function SoftAviationCheckInFlow({
                 <p className={c.pLead}>Resumen</p>
                 <ul className={c.resumenBox}>
                   <li>
-                    Asistencia:{" "}
+                    Confirmación de asistencia (RSVP):{" "}
                     {rsvp === "confirmado" ? "Sí" : rsvp === "declinado" ? "No" : "Pendiente"}
                   </li>
                   <li>Restricciones: {buildRestricciones() || "Ninguna indicada"}</li>

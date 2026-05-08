@@ -21,10 +21,10 @@ export function InvitacionAcciones({
         <h2
           className={`font-display font-bold text-gray-900 ${compact ? "text-base lg:text-[15px]" : "text-lg lg:text-base"}`}
         >
-          Tu respuesta
+          Confirmar asistencia (RSVP)
         </h2>
         <p className={`mt-0.5 text-gray-600 ${compact ? "text-[11px]" : "text-xs lg:text-[11px]"}`}>
-          Confirmar · Restricciones · Fondo de millas
+          Confirma si asistirás al matrimonio · Restricciones · Fondo de millas
         </p>
       </div>
 

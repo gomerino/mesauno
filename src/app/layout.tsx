@@ -3,8 +3,11 @@ import { InstallButton } from "@/components/InstallButton";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import {
   JURNEX_HOME_DESCRIPTION,
-  JURNEX_OG_DESCRIPTION,
+  JURNEX_HOME_TITLE,
+  JURNEX_OG_DESCRIPTION_SHORT,
   JURNEX_OG_IMAGE_ALT,
+  JURNEX_OG_IMAGE_PATH,
+  JURNEX_OG_TITLE_SHORT,
   JURNEX_TWITTER_DESCRIPTION,
 } from "@/lib/seo-jurnex-home";
 import type { Metadata } from "next";
@@ -28,7 +31,7 @@ const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://www.jurn
 export const metadata: Metadata = {
   metadataBase: new URL(siteOrigin),
   title: {
-    default: "Jurnex — Crea tu viaje de bodas",
+    default: JURNEX_HOME_TITLE,
     template: "%s | Jurnex",
   },
   description: JURNEX_HOME_DESCRIPTION,
@@ -42,13 +45,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Jurnex",
-    title: "Jurnex — Crea tu viaje de bodas",
-    description: JURNEX_OG_DESCRIPTION,
+    title: JURNEX_OG_TITLE_SHORT,
+    description: JURNEX_OG_DESCRIPTION_SHORT,
     url: "https://www.jurnex.cl",
     locale: "es_CL",
     images: [
       {
-        url: "/og-image.jpg",
+        url: JURNEX_OG_IMAGE_PATH,
         width: 1200,
         height: 630,
         alt: JURNEX_OG_IMAGE_ALT,
@@ -57,9 +60,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Jurnex — Crea tu viaje de bodas",
+    title: JURNEX_OG_TITLE_SHORT,
     description: JURNEX_TWITTER_DESCRIPTION,
-    images: ["/og-image.jpg"],
+    images: [JURNEX_OG_IMAGE_PATH],
   },
   manifest: "/manifest.json",
   themeColor: "#02182a",

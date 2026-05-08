@@ -1,5 +1,6 @@
 import { createClient, createStrictServiceClient } from "@/lib/supabase/server";
 import { loadInvitacionSeoByToken } from "@/lib/invitacion-seo.server";
+import { InvitacionSemanticaSrOnly } from "@/components/invitacion/InvitacionSemanticaSrOnly";
 import { LegacyTheme } from "@/components/themes/LegacyTheme";
 import { JurnexAviationTheme } from "@/components/themes/JurnexAviationTheme";
 import { SoftAviationTheme } from "@/components/themes/SoftAviationTheme";
@@ -58,6 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title: seo.title,
       description: seo.description,
+      images: [seo.ogImage],
     },
   };
 }
@@ -145,12 +147,27 @@ export default async function InvitacionPage({ params, searchParams }: Props) {
   const themeId = resolveInvitacionThemeId({ evento, invitado }, themeQuery);
 
   if (themeId === "jurnex-aviation") {
-    return <JurnexAviationTheme {...themeProps} />;
+    return (
+      <>
+        <JurnexAviationTheme {...themeProps} />
+        <InvitacionSemanticaSrOnly />
+      </>
+    );
   }
 
   if (themeId === "soft-aviation") {
-    return <SoftAviationTheme {...themeProps} />;
+    return (
+      <>
+        <SoftAviationTheme {...themeProps} />
+        <InvitacionSemanticaSrOnly />
+      </>
+    );
   }
 
-  return <LegacyTheme {...themeProps} />;
+  return (
+    <>
+      <LegacyTheme {...themeProps} />
+      <InvitacionSemanticaSrOnly />
+    </>
+  );
 }

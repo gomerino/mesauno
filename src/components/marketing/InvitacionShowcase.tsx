@@ -32,7 +32,7 @@ export function InvitacionShowcase() {
           Así se ve la invitación real que reciben tus invitados
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-center text-base leading-relaxed text-jurnex-text-primary/88 sm:text-lg">
-          Misma lógica que cuidas en Jurnex: pase, RSVP, mapa, programa y el tono cálido del gran día, listo en web.
+          Misma lógica que cuidas en Jurnex: pase, confirmación de asistencia (RSVP), mapa, programa y el tono cálido del gran día, listo en web.
         </p>
 
         {configurada ? (

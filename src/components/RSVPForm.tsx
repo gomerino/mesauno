@@ -62,9 +62,9 @@ export function RSVPForm({ invitadoId, initialRestricciones, initialEstado, comp
     <form onSubmit={onSubmit} className={`flex flex-col ${compact ? "gap-2" : "gap-3"}`}>
       <div className={`grid grid-cols-1 ${gridGap}`}>
         <div className={card}>
-          <p className={labelSm}>1 · Asistencia</p>
+          <p className={labelSm}>1 · Confirmar asistencia (RSVP)</p>
           <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-gray-600">
-            ¿Nos acompañas?
+            Confirma si asistirás al matrimonio
           </p>
           <div className="mt-2 flex min-h-0 flex-1 flex-col gap-1.5">
             <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 px-2.5 py-1.5 has-[:checked]:border-[#001d66] has-[:checked]:bg-[#001d66]/5">

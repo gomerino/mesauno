@@ -15,7 +15,7 @@ export default function SchemaOrg() {
         "@id": "https://www.jurnex.cl/#app",
         name: "Jurnex",
         url: "https://www.jurnex.cl",
-        applicationCategory: "LifestyleApplication",
+        applicationCategory: "WeddingPlanningApplication",
         operatingSystem: "Web",
         offers: {
           "@type": "Offer",
@@ -23,7 +23,7 @@ export default function SchemaOrg() {
           availability: "https://schema.org/InStock",
         },
         description:
-          "Crea invitaciones de matrimonio estilo boarding pass, gestiona invitados, RSVP, programa y música en un solo lugar.",
+          "Plataforma para crear invitaciones digitales de matrimonio con RSVP, programa y experiencia interactiva",
         inLanguage: "es-CL",
         areaServed: {
           "@type": "GeoCircle",

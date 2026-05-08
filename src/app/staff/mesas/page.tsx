@@ -95,7 +95,7 @@ export default async function StaffMesasPage({
             <tr className="border-b border-white/10 bg-black/30 text-[10px] uppercase tracking-wide text-slate-500">
               <th className="px-3 py-2">Nombre</th>
               <th className="px-3 py-2">Asiento</th>
-              <th className="px-3 py-2">RSVP</th>
+              <th className="px-3 py-2">Confirmar asistencia (RSVP)</th>
               <th className="px-3 py-2">Entrada</th>
               <th className="px-3 py-2">Restricciones</th>
             </tr>

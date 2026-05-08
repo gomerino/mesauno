@@ -105,7 +105,7 @@ export function StaffCheckInClient({ eventoId }: Props) {
               <dd className="font-medium text-white">{preview.asiento ?? "—"}</dd>
             </div>
             <div className="flex justify-between gap-4 border-b border-white/5 pb-2">
-              <dt className="text-slate-500">RSVP</dt>
+              <dt className="text-slate-500">Confirmar asistencia (RSVP)</dt>
               <dd className="font-medium capitalize text-white">{preview.rsvp_estado ?? "—"}</dd>
             </div>
             <div>

@@ -22,8 +22,8 @@ export async function loadInvitacionSeoByToken(token: string) {
     [evento?.nombre_novio_1, evento?.nombre_novio_2].filter(Boolean).join(" & ") ||
     "Nuestra celebración";
   const epigrafe = epigrafeDesdeMotivo(merged.motivo_viaje, 160);
-  const defaultDesc = "Recibí tu pase y confirma tu asistencia en Jurnex.";
-  const description = epigrafe ? `${epigrafe} — ${defaultDesc}` : `Invitación — ${tituloNovios}. ${defaultDesc}`;
+  const baseDesc = `Estás invitado al matrimonio de ${tituloNovios}. Confirma tu asistencia, revisa el programa y participa en la experiencia.`;
+  const description = epigrafe ? `${epigrafe} — ${baseDesc}` : baseDesc;
 
   const origin = ensureAbsoluteSiteOrigin(getCanonicalSiteOriginFromEnv() ?? "http://localhost:3000");
   const pageUrl = `${origin}/invitacion/${encodeURIComponent(token)}`;
@@ -31,7 +31,7 @@ export async function loadInvitacionSeoByToken(token: string) {
 
   return {
     ok: true as const,
-    title: `Invitación — ${tituloNovios}`,
+    title: `Invitación matrimonio ${tituloNovios}`,
     description,
     pageUrl,
     ogImage,

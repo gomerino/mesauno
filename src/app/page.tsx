@@ -1,3 +1,7 @@
+import { LandingFaq } from "@/components/marketing/LandingFaq";
+import { LandingFaqJsonLd } from "@/components/marketing/LandingFaqJsonLd";
+import { LandingSoftwareAppSchema } from "@/components/marketing/LandingSoftwareAppSchema";
+import { LandingSeoSrOnly } from "@/components/marketing/LandingSeoSrOnly";
 import { Hero } from "@/components/marketing/Hero";
 import { LandingStickyCta } from "@/components/marketing/LandingStickyCta";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -6,9 +10,10 @@ import {
   JURNEX_HOME_DESCRIPTION,
   JURNEX_HOME_KEYWORDS,
   JURNEX_HOME_TITLE,
-  JURNEX_OG_DESCRIPTION,
+  JURNEX_OG_DESCRIPTION_SHORT,
   JURNEX_OG_IMAGE_ALT,
   JURNEX_OG_IMAGE_PATH,
+  JURNEX_OG_TITLE_SHORT,
   JURNEX_TWITTER_DESCRIPTION,
 } from "@/lib/seo-jurnex-home";
 import type { Metadata } from "next";
@@ -48,8 +53,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: canonicalOrigin,
-    title: JURNEX_HOME_TITLE,
-    description: JURNEX_OG_DESCRIPTION,
+    title: JURNEX_OG_TITLE_SHORT,
+    description: JURNEX_OG_DESCRIPTION_SHORT,
     siteName: "Jurnex",
     locale: "es_CL",
     alternateLocale: ["es_LA"],
@@ -64,7 +69,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: JURNEX_HOME_TITLE,
+    title: JURNEX_OG_TITLE_SHORT,
     description: JURNEX_TWITTER_DESCRIPTION,
     images: [ogImageAbsoluteUrl],
   },
@@ -105,6 +110,10 @@ export default function HomePage() {
         <LandingDemoFlujoLazy />
         <LandingDiferencialLazy />
         <CTALazy />
+        <LandingFaq />
+        <LandingSoftwareAppSchema />
+        <LandingFaqJsonLd />
+        <LandingSeoSrOnly />
       </main>
       <footer className="border-t border-white/12 bg-jurnex-bg px-4 py-10 text-center text-xs text-jurnex-text-primary/88">
         <div className="mx-auto flex max-w-xl flex-wrap items-center justify-center gap-x-4 gap-y-2 font-medium">

@@ -1,30 +1,36 @@
 /** SEO home (www.jurnex.cl): metadata, OG/Twitter y JSON-LD alineados. */
 
-export const JURNEX_HOME_TITLE = "Jurnex — Crea tu viaje de bodas";
+export const JURNEX_HOME_TITLE = "Jurnex — Invitaciones digitales para matrimonios en Chile";
 
-/** Meta principal + Open Graph (orientación conversión y keywords). */
+/** Meta principal (orientación conversión). */
 export const JURNEX_HOME_DESCRIPTION =
-  "Invitaciones de matrimonio estilo boarding pass con RSVP, gestión de invitados, programa y música en un solo lugar. Hecho en Chile para LATAM.";
+  "Crea invitaciones digitales con RSVP, programa y experiencia completa para tu matrimonio.";
 
-/** Open Graph (descripción corta para previews). */
+/** Open Graph — título corto para previews. */
+export const JURNEX_OG_TITLE_SHORT = "Jurnex — Invitaciones digitales";
+
+/** Open Graph — descripción corta para previews. */
+export const JURNEX_OG_DESCRIPTION_SHORT = "Organiza tu matrimonio sin caos";
+
+/** Open Graph / Twitter — descripción media (alternativa a la corta). */
 export const JURNEX_OG_DESCRIPTION =
-  "Invitaciones de matrimonio estilo boarding pass con RSVP, gestión de invitados, programa y música en un solo lugar.";
+  "Crea invitaciones digitales con RSVP, programa y experiencia completa para tu matrimonio.";
 
-/** Twitter / X (más breve). */
+/** Twitter / X. */
 export const JURNEX_TWITTER_DESCRIPTION =
-  "Invitaciones de matrimonio estilo boarding pass con RSVP, gestión de invitados y más.";
+  "Invitaciones digitales con confirmación de asistencia, programa y experiencia para tu matrimonio.";
 
 export const JURNEX_HOME_KEYWORDS = [
   "invitaciones matrimonio digital Chile",
-  "wedding planner online Chile",
-  "RSVP matrimonio",
-  "organizar matrimonio app",
-  "invitación boda digital",
+  "confirmar asistencia matrimonio",
+  "invitación boda digital Chile",
+  "programa matrimonio digital",
+  "organizar matrimonio Chile",
 ] as const;
 
 export const JURNEX_OG_IMAGE_ALT = "Jurnex — Invitaciones de matrimonio digitales";
 
-/** Ruta pública OG (1200×630); usar JPG final. */
-export const JURNEX_OG_IMAGE_PATH = "/og-image.jpg" as const;
+/** OG social (PNG en /public). */
+export const JURNEX_OG_IMAGE_PATH = "/og-image.png" as const;
 
 export const DEFAULT_SITE_ORIGIN = "https://www.jurnex.cl";
