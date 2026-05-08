@@ -1,5 +1,4 @@
 import { Hero } from "@/components/marketing/Hero";
-import { LandingHomeJsonLd } from "@/components/marketing/LandingHomeJsonLd";
 import { LandingStickyCta } from "@/components/marketing/LandingStickyCta";
 import { SiteHeader } from "@/components/SiteHeader";
 import {
@@ -7,8 +6,10 @@ import {
   JURNEX_HOME_DESCRIPTION,
   JURNEX_HOME_KEYWORDS,
   JURNEX_HOME_TITLE,
+  JURNEX_OG_DESCRIPTION,
   JURNEX_OG_IMAGE_ALT,
   JURNEX_OG_IMAGE_PATH,
+  JURNEX_TWITTER_DESCRIPTION,
 } from "@/lib/seo-jurnex-home";
 import type { Metadata } from "next";
 import nextDynamic from "next/dynamic";
@@ -48,7 +49,7 @@ export const metadata: Metadata = {
     type: "website",
     url: canonicalOrigin,
     title: JURNEX_HOME_TITLE,
-    description: JURNEX_HOME_DESCRIPTION,
+    description: JURNEX_OG_DESCRIPTION,
     siteName: "Jurnex",
     locale: "es_CL",
     alternateLocale: ["es_LA"],
@@ -64,7 +65,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: JURNEX_HOME_TITLE,
-    description: JURNEX_HOME_DESCRIPTION,
+    description: JURNEX_TWITTER_DESCRIPTION,
     images: [ogImageAbsoluteUrl],
   },
 };
@@ -97,7 +98,6 @@ const CTALazy = nextDynamic(() => import("@/components/marketing/CTA").then((m) 
 export default function HomePage() {
   return (
     <div className="jurnex-brand-layers min-h-screen bg-jurnex-bg pb-[5.5rem] md:pb-0">
-      <LandingHomeJsonLd siteUrl={siteUrl} />
       <SiteHeader prominentLogo />
       <main id="contenido-principal">
         <Hero />

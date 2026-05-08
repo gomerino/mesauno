@@ -82,7 +82,7 @@ export function SoftAviationPolaroidStrip({ eventoId, fotos, setFotos, compact }
             <div className="relative aspect-square w-full overflow-hidden rounded bg-invite-navy/5">
               <Image
                 src={eventoFotoPublicUrl(f.storage_path)}
-                alt=""
+                alt="Foto compartida por un invitado"
                 fill
                 className="object-cover"
                 sizes="220px"

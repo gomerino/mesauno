@@ -31,7 +31,7 @@ export function SiteHeader({ compact = false, prominentLogo = false }: Props) {
         >
           <img
             src={JURNEX_BRAND.logos.fullPng}
-            alt="Jurnex — Plataforma de matrimonios digitales"
+            alt="Jurnex logo"
             width={1024}
             height={1024}
             className="h-full w-auto max-w-full object-contain object-left"

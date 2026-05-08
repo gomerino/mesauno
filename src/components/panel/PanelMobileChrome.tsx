@@ -25,7 +25,7 @@ export function PanelMobileHeader({ userEmail }: { userEmail: string }) {
           className="flex shrink-0 items-center p-0 transition hover:opacity-95"
           aria-label="Jurnex, inicio del panel"
         >
-          <JurnexOrbitIcon className="h-10 w-10" alt="Jurnex" />
+          <JurnexOrbitIcon className="h-10 w-10" alt="Jurnex logo" />
         </Link>
         <p className="min-w-0 truncate text-[10px] text-slate-500" title={userEmail}>
           {userEmail}

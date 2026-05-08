@@ -75,7 +75,7 @@ export default async function MarketplacePage({
                   {t.imagen_hero_url ? (
                     <Image
                       src={t.imagen_hero_url}
-                      alt=""
+                      alt={`Portada del perfil de ${t.nombre_negocio}`}
                       fill
                       className="object-cover"
                       sizes="(max-width: 640px) 100vw, 50vw"

@@ -12,7 +12,7 @@ type Props = {
 /**
  * Marca en panel: mismo logo circular PNG que en cabecera (tamaño vía `className`, p. ej. `h-6 w-6`).
  */
-export function JurnexOrbitIcon({ className = "h-9 w-9", alt = "" }: Props) {
+export function JurnexOrbitIcon({ className = "h-9 w-9", alt = "Jurnex logo" }: Props) {
   return (
     <img
       src={JURNEX_BRAND.logos.fullPng}

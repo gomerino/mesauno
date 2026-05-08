@@ -1,0 +1,13 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /onboarding
+Disallow: /dashboard
+Disallow: /api/
+
+# Host
+Host: https://www.jurnex.cl
+
+# Sitemaps
+Sitemap: https://www.jurnex.cl/sitemap.xml
