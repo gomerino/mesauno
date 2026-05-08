@@ -24,9 +24,9 @@ export function getJourneyPhasesProgressLines(
   if (done < TOTAL) {
     const next = JOURNEY_STEP_ORDER.find((id) => !bundle.steps[id]);
     if (next === "tab_tripulacion") {
-      hint = "Completá tripulación: nombres, fechas, lugar y hora.";
+      hint = "Completa tripulación: nombres, fechas, lugar y hora.";
     } else if (next === "tab_invitacion") {
-      hint = "Escribí el mensaje a invitados (pestaña Invitación).";
+      hint = "Escribe el mensaje a invitados (pestaña Invitación).";
     } else if (next === "tab_experiencia") {
       const needSpotify = eventoTienePlanExperienciaProducto(bundle.evento);
       hint = needSpotify

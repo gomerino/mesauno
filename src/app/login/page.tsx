@@ -16,7 +16,28 @@ import { useEffect, useMemo, useRef, useState, Suspense } from "react";
 const fieldStrong =
   "min-h-[48px] border-white/18 bg-black/50 text-[16px] text-white placeholder:text-slate-500 focus:border-teal-400/55 focus:ring-teal-400/25 sm:text-sm";
 
-const RESEND_COOLDOWN_SEC = 30;
+const RESEND_COOLDOWN_SEC = 60;
+
+function otpSendErrorMessage(rawMessage: string): string {
+  const raw = rawMessage.toLowerCase();
+  const isRateLimited =
+    raw.includes("rate") ||
+    raw.includes("429") ||
+    raw.includes("too many") ||
+    raw.includes("security purposes") ||
+    raw.includes("once every") ||
+    raw.includes("seconds");
+
+  if (isRateLimited) {
+    return "Espera un minuto antes de reenviar el código.";
+  }
+
+  if (raw.includes("invalid email") || raw.includes("email address")) {
+    return "El correo no es válido. Revísalo e inténtalo de nuevo.";
+  }
+
+  return "No pudimos enviar el código. Revisa el correo e inténtalo de nuevo.";
+}
 
 function safeNextPath(raw: string | null): string {
   if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/panel";
@@ -114,11 +135,7 @@ function LoginForm() {
     sendLockRef.current = false;
 
     if (error) {
-      const raw = error.message?.toLowerCase() ?? "";
-      const msg =
-        raw.includes("rate") || raw.includes("429")
-          ? "Demasiados intentos. Espera un momento e inténtalo de nuevo."
-          : "No pudimos enviar el código. Revisa el correo e inténtalo de nuevo.";
+      const msg = otpSendErrorMessage(error.message ?? "");
       if (stay) setOtpBanner(msg);
       else setEmailStepMessage(msg);
       return;

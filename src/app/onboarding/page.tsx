@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Crear tu viaje — Jurnex",
-  description: "Creá tu cuenta y tu evento en un solo paso. Sin demo: directo al panel.",
+  description: "Crea tu cuenta y tu evento en un solo paso. Sin demo: directo al panel.",
 };
 
 export default async function OnboardingPage() {
@@ -26,9 +26,9 @@ export default async function OnboardingPage() {
       <p className="text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-invite-gold/90">
         Tu gran día como un viaje
       </p>
-      <h1 className="mt-3 text-center font-display text-3xl font-bold text-white sm:text-4xl">Creá tu viaje</h1>
+      <h1 className="mt-3 text-center font-display text-3xl font-bold text-white sm:text-4xl">Crea tu viaje</h1>
       <p className="mx-auto mt-3 max-w-lg text-center text-sm leading-relaxed text-slate-400">
-        Dejá tu correo y los datos básicos. Te llevamos al panel para seguir armando todo sin vueltas.
+        Deja tu correo y los datos básicos. Te llevamos al panel para seguir armando todo sin vueltas.
       </p>
       <div className="mt-10">
         <OnboardingForm />

@@ -15,7 +15,7 @@ export function JourneyUnlockBanner({ eventoId, userEmail, prefillNombre }: Prop
         <div className="min-w-0 lg:max-w-[min(28rem,46%)]">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-invite-gold/85">Siguiente escala</p>
           <p className="mt-0.5 font-display text-base font-semibold leading-snug text-white sm:text-lg">
-            Desbloqueá invitaciones, música y álbum
+            Desbloquea invitaciones, música y álbum
           </p>
           <p className="mt-1 text-xs leading-relaxed text-slate-500 sm:text-sm">Un solo pago con Mercado Pago. Sin salir de tu viaje.</p>
         </div>

@@ -86,7 +86,7 @@ export default async function InvitadosConfirmacionesPage() {
         <div className="mt-6">
           <EmptyStateCard
             title="Aún no hay invitados"
-            description="Cargá tu lista en Invitados para empezar a recibir confirmaciones."
+            description="Carga tu lista en Invitados para empezar a recibir confirmaciones."
             actionHref="/panel/pasajeros"
             actionLabel="Ir a Invitados"
           />

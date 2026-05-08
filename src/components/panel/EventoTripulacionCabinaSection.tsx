@@ -152,7 +152,7 @@ export function EventoTripulacionCabinaSection({ eventoId, initialMiembros, isAd
               {initialMiembros.length === 0 && (
                 <tr>
                   <td colSpan={isAdmin ? 4 : 3} className="px-3 py-6 text-center text-xs text-white/45">
-                    Aún no hay otras cuentas conectadas. Invitá novios o recepción con el formulario de arriba.
+                    Aún no hay otras cuentas conectadas. Invita a novios o recepción con el formulario de arriba.
                   </td>
                 </tr>
               )}

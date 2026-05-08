@@ -11,7 +11,7 @@ type Props = {
 
 /**
  * Contenedor de página del panel: base oscura Jurnex, ancho máximo y padding coherentes con Invitados.
- * Preferí `@/components/panel/ds` (`PanelLayout`) si necesitás importación explícita del design system.
+ * Prefiere `@/components/panel/ds` (`PanelLayout`) si necesitas importación explícita del design system.
  */
 export function PanelPageContainer({ children, className = "", narrow = false }: Props) {
   return (

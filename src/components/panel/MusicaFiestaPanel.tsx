@@ -185,7 +185,7 @@ export function MusicaFiestaPanel({ eventoId }: Props) {
         </>
       ) : (
         <p className="text-xs leading-relaxed text-white/50">
-          Durante el evento podés activar la votación en tiempo real y ver la cola. Los invitados ven la misma vista desde la
+          Durante el evento puedes activar la votación en tiempo real y ver la cola. Los invitados ven la misma vista desde la
           invitación (actualización cada pocos segundos).
         </p>
       )}

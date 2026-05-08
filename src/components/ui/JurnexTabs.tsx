@@ -21,7 +21,7 @@ export default function JurnexTabs({ active, onChange, tabCompletion }: Props) {
 
   return (
     <div className="mb-6 w-full min-w-0">
-      <p className="mb-2 text-xs text-white/50">Configurá las tres secciones del viaje</p>
+      <p className="mb-2 text-xs text-white/50">Configura las tres secciones del viaje</p>
 
       <div className="grid w-full grid-cols-3 gap-1.5 sm:gap-2">
         {tabs.map((tab) => {

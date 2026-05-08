@@ -15,7 +15,7 @@ const PREVIEW_INVITADO_ID = "00000000-0000-4000-8000-00000000e701";
 type Props = {
   /** Valores actuales del formulario (misma fuente de verdad que al guardar). */
   previewEvento: Evento;
-  /** Tema aplicado o el pendiente mientras editás «Estilo». */
+  /** Tema aplicado o el pendiente mientras editas «Estilo». */
   themeId: InvitacionThemeId;
 };
 
@@ -60,7 +60,7 @@ export function EventoDatosBoardingPassPreview({ previewEvento, themeId }: Props
     <div className="w-full min-w-0 max-w-[28rem] box-border rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-2.5 shadow-[0_12px_40px_rgba(0,0,0,0.35)] sm:p-4">
       <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-teal-200/80">Tu boarding pass</p>
       <p className="mt-1 text-xs leading-relaxed text-white/60">
-        Completá los bloques a la izquierda: en el pase final cada persona verá su nombre, asiento y los datos de vuelo
+        Completa los bloques a la izquierda: en el pase final cada persona verá su nombre, asiento y los datos de vuelo
         y lugar que definas.
       </p>
       <div className="mt-3 w-full min-w-0">

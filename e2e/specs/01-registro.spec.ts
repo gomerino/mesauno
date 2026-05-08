@@ -9,7 +9,7 @@ function fechaEventoFutura(): string {
 test.describe("Registro (onboarding)", () => {
   test("muestra error de validación si falta la fecha del evento", async ({ page }) => {
     await page.goto("/onboarding");
-    await expect(page.getByRole("heading", { name: /Creá tu viaje/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Crea tu viaje/i })).toBeVisible();
 
     await page.getByLabel(/^Email/i).fill(`validacion-${Date.now()}@ejemplo.com`);
     await page.getByLabel(/Nombre novio\/a 1/i).fill("NombreUno");
@@ -31,7 +31,7 @@ test.describe("Registro (onboarding)", () => {
     const email = `e2e-${Date.now()}@jurnex-e2e.test`;
 
     await page.goto("/onboarding");
-    await expect(page.getByRole("heading", { name: /Creá tu viaje/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Crea tu viaje/i })).toBeVisible();
 
     await page.getByLabel(/^Email/i).fill(email);
     await page.getByLabel(/Nombre novio\/a 1/i).fill("Rafa");

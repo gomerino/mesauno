@@ -763,7 +763,7 @@ export function EventoForm({
               Contenido y apariencia del pase: combina con el <span className="text-white/70">estilo de invitación</span> (tema
               arriba). El preview usa el tema elegido.
             </p>
-            <p className="mb-2 text-center text-[11px] text-white/45 lg:hidden">Deslizá horizontalmente o usá las pestañas de abajo.</p>
+            <p className="mb-2 text-center text-[11px] text-white/45 lg:hidden">Desliza horizontalmente o usa las pestañas de abajo.</p>
             <div
               onScroll={onBoardingCarouselScroll}
               className="w-full min-w-0 gap-6 max-lg:flex max-lg:items-start max-lg:snap-x max-lg:snap-mandatory max-lg:overflow-x-auto max-lg:overflow-y-visible max-lg:scroll-smooth max-lg:overscroll-x-contain max-lg:pb-1 max-lg:[-ms-overflow-style:none] max-lg:[scrollbar-width:none] max-lg:[&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-[minmax(0,1fr)_min(28rem,100%)] lg:items-start lg:overflow-visible"
@@ -978,12 +978,12 @@ export function EventoForm({
             }
           >
             {!initial?.id ? (
-              <p className="text-xs text-amber-200/90">Guardá el evento para editar el programa del día.</p>
+              <p className="text-xs text-amber-200/90">Guarda el evento para editar el programa del día.</p>
             ) : programaHitosTableMissing ? (
               <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
                 <p className="font-medium">El cronograma aún no está activo en tu entorno.</p>
                 <p className="mt-1 text-xs text-amber-200/90">
-                  Aplicá la migración del programa en la base de datos (p. ej. <code className="rounded bg-black/30 px-1">migration_evento_programa.sql</code>).
+                  Aplica la migración del programa en la base de datos (p. ej. <code className="rounded bg-black/30 px-1">migration_evento_programa.sql</code>).
                 </p>
               </div>
             ) : programaHitosError ? (

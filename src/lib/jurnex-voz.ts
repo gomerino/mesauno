@@ -1,5 +1,5 @@
 /**
- * Voz Jurnex en producto (Español latinoamericano neutro, tú/vosotros)
+ * Voz Jurnex en producto (español latinoamericano neutro, tuteo)
  *
  * Hablamos a la pareja que planifica, con poco tiempo y cero paciencia para
  * tecnicismos. Tema: viaje, invitación, compañía — no "sistemas" ni "registros de envío"

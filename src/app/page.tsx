@@ -2,6 +2,7 @@ import { LandingFaq } from "@/components/marketing/LandingFaq";
 import { LandingFaqJsonLd } from "@/components/marketing/LandingFaqJsonLd";
 import { LandingSoftwareAppSchema } from "@/components/marketing/LandingSoftwareAppSchema";
 import { LandingSeoSrOnly } from "@/components/marketing/LandingSeoSrOnly";
+import { LandingProductScreens } from "@/components/marketing/LandingProductScreens";
 import { Hero } from "@/components/marketing/Hero";
 import { LandingStickyCta } from "@/components/marketing/LandingStickyCta";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -82,10 +83,10 @@ const HowItWorksLazy = nextDynamic(
   },
 );
 
-const LandingDemoFlujoLazy = nextDynamic(
-  () => import("@/components/marketing/LandingConversion").then((m) => ({ default: m.LandingDemoFlujo })),
+const LandingFotosEnVivoLazy = nextDynamic(
+  () => import("@/components/marketing/LandingFotosEnVivo").then((m) => ({ default: m.LandingFotosEnVivo })),
   {
-    loading: () => <section className="min-h-[16rem] border-b border-jurnex-border bg-jurnex-bg/50" aria-hidden />,
+    loading: () => <section className="min-h-[18rem] border-b border-jurnex-border bg-jurnex-bg/50" aria-hidden />,
   },
 );
 
@@ -107,7 +108,8 @@ export default function HomePage() {
       <main id="contenido-principal">
         <Hero />
         <HowItWorksLazy />
-        <LandingDemoFlujoLazy />
+        <LandingProductScreens />
+        <LandingFotosEnVivoLazy />
         <LandingDiferencialLazy />
         <CTALazy />
         <LandingFaq />

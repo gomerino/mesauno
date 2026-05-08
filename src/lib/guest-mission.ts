@@ -134,7 +134,7 @@ export function guestMissionDescriptionFromSteps(steps: GuestMissionSteps): stri
     case undefined:
       return "Invitados y asistencia al día ✓";
     case "invitados_lista":
-      return "Añade personas a tu lista";
+      return "Agrega personas a tu lista";
     case "invitados_mesas":
       return "Asigna mesa en cada invitado";
     case "invitados_envio":
@@ -142,11 +142,11 @@ export function guestMissionDescriptionFromSteps(steps: GuestMissionSteps): stri
     case "invitados_meta":
       return "Que todos respondan si asisten o no";
     default:
-      return "Seguí con tu lista";
+      return "Sigue con tu lista";
   }
 }
 
-/** Compat: CTA genérico cuando solo tenés el agregado legacy. */
+/** Compat: CTA genérico cuando solo tienes el agregado legacy. */
 export function guestMissionCtaLabel(state: GuestMissionState): string {
   switch (state) {
     case "empty":

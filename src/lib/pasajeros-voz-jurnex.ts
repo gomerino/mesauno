@@ -28,7 +28,7 @@ export function pasajerosVozJurnex(canal: CanalEnvioInvitacion) {
       return {
         cta: "Enviar por WhatsApp",
         bajoCanal:
-          "Queda en vuestro plan el saludo; tú abres el chat, aquí o en cada fila. El correo lo envías con «Correo» o «Ambos» arriba, no con «solo WhatsApp».",
+          "El saludo queda en tu plan; tú abres el chat, aquí o en cada fila. El correo lo envías con «Correo» o «Ambos» arriba, no con «solo WhatsApp».",
         bajoInsistir:
           "A quien aún no responde, ya tuvo noticia, tiene móvil, y no aceptó ni dijo que no. No a quien ya respondió asistencia.",
         hintInsistir:
@@ -39,7 +39,7 @@ export function pasajerosVozJurnex(canal: CanalEnvioInvitacion) {
       return {
         cta: "Enviar invitaciones",
         bajoCanal:
-          "Con email, le llega el enlace. Con WhatsApp, tú abres el mensaje (aquí o en cada fila) y vuestro viaje va al día con los dos canales.",
+          "Con email, le llega el enlace. Con WhatsApp, tú abres el mensaje (aquí o en cada fila) y tu viaje va al día con los dos canales.",
         bajoInsistir:
           "A quien ya tuvo noticia, con correo y aún no responde. No a quien ya aceptó o dijo que no viaja.",
         hintInsistir:

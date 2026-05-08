@@ -116,7 +116,7 @@ export function WhatsappEnviarColaModal({ open, onClose, kind, items, skippedSin
             {skippedSinTelefono > 0 ? (
               <p className="mt-2 text-xs text-amber-200/80" role="status">
                 {skippedSinTelefono === 1
-                  ? "A alguien le hace falta un número bien puesto (con el código de país, si aplica) para abrirle el enlace. El resto, listo a seguir vuestro viaje con el botón de abajo."
+                  ? "A alguien le hace falta un número bien puesto (con el código de país, si aplica) para abrirle el enlace. El resto, listo para seguir tu viaje con el botón de abajo."
                   : "A unas cuantas les falta un número claro. No se suman en este paso; aún les puedes hablar tú, con calma, aparte. El resto, a la mano con el botón o la lista."}
               </p>
             ) : null}

@@ -35,7 +35,7 @@ export function SpotifyPlaylistConnect({ eventoId, spotifyConnected, initialPlay
     if (flashHandled.current) return;
     if (searchParams.get("spotify") === "connected") {
       flashHandled.current = true;
-      toast.success("Spotify listo. Si aún no tenías una lista, armamos una para vuestro viaje.");
+      toast.success("Spotify listo. Si aún no tenías una lista, armamos una para tu viaje.");
       router.replace("/panel/viaje?tab=experiencia#musica-spotify");
       return;
     }

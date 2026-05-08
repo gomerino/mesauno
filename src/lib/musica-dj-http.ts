@@ -36,7 +36,7 @@ export async function musicaDjRequireAcceso(
       message:
         nivelMinimo === "admin"
           ? "Inicia sesión como administrador del evento."
-          : "Acceso no válido: revisá tu sesión o el token DJ.",
+          : "Acceso no válido: revisa tu sesión o el token DJ.",
     };
   }
   if (nivelMinimo === "admin" && nivel !== "admin") {

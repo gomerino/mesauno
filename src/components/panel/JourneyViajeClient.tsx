@@ -289,7 +289,7 @@ export function JourneyViajeClient({
       <div className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-8 text-center shadow-[0_0_40px_rgba(212,175,55,0.06)] backdrop-blur-md transition-all duration-500">
         <Plane className="mx-auto h-10 w-10 text-invite-gold/80" aria-hidden />
         <p className="mt-4 text-lg font-semibold text-white">Todavía no tienes un viaje creado</p>
-        <p className="mt-2 text-sm text-slate-400">Arranca aquí: carga vuestro evento y abre el panel a tu ritmo.</p>
+        <p className="mt-2 text-sm text-slate-400">Arranca aquí: carga tu evento y abre el panel a tu ritmo.</p>
         <Link
           href="/onboarding"
           className={panelCtaJurnexPrimary + " mt-6 min-h-[48px] justify-center px-8"}

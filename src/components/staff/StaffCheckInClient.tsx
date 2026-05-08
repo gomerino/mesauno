@@ -59,7 +59,7 @@ export function StaffCheckInClient({ eventoId }: Props) {
       toast.error(res.error);
       return;
     }
-    toast.success("Listo, anotada la asistencia en vuestro pase");
+    toast.success("Listo, anotada la asistencia en tu pase");
     setPreview((p) => (p ? { ...p, asistencia_confirmada: true } : null));
   }
 

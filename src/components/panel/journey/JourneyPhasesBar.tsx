@@ -216,7 +216,7 @@ export function JourneyPhasesBar({
                     {p.label}
                   </span>
 
-                  {/* SR: señala la página activa cuando navegás dentro de esa fase */}
+                  {/* SR: señala la página activa cuando navegas dentro de esa fase */}
                   {here && !isCurrent ? (
                     <span className="sr-only">Estás en esta sección</span>
                   ) : null}

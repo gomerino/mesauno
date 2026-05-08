@@ -148,7 +148,7 @@ export default async function PanelViajePage({
             className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-xs text-white/80"
             role="status"
           >
-            <span className="font-medium text-white">¡Bienvenidos!</span> Completá los datos para seguir preparando tu
+            <span className="font-medium text-white">¡Bienvenidos!</span> Completa los datos para seguir preparando tu
             viaje.
           </div>
         ) : null}

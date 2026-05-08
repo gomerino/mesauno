@@ -195,7 +195,7 @@ export function useEnvioInvitaciones(
         }
         toast.success(
           conTel.length === 1
-            ? "Listo el recordatorio en vuestro plan. Toca, abre el chat, con el mensaje hecho, abajo."
+            ? "Listo el recordatorio en tu plan. Toca, abre el chat, con el mensaje hecho, abajo."
             : "Listo. Toca, abre, uno a uno, con el mensaje hecho en el recuadro.",
           { duration: 4000 }
         );
@@ -239,7 +239,7 @@ export function useEnvioInvitaciones(
   const enviarTodosPendientes = useCallback(
     async (rows: Invitado[]) => {
       if (!eventoId) {
-        toast.error("Crea o elige un evento para avisar a vuestros invitados.", { duration: 4000 });
+        toast.error("Crea o elige un evento para avisar a tus invitados.", { duration: 4000 });
         return;
       }
       const filasPend = rows.filter((r) => deriveEstadoEnvio(r) === "pendiente");

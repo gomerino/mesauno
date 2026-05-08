@@ -3,7 +3,7 @@ import { JURNEX_BRAND, type JurnexLogoVariant } from "@/components/brand/jurnex-
 type Props = {
   variant: JurnexLogoVariant;
   className?: string;
-  /** Si el icono va junto a texto, podés usar alt vacío. */
+  /** Si el icono va junto a texto, puedes usar alt vacío. */
   alt?: string;
 };
 

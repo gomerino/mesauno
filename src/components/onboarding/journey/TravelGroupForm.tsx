@@ -309,7 +309,7 @@ export function TravelGroupForm() {
 
         <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 sm:p-5">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Acompañantes</p>
-          <p className="mt-1 text-xs text-slate-500">Escribí un nombre y pulsá Enter o “Añadir”.</p>
+          <p className="mt-1 text-xs text-slate-500">Escribe un nombre y pulsa Enter o “Añadir”.</p>
           <div className="mt-3 flex gap-2">
             <input
               value={companionInput}

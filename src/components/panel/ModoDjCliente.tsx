@@ -138,7 +138,7 @@ export function ModoDjCliente({ eventoId, djAccesoToken = "", mostrarControlesAd
       <div className="rounded-xl border border-amber-400/25 bg-black/25 p-4 text-sm text-white/85">
         <p className="font-semibold text-white">Modo DJ</p>
         <p className="mt-2 text-white/65">
-          Activá primero el modo fiesta en Viaje → Música para usar la consola DJ con votación en vivo y la cola.
+          Activa primero el modo fiesta en Viaje → Música para usar la consola DJ con votación en vivo y la cola.
         </p>
         {mostrarControlesAdmin ? (
           <Link
@@ -290,7 +290,7 @@ export function ModoDjCliente({ eventoId, djAccesoToken = "", mostrarControlesAd
         <h2 className="text-[10px] font-semibold uppercase tracking-wider text-white/45">Siguiente en la cola</h2>
         <ul className="mt-3 space-y-2">
           {data.cola.length === 0 ? (
-            <li className="text-xs text-white/45">La cola está vacía. Agregá desde el ranking en vivo.</li>
+            <li className="text-xs text-white/45">La cola está vacía. Agrega desde el ranking en vivo.</li>
           ) : (
             data.cola.map((it) => (
               <li

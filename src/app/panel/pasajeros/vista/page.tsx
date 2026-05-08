@@ -45,13 +45,13 @@ export default async function PanelInvitadosVistaPage({
         <PanelPageHeader
           eyebrow="Compartir"
           title="Vista previa"
-          subtitle="Así verá cada invitado su invitación. Agregá al menos una persona en Invitados para previsualizarla."
+          subtitle="Así verá cada invitado su invitación. Agrega al menos una persona en Invitados para previsualizarla."
         />
         <PanelSubpageProgress />
         <div className="mt-6">
           <EmptyStateCard
             title="Todavía no hay invitados"
-            description="Cuando des de alta a alguien, vas a poder ver acá la invitación tal como la recibirá."
+            description="Cuando registres a alguien en Invitados, podrás ver aquí la invitación tal como la recibirá."
             actionHref="/panel/pasajeros"
             actionLabel="Ir a Invitados"
           />

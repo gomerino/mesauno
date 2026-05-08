@@ -44,11 +44,11 @@ export function OnboardingForm() {
       return;
     }
     if (n1.length < 1 || n2.length < 1) {
-      setError("Escribí el nombre de ambos novios.");
+      setError("Escribe el nombre de ambos novios.");
       return;
     }
     if (!fecha) {
-      setError("Elegí la fecha del evento.");
+      setError("Elige la fecha del evento.");
       return;
     }
 
@@ -104,7 +104,7 @@ export function OnboardingForm() {
 
       if (insErr) {
         console.error("[onboarding] insert evento", insErr);
-        setError("Tu cuenta quedó creada, pero no pudimos crear el evento. Probá en el panel.");
+        setError("Tu cuenta quedó creada, pero no pudimos crear el evento. Prueba en el panel.");
         router.push("/panel");
         router.refresh();
         return;
@@ -113,7 +113,7 @@ export function OnboardingForm() {
       router.push("/panel");
       router.refresh();
     } catch {
-      setError("Algo salió mal. Probá de nuevo.");
+      setError("Algo salió mal. Prueba de nuevo.");
     } finally {
       setBusy(false);
     }

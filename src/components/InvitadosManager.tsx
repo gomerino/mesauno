@@ -391,7 +391,7 @@ export function InvitadosManager({
         ) : displayRows.length === 0 ? (
           <div className="px-2 py-10 text-center sm:px-4">
             <p className="font-display text-sm font-medium text-white/70">Sin resultados con este filtro</p>
-            <p className="mt-2 text-sm text-white/45">Probá otra categoría o mostrá la lista completa.</p>
+            <p className="mt-2 text-sm text-white/45">Prueba otra categoría o muestra la lista completa.</p>
             <Link
               href="/panel/pasajeros?from=panel"
               className="mt-3 inline-block text-sm font-medium text-teal-300/90 underline decoration-teal-500/40 underline-offset-2 hover:text-teal-200"
@@ -518,7 +518,7 @@ export function InvitadosManager({
                     autoComplete="off"
                   />
                   <p className="mt-1 text-xs text-jurnex-text-muted">
-                    Si lo dejás vacío, usamos el asiento por defecto que definiste en los datos del evento.
+                    Si lo dejas vacío, usamos el asiento por defecto que definiste en los datos del evento.
                   </p>
                 </div>
                 <div>

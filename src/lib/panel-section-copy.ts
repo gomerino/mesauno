@@ -6,7 +6,8 @@ export const PANEL_VIAJE_TITLE = "Tu viaje";
 export const PANEL_VIAJE_SUBTITLE = "Quiénes acompañan, cómo luce la invitación y el día, en tres movimientos.";
 
 export const PANEL_INVITADOS_TITLE = "Tus Pasajeros";
-export const PANEL_INVITADOS_SUBTITLE = "Quiénes, qué les toca, y qué responde cada invitado — acompáñalos a vuestro día.";
+export const PANEL_INVITADOS_SUBTITLE =
+  "Quiénes, qué les toca y qué responde cada invitado — acompáñalos en tu gran día.";
 
 export const PANEL_RECUERDOS_EYEBROW = "Aterrizaje";
 export const PANEL_RECUERDOS_TITLE = "Lo que queda del viaje";

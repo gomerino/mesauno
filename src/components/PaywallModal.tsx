@@ -156,7 +156,7 @@ export function PaywallModal({
           Activa tu viaje <span aria-hidden>✈️</span>
         </h2>
         <p className="mt-3 text-center text-sm leading-relaxed text-slate-300">
-          Desbloqueá la experiencia completa para tus invitados
+          Desbloquea la experiencia completa para tus invitados
         </p>
         <ul className="mt-6 space-y-2.5 rounded-xl border border-white/10 bg-white/[0.04] p-4">
           {benefits.map((b) => (

@@ -131,7 +131,7 @@ export default async function PanelEquipoPage() {
 
       {listErr && (
         <p className="mt-4 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
-          No pudimos cargar el equipo. Si persiste, contactá soporte e indicá este mensaje: {listErr.message}
+          No pudimos cargar el equipo. Si persiste, contacta soporte e indica este mensaje: {listErr.message}
         </p>
       )}
 

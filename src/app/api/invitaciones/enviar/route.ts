@@ -68,7 +68,7 @@ export async function POST(request: Request) {
   if (eventoIdBody) {
     if (invitado.evento_id !== eventoIdBody) {
       return NextResponse.json(
-        { error: "Esa ficha no corresponde a vuestro evento." },
+        { error: "Esa ficha no corresponde a tu evento." },
         { status: 400 }
       );
     }
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     });
     if (rpcErr) {
       return NextResponse.json(
-        { error: rpcErr.message ?? "No pudimos comprobar vuestro acceso. Vuelve a entrar o inténtalo luego." },
+        { error: rpcErr.message ?? "No pudimos comprobar tu acceso. Vuelve a entrar o inténtalo luego." },
         { status: 500 }
       );
     }

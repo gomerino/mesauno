@@ -147,7 +147,7 @@ export function OnboardingPaywallModal({ open, onClose, eventId, prefillNombre, 
         </h2>
 
         <p className="mt-4 text-center text-sm leading-relaxed text-slate-300">
-          Desbloqueá la experiencia completa para tus invitados
+          Desbloquea la experiencia completa para tus invitados
         </p>
 
         <div

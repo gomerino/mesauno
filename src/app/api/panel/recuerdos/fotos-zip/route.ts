@@ -140,7 +140,7 @@ export async function POST(request: Request) {
     const fotos = toProgramaFotos(allRows);
     if (fotos.length > MAX_FOTOS) {
       return NextResponse.json(
-        { error: `Límite de ${MAX_FOTOS} imágenes por descarga. Contactá a soporte si necesitás un export mayor.` },
+        { error: `Límite de ${MAX_FOTOS} imágenes por descarga. Contacta a soporte si necesitas un export mayor.` },
         { status: 400 }
       );
     }
@@ -167,7 +167,7 @@ export async function POST(request: Request) {
   } else {
     if (!hub) {
       return NextResponse.json(
-        { error: "No se pudo cargar el programa. Probá con «Todas las fotos (ZIP)» o reintentá luego." },
+        { error: "No se pudo cargar el programa. Prueba con «Todas las fotos (ZIP)» o reintenta luego." },
         { status: 502 }
       );
     }
@@ -189,7 +189,7 @@ export async function POST(request: Request) {
           total += 1;
           if (total > MAX_FOTOS) {
             return NextResponse.json(
-              { error: `Límite de ${MAX_FOTOS} imágenes por descarga. Bajá por momento o usá la descarga completa del evento.` },
+              { error: `Límite de ${MAX_FOTOS} imágenes por descarga. Baja por momento o usa la descarga completa del evento.` },
               { status: 400 }
             );
           }

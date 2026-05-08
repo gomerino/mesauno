@@ -19,7 +19,7 @@ function subtitleForPath(pathname: string): string {
   if (pathname.startsWith("/panel/ajustes")) return "Equipo, cuenta y permisos";
   if (pathname.startsWith("/panel/finanzas")) return "Regalos y números";
   if (pathname.startsWith("/panel/pareja-evento")) return "Tu pareja y el evento";
-  return "Seguí armando tu viaje con calma";
+  return "Sigue armando tu viaje con calma";
 }
 
 function isPanelHome(pathname: string): boolean {

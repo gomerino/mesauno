@@ -48,5 +48,5 @@ export function getViajeMisionMicroFromBundle(bundle: PanelProgressBundle): stri
   if (hint) {
     return `${primary}. ${hint}`;
   }
-  return `${primary}. Completá en orden tripulación → invitación → experiencia.`;
+  return `${primary}. Completa en orden tripulación → invitación → experiencia.`;
 }

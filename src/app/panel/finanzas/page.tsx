@@ -19,15 +19,15 @@ function pagoBanner(pago: string | undefined) {
         className="mb-6 rounded-xl border border-teal-500/35 bg-teal-500/15 px-4 py-3 text-sm text-teal-50"
         role="status"
       >
-        <strong className="font-semibold text-white">Pago recibido.</strong> Estamos confirmando tu suscripción; si no ves
-        el cambio en unos minutos, recargá esta página o el inicio.
+        <strong className="font-semibold text-white">Pago recibido.</strong> Estamos confirmando tu suscripci?n; si no ves
+        el cambio en unos minutos, recarga esta p?gina o el inicio.
       </div>
     );
   }
   if (pago === "pendiente") {
     return (
       <div className="mb-6 rounded-xl border border-amber-500/35 bg-amber-500/15 px-4 py-3 text-sm text-amber-50" role="status">
-        <strong className="font-semibold text-white">Pago en proceso.</strong> Vuelve más tarde; te avisamos cuando quede
+        <strong className="font-semibold text-white">Pago en proceso.</strong> Vuelve m?s tarde; te avisamos cuando quede
         acreditado.
       </div>
     );
@@ -36,7 +36,7 @@ function pagoBanner(pago: string | undefined) {
     return (
       <div className="mb-6 rounded-xl border border-red-500/35 bg-red-500/10 px-4 py-3 text-sm text-red-100" role="status">
         <strong className="font-semibold text-white">Pago no completado.</strong> Puedes intentarlo nuevamente cuando quieras
-        con el botón de activar suscripción en el aviso de trial (si aplica).
+        con el bot?n de activar suscripci?n en el aviso de trial (si aplica).
       </div>
     );
   }
@@ -93,7 +93,7 @@ export default async function PanelFinanzasPage({ searchParams }: { searchParams
       <PanelPageHeader
         eyebrow="Finanzas"
         title="Regalos y pagos"
-        subtitle="Datos para transferencias, registro de aportes y, si aplica, el estado de tu suscripción. Todo en un solo lugar."
+        subtitle="Datos para transferencias, registro de aportes y, si aplica, el estado de tu suscripci?n. Todo en un solo lugar."
       />
 
       <PanelSubpageProgress />
@@ -102,7 +102,7 @@ export default async function PanelFinanzasPage({ searchParams }: { searchParams
         <MainCard className="p-6">
           <h2 className="font-display text-lg font-bold text-white">Datos para transferencia</h2>
           <p className="mt-2 text-sm text-slate-400">
-            Comparte estos datos con quien quiera hacerte un regalo en dinero (misma referencia que en la invitación, si
+            Comparte estos datos con quien quiera hacerte un regalo en dinero (misma referencia que en la invitaci?n, si
             la configuraste).
           </p>
           <dl className="mt-6 grid gap-3 rounded-xl bg-black/40 p-4 font-mono text-sm sm:grid-cols-2">
@@ -124,7 +124,7 @@ export default async function PanelFinanzasPage({ searchParams }: { searchParams
             </div>
           </dl>
           <p className="mt-4 text-xs text-slate-500">
-            En una versión futura podrás conectar cobros automáticos; hoy el registro de regalos es manual.
+            En una versi?n futura podr?s conectar cobros autom?ticos; hoy el registro de regalos es manual.
           </p>
         </MainCard>
 
@@ -146,7 +146,7 @@ export default async function PanelFinanzasPage({ searchParams }: { searchParams
               href="/panel/viaje"
               className="mt-4 inline-block text-sm font-medium text-teal-300 hover:text-teal-200"
             >
-              Ir a datos del evento →
+              Ir a datos del evento ?
             </Link>
           </div>
         )}
