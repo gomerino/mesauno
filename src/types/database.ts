@@ -172,8 +172,17 @@ export type ConfiguracionInvitacionEvento = {
   canal_envio: CanalEnvioInvitacion;
   regalos_activos: boolean;
   url_regalos: string | null;
+  /** Mensaje junto al enlace de regalos en la invitación (opcional). */
+  texto_regalos: string | null;
   created_at: string | null;
   updated_at: string | null;
+};
+
+/** Lectura pública de regalos (RPC `configuracion_regalos_publica`). */
+export type ConfiguracionRegalosPublica = {
+  regalos_activos: boolean;
+  url_regalos: string | null;
+  texto_regalos: string | null;
 };
 
 /** Fila en `evento_fotos`; `storage_path` relativo al bucket `fotos_eventos`. */

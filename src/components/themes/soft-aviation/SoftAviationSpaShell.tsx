@@ -61,6 +61,7 @@ export function SoftAviationSpaShell({
   programaFotosPorHito,
   albumFotos,
   musicColabEnabled,
+  regalos,
   aviationVariant = "soft",
 }: InvitacionThemePageProps & { aviationVariant?: AviationInvitacionVariant }) {
   const u = getAviationInviteShellUi(aviationVariant);
@@ -98,13 +99,17 @@ export function SoftAviationSpaShell({
     const core = NAV.filter((n) => n.id === "ticket" || n.id === "motivo");
     const planTab = hasItinerario ? NAV.filter((n) => n.id === "itinerario") : [];
     const postConfirm = isConfirmed
-      ? NAV.filter((n) => n.id === "dietas" || n.id === "regalos")
+      ? NAV.filter((n) => {
+          if (n.id === "dietas") return true;
+          if (n.id === "regalos") return regalos.regalos_activos;
+          return false;
+        })
       : [];
     const playlistTab =
       hasPlaylist || musicColabEnabled ? NAV.filter((n) => n.id === "playlist") : [];
     const fotosTab = isEventDay ? NAV.filter((n) => n.id === "fotos") : [];
     return [...core, ...planTab, ...postConfirm, ...playlistTab, ...fotosTab];
-  }, [isConfirmed, isEventDay, hasItinerario, hasPlaylist, musicColabEnabled]);
+  }, [isConfirmed, isEventDay, hasItinerario, hasPlaylist, musicColabEnabled, regalos.regalos_activos]);
 
   const navColumnCount = navItems.length + (isEventDay ? 1 : 0);
 
@@ -298,7 +303,7 @@ export function SoftAviationSpaShell({
           <SoftAviationPostalMotivo key="motivo" motivoText={motivoText} />
         ) : null}
 
-        {activeTab === "regalos" ? <SoftAviationRegalosPanel key="regalos" /> : null}
+        {activeTab === "regalos" ? <SoftAviationRegalosPanel key="regalos" regalos={regalos} /> : null}
 
         {activeTab === "fotos" ? (
           <div key="fotos" className={sectionFrameLoose}>

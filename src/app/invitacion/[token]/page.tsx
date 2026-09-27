@@ -25,9 +25,15 @@ import {
   playlistListTopPublic,
   spotifyGetCredentials,
 } from "@/lib/spotify-credentials";
-import type { EventoFoto, EventoProgramaHito, Invitado } from "@/types/database";
+import type { EventoFoto, EventoProgramaHito, Invitado, ConfiguracionRegalosPublica } from "@/types/database";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+const REGALOS_DEFAULT: ConfiguracionRegalosPublica = {
+  regalos_activos: false,
+  url_regalos: null,
+  texto_regalos: null,
+};
 
 type Props = {
   params: Promise<{ token: string }>;
@@ -128,6 +134,21 @@ export default async function InvitacionPage({ params, searchParams }: Props) {
     }
   }
 
+  let regalos: ConfiguracionRegalosPublica = REGALOS_DEFAULT;
+  {
+    const { data: regalosRaw, error: regalosErr } = await supabase.rpc("configuracion_regalos_publica", {
+      p_token: token,
+    });
+    if (!regalosErr && Array.isArray(regalosRaw) && regalosRaw[0]) {
+      const row = regalosRaw[0] as ConfiguracionRegalosPublica;
+      regalos = {
+        regalos_activos: Boolean(row.regalos_activos),
+        url_regalos: row.url_regalos ?? null,
+        texto_regalos: row.texto_regalos ?? null,
+      };
+    }
+  }
+
   const themeProps: InvitacionThemePageProps = {
     token,
     invitado,
@@ -142,6 +163,7 @@ export default async function InvitacionPage({ params, searchParams }: Props) {
     recentTracks,
     topTracks,
     apoyoTrackUris,
+    regalos,
   };
 
   const themeId = resolveInvitacionThemeId({ evento, invitado }, themeQuery);

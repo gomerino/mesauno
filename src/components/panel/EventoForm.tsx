@@ -189,12 +189,14 @@ export function EventoForm({
     () => configuracionInvitacion?.regalos_activos ?? false
   );
   const [urlRegalos, setUrlRegalos] = useState(() => configuracionInvitacion?.url_regalos ?? "");
+  const [textoRegalos, setTextoRegalos] = useState(() => configuracionInvitacion?.texto_regalos ?? "");
 
   useEffect(() => {
     if (!configuracionInvitacion) return;
     setCanalEnvio(configuracionInvitacion.canal_envio);
     setRegalosActivos(configuracionInvitacion.regalos_activos);
     setUrlRegalos(configuracionInvitacion.url_regalos ?? "");
+    setTextoRegalos(configuracionInvitacion.texto_regalos ?? "");
   }, [configuracionInvitacion?.id, configuracionInvitacion?.updated_at]);
 
   useEffect(() => {
@@ -235,6 +237,7 @@ export function EventoForm({
       canal_envio: CanalEnvioInvitacion;
       regalos_activos: boolean;
       url_regalos: string | null;
+      texto_regalos: string | null;
     }>
   ) {
     if (!initial?.id) {
@@ -248,6 +251,8 @@ export function EventoForm({
     const regAct = patch.regalos_activos ?? regalosActivos;
     const urlRaw = patch.url_regalos !== undefined ? patch.url_regalos : urlRegalos;
     const urlNorm = (urlRaw ?? "").trim() || null;
+    const textoRaw = patch.texto_regalos !== undefined ? patch.texto_regalos : textoRegalos;
+    const textoNorm = (textoRaw ?? "").trim() || null;
     return supabase.from("configuracion_invitacion_evento").upsert(
       {
         evento_id: initial.id,
@@ -255,6 +260,7 @@ export function EventoForm({
         canal_envio: canal,
         regalos_activos: regAct,
         url_regalos: urlNorm,
+        texto_regalos: textoNorm,
       },
       { onConflict: "evento_id" }
     );
@@ -398,6 +404,7 @@ export function EventoForm({
     const { error } = await upsertConfiguracionRow({
       regalos_activos: regalosActivos,
       url_regalos: urlRegalos.trim() || null,
+      texto_regalos: textoRegalos.trim() || null,
     });
     setSaving(false);
     if (error) {
@@ -634,9 +641,12 @@ export function EventoForm({
             preview={
               <p className="text-sm text-white/80">
                 {regalosActivos
-                  ? urlRegalos.trim()
-                    ? "Enlace visible para invitados"
-                    : "Activado sin URL externa"
+                  ? [
+                      urlRegalos.trim() ? "Enlace" : null,
+                      textoRegalos.trim() ? "texto" : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" + ") || "Activado (sin enlace ni texto aún)"
                   : "No se muestra bloque de regalos"}
               </p>
             }
@@ -653,13 +663,29 @@ export function EventoForm({
                 Mostrar información de regalos en la invitación
               </label>
               <div>
-                <label className={label}>URL de lista de regalos o página (opcional)</label>
+                <label className={label}>Texto que acompaña el enlace</label>
+                <textarea
+                  className={input + " min-h-[88px] resize-y"}
+                  value={textoRegalos}
+                  onChange={(e) => setTextoRegalos(e.target.value)}
+                  placeholder="Si quieres acompañarnos con un regalo, puedes visitar nuestra lista."
+                  disabled={saving || !regalosActivos}
+                  maxLength={500}
+                />
+                <p className="mt-1 text-[11px] text-white/45">
+                  Aparece en la pestaña Regalos de la invitación. Máximo 500 caracteres.
+                </p>
+              </div>
+              <div>
+                <label className={label}>URL de lista de regalos o página</label>
                 <input
                   className={input}
                   value={urlRegalos}
                   onChange={(e) => setUrlRegalos(e.target.value)}
                   placeholder="https://…"
                   disabled={saving || !regalosActivos}
+                  inputMode="url"
+                  autoComplete="url"
                 />
               </div>
               <p className="text-[11px] text-white/45">
