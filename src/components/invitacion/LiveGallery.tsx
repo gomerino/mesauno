@@ -9,11 +9,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 type Props = {
   eventoId: string;
+  emptyHint?: string;
   fotos: EventoFoto[];
   setFotos: React.Dispatch<React.SetStateAction<EventoFoto[]>>;
 };
 
-export function LiveGallery({ eventoId, fotos, setFotos }: Props) {
+export function LiveGallery({ eventoId, fotos, setFotos, emptyHint = "Sé el primero en compartir un momento con el botón flotante." }: Props) {
   const supabase = useMemo(() => createClient(), []);
   const [lightbox, setLightbox] = useState<EventoFoto | null>(null);
 
@@ -61,7 +62,7 @@ export function LiveGallery({ eventoId, fotos, setFotos }: Props) {
     return (
       <div className="rounded-xl border border-dashed border-[#001d66]/25 bg-white/60 px-4 py-10 text-center">
         <p className="text-sm font-medium text-gray-700">Aún no hay fotos</p>
-        <p className="mt-1 text-xs text-gray-500">Sé el primero en compartir un momento con el botón flotante.</p>
+        <p className="mt-1 text-xs text-gray-500">{emptyHint}</p>
       </div>
     );
   }

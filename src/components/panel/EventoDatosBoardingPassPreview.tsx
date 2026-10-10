@@ -1,5 +1,7 @@
 "use client";
 
+import editorialStyles from "@/components/themes/editorial-premium/editorial.module.css";
+import { formatFechaEventoLarga } from "@/lib/format-fecha-evento";
 import { BoardingPassCard } from "@/components/BoardingPassCard";
 import { AviationInvitacionProvider } from "@/components/themes/AviationInvitacionContext";
 import { SoftAviationTicket } from "@/components/themes/soft-aviation/SoftAviationTicket";
@@ -64,7 +66,20 @@ export function EventoDatosBoardingPassPreview({ previewEvento, themeId }: Props
         y lugar que definas.
       </p>
       <div className="mt-3 w-full min-w-0">
-        {themeId === "soft-aviation" || themeId === "jurnex-aviation" ? (
+        {themeId === "editorial-premium" ? (
+          <div className="rounded-2xl bg-[#f6f3ec] p-3 text-[#182a3b]">
+            <div className={editorialStyles.ticket}>
+              <small>{merged.boarding_linea_aerea || "DREAMS AIRLINES"} · BOARDING PASS</small>
+              <h2>{merged.footerNovios}</h2>
+              <div className={editorialStyles.ticketgrid}>
+                <div><span>PASAJERO</span>{invitadoPreview.nombre_pasajero}</div>
+                <div><span>FECHA</span>{formatFechaEventoLarga(merged.fecha_evento) || "Por confirmar"}</div>
+                <div><span>DESTINO</span>{merged.lugar_evento_linea}</div>
+                <div><span>ESTADO</span>Pendiente</div>
+              </div>
+            </div>
+          </div>
+        ) : themeId === "soft-aviation" || themeId === "jurnex-aviation" ? (
           <div
             className={
               themeId === "jurnex-aviation"
@@ -92,7 +107,9 @@ export function EventoDatosBoardingPassPreview({ previewEvento, themeId }: Props
       </div>
       <p className="mt-3 text-center text-[10px] text-white/40">
         Tema:{" "}
-        {themeId === "soft-aviation"
+        {themeId === "editorial-premium"
+          ? "Editorial Premium"
+          : themeId === "soft-aviation"
           ? "Premium Aviation"
           : themeId === "jurnex-aviation"
             ? "Jurnex Aviation"

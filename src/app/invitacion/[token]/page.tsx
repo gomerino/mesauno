@@ -1,3 +1,7 @@
+import { InvitacionViewTracker } from "@/components/InvitacionViewTracker";
+import { EditorialPremiumTheme } from "@/components/themes/editorial-premium/EditorialPremiumTheme";
+import { eventoFotoPublicUrl } from "@/lib/evento-foto-url";
+import { EditorialDevelopmentPreview } from "@/components/themes/editorial-premium/EditorialDevelopmentPreview";
 import { createClient, createStrictServiceClient } from "@/lib/supabase/server";
 import { loadInvitacionSeoByToken } from "@/lib/invitacion-seo.server";
 import { InvitacionSemanticaSrOnly } from "@/components/invitacion/InvitacionSemanticaSrOnly";
@@ -10,7 +14,7 @@ import {
   fetchEventoForInvitado,
   mergeEventoParaPase,
 } from "@/lib/evento-boarding";
-import { resolveInvitacionThemeId } from "@/lib/invitacion-theme";
+import { isEditorialDevelopmentPreview, resolveInvitacionThemeId } from "@/lib/invitacion-theme";
 import { resolveEventPlaylistEnv } from "@/lib/event-playlist-env";
 import { fetchInvitadoWithAcompanantes } from "@/lib/invitado-fetch";
 import {
@@ -37,13 +41,16 @@ const REGALOS_DEFAULT: ConfiguracionRegalosPublica = {
 
 type Props = {
   params: Promise<{ token: string }>;
-  searchParams: Promise<{ theme?: string }>;
+  searchParams: Promise<{ theme?: string; phase?: string; boarding?: string; cover?: string; contracts?: string }>;
 };
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { token } = await params;
+  if (token === "editorial-preview") {
+    return { title: "Editorial Premium · Preview", robots: { index: false, follow: false } };
+  }
   const seo = await loadInvitacionSeoByToken(token);
   if (!seo.ok) {
     return { title: "Invitación" };
@@ -72,7 +79,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function InvitacionPage({ params, searchParams }: Props) {
   const { token } = await params;
-  const { theme: themeQuery } = await searchParams;
+  const { theme: themeQuery, phase, boarding, cover, contracts } = await searchParams;
+  if (token === "editorial-preview") {
+    if (!isEditorialDevelopmentPreview(token, themeQuery, process.env.NODE_ENV)) notFound();
+    return <EditorialDevelopmentPreview phase={phase} boarding={boarding} contracts={contracts === "1"} />;
+  }
   const supabase = await createClient();
   const { data, error } = await fetchInvitadoWithAcompanantes(supabase, token);
 
@@ -167,6 +178,20 @@ export default async function InvitacionPage({ params, searchParams }: Props) {
   };
 
   const themeId = resolveInvitacionThemeId({ evento, invitado }, themeQuery);
+
+  if (themeId === "editorial-premium") {
+    const selectedCover = albumFotos.find((foto) => foto.id === cover && foto.evento_id === invitado.evento_id);
+    return (
+      <>
+        <InvitacionViewTracker accessToken={token} />
+        <EditorialPremiumTheme {...themeProps} config={{
+          showBoardingPass: boarding !== "0",
+          cover: selectedCover ? { src: eventoFotoPublicUrl(selectedCover.storage_path), alt: "Fotografía elegida del evento" } : undefined,
+        }} />
+        <InvitacionSemanticaSrOnly />
+      </>
+    );
+  }
 
   if (themeId === "jurnex-aviation") {
     return (

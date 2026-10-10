@@ -3,7 +3,7 @@
 import type { EventoFoto } from "@/types/database";
 import { subirFotoInvitacionDesdeCliente } from "@/lib/invitacion-foto-upload-client";
 import { Camera } from "lucide-react";
-import { useCallback, useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 type Props = {
@@ -11,10 +11,14 @@ type Props = {
   onUploaded: (foto: EventoFoto) => void;
   /** Suma al `bottom` del FAB (p. ej. barra fija de check-in encima). Ej: `5.25rem`. */
   fabBottomExtra?: string;
+  presentation?: "floating" | "inline";
+  buttonClassName?: string;
 };
 
-export function PhotoUpload({ invitacionToken, onUploaded, fabBottomExtra }: Props) {
+export function PhotoUpload({ invitacionToken, onUploaded, fabBottomExtra, presentation = "floating", buttonClassName }: Props) {
   const inputId = useId();
+  const inlineInput = useRef<HTMLInputElement>(null);
+  const [uploaded, setUploaded] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [compressPct, setCompressPct] = useState<number | null>(null);
@@ -32,6 +36,7 @@ export function PhotoUpload({ invitacionToken, onUploaded, fabBottomExtra }: Pro
       if (!file || !invitacionToken) return;
 
       setErr(null);
+      setUploaded(false);
       setBusy(true);
       setUploadPct(0);
       setCompressPct(8);
@@ -48,6 +53,7 @@ export function PhotoUpload({ invitacionToken, onUploaded, fabBottomExtra }: Pro
         }
 
         onUploaded(res.foto);
+        setUploaded(true);
       } catch (ce) {
         setErr(ce instanceof Error ? ce.message : "Error al procesar la imagen");
       } finally {
@@ -64,6 +70,18 @@ export function PhotoUpload({ invitacionToken, onUploaded, fabBottomExtra }: Pro
   const bottomExpr = fabBottomExtra
     ? `calc(max(1.25rem, env(safe-area-inset-bottom, 0px)) + ${fabBottomExtra})`
     : "max(1.25rem, env(safe-area-inset-bottom, 0px))";
+
+  if (presentation === "inline") {
+    return <div aria-busy={busy}>
+      <button type="button" className={buttonClassName} disabled={busy} onClick={() => inlineInput.current?.click()}>
+        {busy ? "Subiendo foto…" : "Compartir fotos"}
+      </button>
+      <input ref={inlineInput} type="file" accept="image/jpeg,image/png,image/webp,image/heic,.heic" hidden onChange={onChange} aria-label="Seleccionar foto" />
+      {busy && <p role="status">{compressPct !== null && compressPct < 100 ? "Preparando imagen…" : `Subiendo: ${uploadPct}%`}</p>}
+      {err && <p role="alert">{err}</p>}
+      {uploaded && <p role="status">Tu foto ya está en el álbum.</p>}
+    </div>;
+  }
 
   const shell = (
     <div

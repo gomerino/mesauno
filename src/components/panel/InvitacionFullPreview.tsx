@@ -4,12 +4,14 @@ import { buildInvitationUrl } from "@/lib/invitation-url";
 import { trackEvent } from "@/lib/analytics";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import type { InvitacionThemeId } from "@/lib/invitacion-theme";
+
 type Props = {
   tokenAcceso: string;
   invitadoId: string;
   invitadoNombre?: string | null;
   /** Forzar un tema vía querystring (override visual sin tocar la DB). */
-  previewThemeId?: "legacy" | "soft-aviation" | "jurnex-aviation" | null;
+  previewThemeId?: InvitacionThemeId | null;
 };
 
 /**
@@ -71,7 +73,7 @@ export function InvitacionFullPreview({
         />
       </div>
       <p className="max-w-xs text-center text-[11px] text-slate-500">
-        Así se ve la invitación completa. Desplazate dentro del marco para revisar todo el contenido.
+        Así se ve la invitación completa. Desplázate dentro del marco para revisar todo el contenido.
       </p>
     </div>
   );

@@ -1,6 +1,6 @@
 import type { Evento, Invitado } from "@/types/database";
 
-export const INVITACION_THEME_IDS = ["legacy", "soft-aviation", "jurnex-aviation"] as const;
+export const INVITACION_THEME_IDS = ["legacy", "soft-aviation", "jurnex-aviation", "editorial-premium"] as const;
 export type InvitacionThemeId = (typeof INVITACION_THEME_IDS)[number];
 
 export const INVITACION_THEMES: Array<{
@@ -23,6 +23,7 @@ export const INVITACION_THEMES: Array<{
     name: "Jurnex Aviation",
     tagline: "Mismo viaje aéreo, colores de marca Jurnex (oro y marino).",
   },
+  { id: "editorial-premium", name: "Editorial Premium", tagline: "Portada fotográfica, detalles elegantes y todos los momentos de tu evento." },
 ];
 
 function normalize(raw: unknown): InvitacionThemeId | null {
@@ -30,6 +31,7 @@ function normalize(raw: unknown): InvitacionThemeId | null {
   const v = raw.trim().toLowerCase();
   if (v === "soft-aviation" || v === "premium") return "soft-aviation";
   if (v === "jurnex-aviation" || v === "jurnex" || v === "jurnex-av" || v === "marca") return "jurnex-aviation";
+  if (v === "editorial-premium") return "editorial-premium";
   if (v === "legacy") return "legacy";
   return null;
 }
@@ -38,7 +40,7 @@ function normalize(raw: unknown): InvitacionThemeId | null {
  * Resuelve el tema a renderizar.
  *
  * Orden de prioridad:
- * 1. `?theme=soft-aviation|premium|legacy` (override de vista previa).
+ * 1. `?theme=<id>` (override de vista previa).
  * 2. `eventos.theme_id` (fuente de verdad del evento).
  * 3. `invitados.theme_id` (compatibilidad con datos antiguos; se deprecará).
  * 4. Default `"legacy"`.
@@ -65,4 +67,9 @@ export function resolveInvitacionThemeId(
   if (fromInvitado) return fromInvitado;
 
   return "legacy";
+}
+
+/** El token sintético permanece reservado exclusivamente para desarrollo. */
+export function isEditorialDevelopmentPreview(token: string, theme: string | undefined, environment: string | undefined): boolean {
+  return environment === "development" && token === "editorial-preview" && theme === "editorial-premium";
 }

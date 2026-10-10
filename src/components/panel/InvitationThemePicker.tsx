@@ -251,6 +251,12 @@ function SoftAviationBoardingMock() {
 }
 
 const MOCKS: Record<InvitacionThemeId, React.ReactNode> = {
+  "editorial-premium": <div aria-hidden className="mx-auto w-full max-w-[230px] overflow-hidden rounded-xl bg-[#f6f3ec] text-[#182a3b]">
+    <div className="flex h-32 flex-col justify-end bg-cover bg-center p-3 text-white" style={{ backgroundImage: "linear-gradient(transparent,rgba(0,0,0,.65)),url(https://images.unsplash.com/photo-1519741497674-611481863552?w=1000&q=85)" }}>
+      <span className="text-[8px] uppercase tracking-[.2em]">Nos casamos</span><span className="font-serif text-2xl">Claudia & Gonzalo</span><span className="text-[8px]">20 de febrero · Buin</span>
+    </div>
+    <div className="space-y-2 p-3"><div className="rounded-full bg-[#193b45] p-2 text-center text-[9px] text-white">Confirmar mi asistencia</div><div className="rounded-lg border border-[#ded8cb] p-2 font-serif text-sm">Tu viaje comienza aquí</div></div>
+  </div>,
   legacy: <LegacyBoardingMock />,
   "soft-aviation": <SoftAviationBoardingMock />,
   /** Misma silueta que Premium Aviation; en vivo usa oro/ marino Jurnex. */

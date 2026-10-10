@@ -1,0 +1,61 @@
+.root {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: normal;
+  color: #25344a;
+  background: #eae6df;
+  min-height: 100vh;
+  padding: 18px 0 70px;
+  -webkit-font-smoothing: auto;
+}
+.root *, .root *::before, .root *::after { box-sizing: border-box; }
+.root button, .root input, .root select, .root textarea { font-family: Arial, sans-serif; line-height: normal; }
+.root button { text-transform: none; letter-spacing: normal; }
+.root b, .root strong { font-weight: bold; }
+.root p { margin: 1em 0; }
+.frame { max-width: 450px; margin: 0 auto; background: #fffdf9; min-height: 90vh; box-shadow: 0 10px 50px #0002; border-radius: 18px; overflow: hidden; }
+.hero { position: relative; min-height: 330px; background-color: #26394c; background-position: center; background-size: cover; display: flex; align-items: end; justify-content: center; color: white; text-align: center; padding: 34px 24px; }
+.hero h1 { font: normal 46px/1.1 Georgia, serif; margin: 14px 0; overflow-wrap: anywhere; }
+.eyebrow { font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; }
+.content { padding: 24px; }
+.sub { font-size: 16px; line-height: 1.6; color: #5a626a; }
+.center { text-align: center; }
+.info { padding: 17px 0; border-bottom: 1px solid #e6ddd0; display: flex; gap: 14px; align-items: center; }
+.info b { display: block; margin-bottom: 4px; }
+.info span { font-size: 15px; }
+.primary, .secondary { width: 100%; min-height: 52px; border: 0; border-radius: 10px; font-size: 17px; font-weight: 650; cursor: pointer; padding: 13px; display: block; text-align: center; text-decoration: none; }
+.primary { background: #26394c; color: white; }
+.secondary { background: #f0e8db; color: #26394c; }
+.primary:disabled, .secondary:disabled { cursor: wait; opacity: .7; }
+.stack { display: grid; gap: 12px; margin: 20px 0; }
+.ticket { background: #f5f0e7; border: 1px solid #d8c8ae; border-radius: 15px; padding: 20px; position: relative; }
+.ticket::after { content: ''; display: block; border-top: 2px dashed #cdbb9f; margin: 18px 0; }
+.ticket h2 { font: normal 29px Georgia, serif; margin: 10px 0; }
+.ticket small { font-size: smaller; letter-spacing: 1.5px; }
+.ticketgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; overflow-wrap: anywhere; }
+.ticketgrid span { display: block; font-size: 12px; color: #64717d; }
+.ticketAction { margin-top: 18px; }
+.sectionTitle { font: normal 27px Georgia, serif; margin: 28px 0 12px; }
+.tile { display: flex; justify-content: space-between; align-items: center; padding: 17px 0; border: 0; border-bottom: 1px solid #e5dbcd; cursor: pointer; background: transparent; width: 100%; min-height: 44px; color: #25344a; text-align: left; font-size: 17px; }
+.dialog { color: #25344a; background: #fffdf8; border: 0; border-radius: 18px; padding: 23px; max-width: 430px; width: calc(100% - 40px); max-height: 90vh; max-height: 90dvh; overflow: auto; margin: auto; font: 16px/normal system-ui, -apple-system, sans-serif; }
+.dialog::backdrop { background: #102034b8; }
+.dialog h2 { font: normal 30px Georgia, serif; margin: .83em 0; }
+.dialog .ticket h2 { font: normal 29px Georgia, serif; margin: 10px 0; }
+.close { float: right; border: 0; background: #f1ebe3; color: #25344a; border-radius: 100%; width: 44px; height: 44px; font-size: 24px; cursor: pointer; }
+.field { display: block; margin: 12px 0; font-size: 16px; }
+.field input, .field select, .field textarea { display: block; margin-top: 6px; width: 100%; padding: 13px; font-size: 16px; border: 1px solid #9a9a9a; border-radius: 8px; background: white; color: #25344a; }
+.field textarea { min-height: 95px; resize: vertical; }
+.status { margin-top: 14px; padding: 12px; background: #edf3e9; color: #315b3c; border-radius: 10px; }
+.error { padding: 12px; background: #fff0ed; color: #8c241a; border-radius: 10px; }
+.muted { color: #64717d; font-size: 14px; line-height: 1.5; }
+.module { clear: both; }
+.module button, .module a { min-height: 44px; }
+.module input { font-size: 16px; }
+.skip { position: absolute; top: -100px; left: 12px; z-index: 5; padding: 12px; background: white; }
+.skip:focus { top: 12px; }
+.root button:focus-visible, .root a:focus-visible, .root input:focus-visible, .root select:focus-visible, .root textarea:focus-visible { outline: 3px solid #b37e2c; outline-offset: 3px; }
+.previewTools { max-width: 450px; margin: 24px auto 0; padding: 16px 24px; font: 14px/1.5 system-ui, sans-serif; color: #25344a; }
+.previewTools nav { display: flex; flex-wrap: wrap; gap: 8px; }
+.previewTools a { min-height: 44px; padding: 12px; background: #fffdf8; border-radius: 8px; text-decoration: underline; }
+@media(max-width:480px) { .root { padding: 0; } .frame { border-radius: 0; } .hero { min-height: 310px; } }
+@media print { .previewTools, .close, .dialog button, .skip { display: none; } }
