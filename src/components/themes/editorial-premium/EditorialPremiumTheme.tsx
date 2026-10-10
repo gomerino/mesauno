@@ -98,9 +98,15 @@ export function EditorialPremiumTheme({ token, invitado, evento, merged, qrValue
     <a href="#editorial-content" className={styles.skip}>Saltar al contenido</a>
     <main className={styles.frame} data-testid="editorial-frame">
       <header className={styles.hero} data-testid="editorial-hero" style={{ backgroundImage: `linear-gradient(0deg,#162d42bf,#162d4233),url(${JSON.stringify(config.cover?.src || EDITORIAL_REFERENCE_COVER)})` }}>
-        <div><div className={styles.eyebrow}>{phase === "despues" ? "Nuestros recuerdos" : phase === "durante" ? "Hoy celebramos" : "Nos casamos"}</div><h1>{names.length === 2 ? <>{names[0]}<br /><span className={styles.ampersand}>&amp;</span><br />{names[1]}</> : merged.footerNovios || "Nuestra boda"}</h1><div>{dateWithoutWeekday} · {location}</div></div>
+        <div><div className={styles.eyebrow}>{phase === "despues" ? "Nuestros recuerdos" : phase === "durante" ? "Hoy celebramos" : "Nos casamos"}</div><h1>{names.length === 2 ? <>{names[0]}<br /><span className={styles.ampersand}>&amp;</span><br />{names[1]}</> : merged.footerNovios || "Nuestra boda"}</h1><div>{dateWithoutWeekday} · {location}</div>
+          <button type="button" className={styles.heroContinue} onClick={() => {
+            const content = document.getElementById("editorial-content");
+            content?.focus({ preventScroll: true });
+            content?.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+          }}>{phase === "antes" || !photoEnabled ? "Ver la invitación" : phase === "durante" ? "Ver y compartir fotos" : "Ver los recuerdos"}<span aria-hidden="true">↓</span></button>
+        </div>
       </header>
-      <div className={styles.content} id="editorial-content">
+      <div className={styles.content} id="editorial-content" tabIndex={-1}>
         {phase === "antes" && <p className={`${styles.sub} ${styles.center} ${styles.message}`}>{merged.motivo_viaje || "Hay viajes que cambian la vida. Nos encantaría compartir este contigo."}</p>}
         {phase !== "antes" && photoEnabled && <><h2 className={styles.sectionTitle}>{phase === "despues" ? "Álbum de recuerdos" : "Nuestros recuerdos de hoy"}</h2>{phase === "despues" && <p className={styles.sub}>El día pasó volando, pero la alegría de compartirlo con ustedes se queda para siempre. Gracias por cada abrazo, cada sonrisa y por ser parte de nuestra historia. Aquí guardamos esos instantes para volver a vivirlos juntos.</p>}</>}
         <div className={styles.stack}>

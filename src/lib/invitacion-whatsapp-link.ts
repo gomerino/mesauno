@@ -32,6 +32,19 @@ export function isWhatsappAppDeepLinkPreferred(): boolean {
 
 export type WhatsappLinkTarget = "https" | "app";
 
+function whatsappPublicOrigin(siteOrigin: string): string {
+  const base = siteOrigin.replace(/\/$/, "");
+  try {
+    const host = new URL(base).hostname;
+    if (host === "localhost" || host === "[::1]" || /^(127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(host)) {
+      return "https://www.jurnex.cl";
+    }
+  } catch {
+    return "https://www.jurnex.cl";
+  }
+  return base;
+}
+
 function buildInvitacionText(invitado: Invitado, siteOrigin: string): {
   d: string;
   text: string;
@@ -40,12 +53,18 @@ function buildInvitacionText(invitado: Invitado, siteOrigin: string): {
   if (!phone) return null;
   const d = onlyDigits(phone);
   if (d.length < 8) return null;
-  const base = siteOrigin.replace(/\/$/, "");
+  const base = whatsappPublicOrigin(siteOrigin);
   const access = (invitado as Invitado & { token_acceso?: string | null }).token_acceso ?? invitado.id;
   const link = `${base}/invitacion/${access}`;
-  const text = `Hola${
-    invitado.nombre_pasajero ? `, ${invitado.nombre_pasajero.trim()}` : ""
-  }. Tu invitación: ${link}`;
+  const nombre = invitado.nombre_pasajero?.trim();
+  const text = [
+    `¡Hola${nombre ? `, ${nombre}` : ""}!`,
+    "*¡Nos casamos!*",
+    "Nos encantaría compartir este día tan especial contigo.",
+    "Abre tu invitación para conocer los detalles y confirmar tu asistencia:",
+    link,
+    "¡Te esperamos con mucho cariño!",
+  ].join("\n\n");
   return { d, text };
 }
 
@@ -79,7 +98,7 @@ export function buildWhatsappRecordatorioHref(
   if (!invitadoTieneTelefonoWhatsapp(invitado)) return null;
   const phone = invitado.telefono!.trim();
   const d = onlyDigits(phone);
-  const base = siteOrigin.replace(/\/$/, "");
+  const base = whatsappPublicOrigin(siteOrigin);
   const access = (invitado as Invitado & { token_acceso?: string | null }).token_acceso ?? invitado.id;
   const link = `${base}/invitacion/${access}`;
   const nombre = invitado.nombre_pasajero?.trim();

@@ -67,3 +67,18 @@ test("token reservado sin override devuelve 404", async ({ page }) => {
   const response = await page.goto("/invitacion/editorial-preview");
   expect(response?.status()).toBe(404);
 });
+
+
+test("portada permite continuar con teclado y movimiento reducido en cada etapa", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const [phase, label] of [["antes", "Ver la invitación"], ["durante", "Ver y compartir fotos"], ["despues", "Ver los recuerdos"]]) {
+    await page.goto(`${url}&phase=${phase}`);
+    const button = page.getByRole("button", { name: label, exact: true });
+    await expect(button).toBeVisible();
+    expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(48);
+    await button.focus();
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#editorial-content")).toBeFocused();
+    await expect.poll(() => page.locator("#editorial-content").evaluate((element) => element.getBoundingClientRect().top)).toBeLessThan(100);
+  }
+});

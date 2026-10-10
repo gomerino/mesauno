@@ -32,6 +32,10 @@ for (const width of [390, 1280]) {
       button?.remove();
       const names = document.querySelector(".hero h1");
       if (names) names.innerHTML = 'Claudia<br><span style="font-size:.7em;line-height:1">&amp;</span><br>Gonzalo';
+      const continueButton = document.createElement("button");
+      continueButton.innerHTML = 'Ver la invitación<span aria-hidden="true">↓</span>';
+      continueButton.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:48px;max-width:100%;margin-top:24px;padding:12px 20px;border:1px solid #d8c8ae;border-radius:10px;background:#f0e8db;color:#26394c;font-size:16px;font-weight:600;cursor:pointer';
+      names?.parentElement?.append(continueButton);
       Array.from(document.querySelectorAll(".tile")).find((item) => item.textContent?.includes("Dietas y preferencias"))?.remove();
       const title = document.createElement("h2");
       title.className = "section-title";
