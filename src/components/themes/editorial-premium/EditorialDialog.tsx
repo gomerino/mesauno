@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import styles from "./editorial.module.css";
 
-export function EditorialDialog({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) {
+export function EditorialDialog({ title, children, onClose, stickyClose = false }: { stickyClose?: boolean; title: string; children: ReactNode; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   useEffect(() => {
@@ -23,7 +23,7 @@ export function EditorialDialog({ title, children, onClose }: { title: string; c
     const bounds = event.currentTarget.getBoundingClientRect();
     if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onClose();
   }}>
-    <button className={styles.close} type="button" aria-label="Cerrar" onClick={onClose}>×</button>
+    <button className={`${styles.close} ${stickyClose ? styles.stickyClose : ""}`} type="button" aria-label="Cerrar" onClick={onClose}>×</button>
     <h2 id={titleId}>{title}</h2>
     {children}
   </dialog>;

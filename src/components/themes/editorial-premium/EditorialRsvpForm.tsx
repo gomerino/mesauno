@@ -10,12 +10,13 @@ type Props = {
   estado: EditorialRsvp;
   restricciones: string;
   dietaryOnly?: boolean;
+  showDietary?: boolean;
   demo?: boolean;
   onSaved: (estado: EditorialRsvp, restricciones: string) => void;
   onClose: () => void;
 };
 
-export function EditorialRsvpForm({ invitadoId, nombre, estado, restricciones, dietaryOnly, demo, onSaved, onClose }: Props) {
+export function EditorialRsvpForm({ invitadoId, nombre, estado, restricciones, dietaryOnly, showDietary = true, demo, onSaved, onClose }: Props) {
   const [response, setResponse] = useState(estado);
   const [diet, setDiet] = useState(restricciones);
   const [dietChoice, setDietChoice] = useState(["", "Vegetariana", "Vegana", "Sin gluten"].includes(restricciones) ? restricciones : "Otra");
@@ -54,10 +55,11 @@ export function EditorialRsvpForm({ invitadoId, nombre, estado, restricciones, d
   return <>
     <p className={styles.sub}>{demo ? "Confirma tu respuesta. Esta demostración guarda el estado únicamente en esta página." : "Puedes modificar tu respuesta cuando lo necesites."}</p>
     <form onSubmit={submit} aria-busy={busy}>
-      <label className={styles.field}>Tu nombre<input value={nombre} readOnly autoComplete="name" /></label>
+      <div className={styles.field}><span>Invitación para</span><p><strong>{nombre}</strong></p></div>
       {!dietaryOnly && <label className={styles.field}>Asistencia<select value={response} onChange={(event) => setResponse(event.target.value as EditorialRsvp)} disabled={busy}><option value="pendiente">Aún no lo tengo claro</option><option value="confirmado">Sí, asistiré</option><option value="declinado">No podré asistir</option></select></label>}
-      <label className={styles.field}>Preferencia alimentaria (opcional)<select value={dietChoice} onChange={(event) => { const next = event.target.value; setDietChoice(next); if (next !== "Otra") setDiet(next); }} disabled={busy}><option value="">Sin preferencias</option><option value="Vegetariana">Vegetariana</option><option value="Vegana">Vegana</option><option value="Sin gluten">Sin gluten</option><option value="Otra">Otra (especificar)</option></select></label>
+      {showDietary && <><label className={styles.field}>Preferencia alimentaria (opcional)<select value={dietChoice} onChange={(event) => { const next = event.target.value; setDietChoice(next); if (next !== "Otra") setDiet(next); }} disabled={busy}><option value="">Sin preferencias</option><option value="Vegetariana">Vegetariana</option><option value="Vegana">Vegana</option><option value="Sin gluten">Sin gluten</option><option value="Otra">Otra (especificar)</option></select></label>
       {dietChoice === "Otra" && <label className={styles.field}>Otras preferencias<textarea value={diet} onChange={(event) => setDiet(event.target.value)} disabled={busy} placeholder="Cuéntanos tus alergias o preferencias…" /></label>}
+      </>}
       {error && <p className={styles.error} role="alert">{error}</p>}
       <button className={styles.primary} type="submit" disabled={busy}>{busy ? "Guardando…" : dietaryOnly ? "Guardar preferencias" : "Guardar mi respuesta"}</button>
     </form>

@@ -185,6 +185,7 @@ export default async function InvitacionPage({ params, searchParams }: Props) {
       <>
         <InvitacionViewTracker accessToken={token} />
         <EditorialPremiumTheme {...themeProps} config={{
+          phase: process.env.NODE_ENV === "development" && (phase === "antes" || phase === "durante" || phase === "despues") ? phase : undefined,
           showBoardingPass: boarding !== "0",
           cover: selectedCover ? { src: eventoFotoPublicUrl(selectedCover.storage_path), alt: "Fotografía elegida del evento" } : undefined,
         }} />

@@ -1,5 +1,6 @@
 "use client";
 
+import { EditorialTimeline } from "@/components/themes/editorial-premium/EditorialTimeline";
 import { eventoFotoPublicUrl } from "@/lib/evento-foto-url";
 import type { ProgramaHitoFotoPublic } from "@/lib/programa-con-fotos-publica";
 import { ProgramaIconoLucide } from "@/lib/programa-icons";
@@ -84,6 +85,7 @@ function getMomentState(
 }
 
 type Props = {
+  presentation?: "default" | "editorial";
   hitos: EventoProgramaHito[];
   /** Fecha del evento (YYYY-MM-DD o ISO); define el día en que aplica “Ahora”. */
   fechaEvento: string | null;
@@ -91,7 +93,7 @@ type Props = {
   fotosPorHito?: Record<string, ProgramaHitoFotoPublic[]>;
 };
 
-export function InvitacionCronograma({ hitos, fechaEvento, fotosPorHito }: Props) {
+export function InvitacionCronograma({ hitos, fechaEvento, fotosPorHito, presentation = "default" }: Props) {
   const [now, setNow] = useState(() => new Date());
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
 
@@ -106,15 +108,17 @@ export function InvitacionCronograma({ hitos, fechaEvento, fotosPorHito }: Props
 
   /** Centrar en vista el hito “Ahora” o, si no aplica, el “Próximo”. */
   useEffect(() => {
+    if (presentation === "editorial") return;
     const target = liveIdx >= 0 ? liveIdx : nextIdx >= 0 ? nextIdx : -1;
     if (target < 0) return;
     const t = window.setTimeout(() => {
       itemRefs.current[target]?.scrollIntoView({ block: "center", behavior: "smooth" });
     }, 100);
     return () => window.clearTimeout(t);
-  }, [liveIdx, nextIdx, hitos.length]);
+  }, [liveIdx, nextIdx, hitos.length, presentation]);
 
   if (hitos.length === 0) return null;
+  if (presentation === "editorial") return <EditorialTimeline hitos={hitos} liveIndex={liveIdx} nextIndex={nextIdx} fotosPorHito={fotosPorHito} />;
 
   const statusBanner = (() => {
     if (!eventDay) return null;

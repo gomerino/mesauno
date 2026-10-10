@@ -26,6 +26,29 @@ for (const width of [390, 1280]) {
       const parent = document.querySelector(frame)!.getBoundingClientRect();
       return selectors.map((selector) => { const element = document.querySelector(selector)!; const rect = element.getBoundingClientRect(); const css = getComputedStyle(element); return { x: rect.x - parent.x, y: rect.y - parent.y, width: rect.width, height: rect.height, fontSize: css.fontSize, color: css.color, backgroundColor: css.backgroundColor, padding: css.padding, margin: css.margin }; });
     }, { selectors, frame });
+    // Ajustes solicitados después de aprobar A: título de ubicación y enlace directo.
+    await page.evaluate(() => {
+      const button = Array.from(document.querySelectorAll("button")).find((item) => item.textContent === "Ver lugar y horario");
+      button?.remove();
+      const names = document.querySelector(".hero h1");
+      if (names) names.innerHTML = 'Claudia<br><span style="font-size:.7em;line-height:1">&amp;</span><br>Gonzalo';
+      Array.from(document.querySelectorAll(".tile")).find((item) => item.textContent?.includes("Dietas y preferencias"))?.remove();
+      const title = document.createElement("h2");
+      title.className = "section-title";
+      title.textContent = "Lugar y horario";
+      document.querySelector(".info")?.before(title);
+      const detail = document.querySelector(".info span");
+      if (detail) {
+        detail.textContent = "Salón Jardín Esperanza · Buin";
+        const address = document.createElement("span");
+        address.textContent = "Camino de ejemplo 123, Buin, Región Metropolitana";
+        detail.after(address);
+        for (const line of [detail, address]) (line as HTMLElement).style.cssText = "display:block;overflow-wrap:anywhere;line-height:1.5";
+      }
+      for (const heading of Array.from(document.querySelectorAll("h2"))) {
+        if (heading.textContent === "Todos los detalles") heading.textContent = "Más detalles";
+      }
+    });
     const expected = await measure(originalSelectors, ".frame");
     const original = await page.locator(".frame").screenshot({ path: path.join(output, `original-a-${width}.png`) });
     if (width === 390) {
@@ -50,7 +73,7 @@ for (const width of [390, 1280]) {
     const fraction = different / (first.info.width * first.info.height);
     fs.writeFileSync(path.join(output, `medidas-${width}.json`), JSON.stringify({ viewport: { width, height: 844 }, original: expected, implementation: actual, pixelDifferenceAbove18: fraction }, null, 2));
     const w = first.info.width;
-    const label = Buffer.from(`<svg width="${w * 2 + 20}" height="44"><rect width="100%" height="100%" fill="#eae6df"/><g font-family="Arial" font-size="16" fill="#25344a"><text x="12" y="28">Prototipo · Alternativa A</text><text x="${w + 32}" y="28">Jurnex · Implementación</text></g></svg>`);
+    const label = Buffer.from(`<svg width="${w * 2 + 20}" height="44"><rect width="100%" height="100%" fill="#eae6df"/><g font-family="Arial" font-size="16" fill="#25344a"><text x="12" y="28">Alternativa A · ajustes pedidos</text><text x="${w + 32}" y="28">Jurnex · Implementación</text></g></svg>`);
     await sharp({ create: { width: w * 2 + 20, height: first.info.height + 44, channels: 4, background: "#eae6df" } }).composite([{ input: label, top: 0, left: 0 }, { input: original, top: 44, left: 0 }, { input: implementation, top: 44, left: w + 20 }]).png().toFile(path.join(output, `comparativa-${width}.png`));
     // Fondo de respaldo oscuro deliberado: conserva contraste si falla la fotografía.
     expect(actual[0].backgroundColor).toBe("rgb(38, 57, 76)");

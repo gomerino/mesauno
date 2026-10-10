@@ -37,12 +37,12 @@ test("demo segura, diálogos, foco y opciones de fase", async ({ page }) => {
   const mutations: string[] = [];
   page.on("request", (req) => { if (["POST", "PUT", "PATCH", "DELETE"].includes(req.method())) mutations.push(req.url()); });
   await page.goto(url);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Claudia& Gonzalo");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Claudia&Gonzalo");
   const cta = page.getByRole("button", { name: "Confirmar mi asistencia", exact: true });
   await cta.click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.getByRole("combobox", { name: "Asistencia", exact: true }).selectOption("confirmado");
-  await page.getByRole("combobox", { name: "Preferencia alimentaria (opcional)", exact: true }).selectOption("Sin gluten");
+  await expect(page.getByRole("combobox", { name: /Preferencia alimentaria/ })).toHaveCount(0);
   await page.getByRole("button", { name: "Guardar mi respuesta" }).click();
   await expect(page.getByRole("status")).toContainText("Solo en esta demostración");
   await page.keyboard.press("Escape");
@@ -57,7 +57,7 @@ test("demo segura, diálogos, foco y opciones de fase", async ({ page }) => {
   await page.goto(`${url}&phase=durante`);
   await expect(page.getByRole("button", { name: "Compartir fotos", exact: true })).toBeVisible();
   await page.goto(`${url}&phase=despues`);
-  await expect(page.getByRole("button", { name: "Ver álbum de recuerdos" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Álbum de recuerdos", exact: true })).toBeVisible();
   await page.goto(`${url}&boarding=0`);
   await expect(page.getByRole("button", { name: "Ver mi pase", exact: true })).toHaveCount(0);
   expect(mutations).toEqual([]);
