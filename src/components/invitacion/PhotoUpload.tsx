@@ -13,9 +13,10 @@ type Props = {
   fabBottomExtra?: string;
   presentation?: "floating" | "inline";
   buttonClassName?: string;
+  buttonLabel?: string;
 };
 
-export function PhotoUpload({ invitacionToken, onUploaded, fabBottomExtra, presentation = "floating", buttonClassName }: Props) {
+export function PhotoUpload({ invitacionToken, onUploaded, fabBottomExtra, presentation = "floating", buttonClassName, buttonLabel = "Compartir fotos" }: Props) {
   const inputId = useId();
   const inlineInput = useRef<HTMLInputElement>(null);
   const [uploaded, setUploaded] = useState(false);
@@ -74,7 +75,7 @@ export function PhotoUpload({ invitacionToken, onUploaded, fabBottomExtra, prese
   if (presentation === "inline") {
     return <div aria-busy={busy}>
       <button type="button" className={buttonClassName} disabled={busy} onClick={() => inlineInput.current?.click()}>
-        {busy ? "Subiendo foto…" : "Compartir fotos"}
+        {busy ? "Subiendo foto…" : buttonLabel}
       </button>
       <input ref={inlineInput} type="file" accept="image/jpeg,image/png,image/webp,image/heic,.heic" hidden onChange={onChange} aria-label="Seleccionar foto" />
       {busy && <p role="status">{compressPct !== null && compressPct < 100 ? "Preparando imagen…" : `Subiendo: ${uploadPct}%`}</p>}

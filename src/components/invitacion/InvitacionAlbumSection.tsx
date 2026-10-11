@@ -22,6 +22,10 @@ type Props = {
   setFotos?: Dispatch<SetStateAction<EventoFoto[]>>;
   albumTitle?: string;
   albumBlurb?: string;
+  presentation?: "default" | "editorial";
+  showUpload?: boolean;
+  allowDownload?: boolean;
+  photoGroups?: { id: string; title: string; photoIds: string[] }[];
 };
 
 export function InvitacionAlbumSection({
@@ -33,6 +37,7 @@ export function InvitacionAlbumSection({
   omitInnerGallery,
   fotos: fotosProp,
   setFotos: setFotosProp,
+  presentation = "default", showUpload = true, allowDownload = false, photoGroups,
   albumTitle = "Álbum compartido",
   albumBlurb = "Sube fotos desde tu celular durante el evento. La galería se actualiza en vivo para todos los invitados.",
 }: Props) {
@@ -49,7 +54,7 @@ export function InvitacionAlbumSection({
     const onSubida = (ev: Event) => {
       const ce = ev as CustomEvent<{ foto?: EventoFoto }>;
       const foto = ce.detail?.foto;
-      if (!foto) return;
+      if (!foto || (presentation === "editorial" && foto.evento_id !== eventoId)) return;
       setFotos((prev) => {
         if (prev.some((p) => p.id === foto.id)) return prev;
         return [foto, ...prev].sort(
@@ -59,7 +64,23 @@ export function InvitacionAlbumSection({
     };
     window.addEventListener(INVITACION_FOTO_SUBIDA_EVENT, onSubida as EventListener);
     return () => window.removeEventListener(INVITACION_FOTO_SUBIDA_EVENT, onSubida as EventListener);
-  }, [setFotos]);
+  }, [setFotos, presentation, eventoId]);
+
+  const onUploaded = (foto: EventoFoto) => setFotos(previous => {
+    if (presentation === "editorial" && foto.evento_id !== eventoId) return previous;
+    if (previous.some(item => item.id === foto.id)) return previous;
+    return [foto, ...previous].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  });
+
+  if (presentation === "editorial") return <section aria-label="Fotos del evento" className={albumCardClassName}>
+    <h2>{albumTitle}</h2><p>{albumBlurb}</p>
+    <div className="grid gap-3 my-5">
+      {showUpload && <PhotoUpload invitacionToken={invitacionToken} presentation="inline" buttonLabel="Compartir mis fotos" buttonClassName="editorial-photo-action" onUploaded={onUploaded} />}
+      <a className="editorial-photo-link" href="#editorial-live-gallery">Ver fotos del evento</a>
+    </div>
+    <div id="editorial-live-gallery" tabIndex={-1}><LiveGallery editorial eventoId={eventoId} fotos={fotos} setFotos={setFotos} allowDownload={allowDownload} photoGroups={photoGroups} emptyHint="Aquí aparecerán los recuerdos compartidos por los invitados." /></div>
+  </section>;
+
 
   return (
     <section
@@ -90,14 +111,7 @@ export function InvitacionAlbumSection({
       <PhotoUpload
         invitacionToken={invitacionToken}
         fabBottomExtra={photoFabBottomExtra}
-        onUploaded={(foto) =>
-          setFotos((prev) => {
-            if (prev.some((p) => p.id === foto.id)) return prev;
-            return [foto, ...prev].sort(
-              (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-            );
-          })
-        }
+        onUploaded={onUploaded}
       />
     </section>
   );

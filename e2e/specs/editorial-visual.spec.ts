@@ -12,8 +12,9 @@ const url = "/invitacion/editorial-preview?theme=editorial-premium";
 const originalSelectors = [".hero", ".hero h1", ".content", ".sub", ".stack", ".info", ".section-title", ".ticket", ".tile"];
 const currentSelectors = ['[data-testid="editorial-hero"]', "h1", '[class*="_content"]', '[class*="_sub"]', '[class*="_stack"]', '[class*="_info"]', '[class*="_sectionTitle"]', '[class*="_ticket_"]', '[class*="_tile"]'];
 
+// Referencia histórica reemplazada por el PNG de París; validación vigente en editorial-paris.spec.ts.
 for (const width of [390, 1280]) {
-  test(`Alternativa A coincide visualmente a ${width}px`, async ({ page }) => {
+  test.skip(`Alternativa A coincide visualmente a ${width}px`, async ({ page }) => {
     test.skip(!fs.existsSync(reference), "Se requiere el HTML de referencia aprobado en EDITORIAL_REFERENCE_HTML.");
     fs.mkdirSync(output, { recursive: true });
     await page.setViewportSize({ width, height: 844 });

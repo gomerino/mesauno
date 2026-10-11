@@ -27,13 +27,15 @@ test("RSVP maneja error, éxito y edición sin editar nombre ni dietas", async (
   await expect(page.getByRole("status")).toContainText("asistencia quedó confirmada");
   await page.keyboard.press("Escape");
   await expect(page.getByRole("button", { name: "Dietas y preferencias" })).toHaveCount(0);
-  await page.getByRole("button", { name: "Modificar mi respuesta", exact: true }).click();
+  const stateCard = page.getByRole("region", { name: "Estado de asistencia" });
+  await expect(stateCard).toContainText("Asistencia confirmada");
+  await expect(stateCard).toContainText("Invitado especial");
+  await stateCard.getByRole("button", { name: "Modificar mi respuesta", exact: true }).click();
   await expect(page.getByRole("dialog").getByRole("textbox")).toHaveCount(0);
   await page.getByRole("combobox", { name: "Asistencia", exact: true }).selectOption("declinado");
   await page.getByRole("button", { name: "Guardar mi respuesta" }).click();
   await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "Ver mi pase", exact: true }).click();
-  await expect(page.getByRole("dialog")).toContainText("No asistiré");
+  await expect(page.getByRole("region", { name: "Pase de embarque", exact: true })).toContainText("No asistiré");
 });
 
 test("programa, mapas, regalos y música usan módulos y contratos existentes", async ({ page }) => {
@@ -52,13 +54,13 @@ test("programa, mapas, regalos y música usan módulos y contratos existentes", 
   await expect(page.getByRole("dialog")).toContainText("Buin");
   await page.getByRole("dialog").screenshot({ path: `artifacts/editorial/programa-${test.info().project.name}.png` });
   await page.keyboard.press("Escape");
-  await expect(page.getByRole("heading", { name: "Lugar y horario" })).toBeVisible();
-  await expect(page.locator("#editorial-place")).toContainText("Salón Jardín Esperanza · Buin");
-  await expect(page.locator("#editorial-place")).toContainText("Camino de ejemplo 123, Buin, Región Metropolitana");
+  await expect(page.getByRole("region", { name: "Fecha, hora y ubicación" })).toBeVisible();
+  await expect(page.locator("#editorial-place")).toContainText("Salón Jardín Esperanza");
+  await expect(page.locator("#editorial-place")).not.toContainText("Camino de ejemplo 123");
   await expect(page.getByRole("button", { name: "Ver lugar y horario" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Más detalles" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Cómo llegar" })).toHaveAttribute("href", /google.com\/maps/);
-  await expect(page.getByRole("link", { name: "Cómo llegar" })).toHaveAttribute("target", "_blank");
+  await expect(page.getByRole("link", { name: "Cómo llegar" }).first()).toHaveAttribute("href", /google.com\/maps/);
+  await expect(page.getByRole("link", { name: "Cómo llegar" }).first()).toHaveAttribute("target", "_blank");
   await page.getByRole("button", { name: "Regalos", exact: true }).click();
   await expect(page.getByRole("link", { name: "Abrir lista de regalos" })).toHaveAttribute("href", "https://example.com/regalos");
   await page.keyboard.press("Escape");
@@ -66,7 +68,7 @@ test("programa, mapas, regalos y música usan módulos y contratos existentes", 
   await page.getByRole("combobox", { name: "Asistencia", exact: true }).selectOption("confirmado");
   await page.getByRole("button", { name: "Guardar mi respuesta" }).click();
   await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "Nuestra música" }).click();
+  await page.getByRole("button", { name: "Música" }).click();
   await page.getByPlaceholder(/Busca/i).fill("Nuestra canción");
   await page.getByRole("button", { name: /Agregar|Proponer|Sugerir/i }).last().click();
   await expect(page.getByText("Canción enviada para aprobación", { exact: true })).toBeVisible();
@@ -91,7 +93,7 @@ for (const phase of ["durante", "despues"]) test(`PhotoUpload inline y álbum ${
   await expect(page.getByText("Hay viajes que cambian la vida.", { exact: false })).toHaveCount(0);
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.getByRole("region", { name: "Fotos del evento" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Cómo llegar" })).toHaveCount(phase === "despues" ? 0 : 1);
+  await expect(page.getByRole("link", { name: "Cómo llegar" })).toHaveCount(phase === "despues" ? 1 : 2);
   await expect(page.getByRole("button", { name: "Programa del evento" })).toHaveCount(phase === "despues" ? 0 : 1);
   await expect(page.getByRole("img", { name: "Foto compartida por un invitado" })).toBeVisible();
   await expect(page.getByRole("region", { name: "12:00 · Ceremonia", exact: true }).getByRole("img")).toBeVisible();

@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 type Props = {
   eventoId: string;
+  editorial?: boolean;
   emptyHint?: string;
   allowDownload?: boolean;
   photoGroups?: { id: string; title: string; photoIds: string[] }[];
@@ -16,14 +17,17 @@ type Props = {
   setFotos: React.Dispatch<React.SetStateAction<EventoFoto[]>>;
 };
 
-export function LiveGallery({ eventoId, fotos, setFotos, allowDownload = false, photoGroups, emptyHint = "Sé el primero en compartir un momento con el botón flotante." }: Props) {
+export function LiveGallery({ editorial = false, eventoId, fotos, setFotos, allowDownload = false, photoGroups, emptyHint = "Sé el primero en compartir un momento con el botón flotante." }: Props) {
   const supabase = useMemo(() => createClient(), []);
+  const [connection, setConnection] = useState("CONNECTING");
   const [downloading, setDownloading] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [downloaded, setDownloaded] = useState(false);
   const [lightbox, setLightbox] = useState<EventoFoto | null>(null);
 
   useEffect(() => {
+    let active = true;
+    if (editorial) setConnection("CONNECTING");
     const channel = supabase
       .channel(`evento_fotos:${eventoId}`)
       .on(
@@ -36,7 +40,7 @@ export function LiveGallery({ eventoId, fotos, setFotos, allowDownload = false, 
         },
         (payload) => {
           const row = payload.new as EventoFoto;
-          if (!row?.id) return;
+          if (!row?.id || (editorial && row.evento_id !== eventoId)) return;
           setFotos((prev) => {
             if (prev.some((p) => p.id === row.id)) return prev;
             return [row, ...prev].sort(
@@ -45,12 +49,13 @@ export function LiveGallery({ eventoId, fotos, setFotos, allowDownload = false, 
           });
         }
       )
-      .subscribe();
+      .subscribe(status => { if (editorial && active) setConnection(status); });
 
     return () => {
+      active = false;
       void supabase.removeChannel(channel);
     };
-  }, [eventoId, setFotos, supabase]);
+  }, [eventoId, setFotos, supabase, editorial]);
 
   async function downloadPhoto(foto: EventoFoto) {
     setDownloading(true);
@@ -89,6 +94,8 @@ export function LiveGallery({ eventoId, fotos, setFotos, allowDownload = false, 
   if (fotos.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-[#001d66]/25 bg-white/60 px-4 py-10 text-center">
+        {editorial && connection === "CONNECTING" && <p aria-live="polite">Conectando con el álbum…</p>}
+        {editorial && ["CHANNEL_ERROR", "TIMED_OUT", "CLOSED"].includes(connection) && <p aria-live="polite">No pudimos conectar las actualizaciones en vivo. Puedes volver a cargar la página para reintentar.</p>}
         <p className="text-sm font-medium text-gray-700">Aún no hay fotos</p>
         <p className="mt-1 text-xs text-gray-500">{emptyHint}</p>
       </div>

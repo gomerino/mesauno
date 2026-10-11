@@ -1,0 +1,37 @@
+import { expect, test } from "@playwright/test";
+import { nombresAcompanantes } from "../../src/lib/invitado-acompanantes";
+import { buildDemoInvitacion } from "../../src/lib/demo-invitation-mock";
+import fs from "node:fs";
+const url = "/invitacion/editorial-preview?theme=editorial-premium&phase=durante";
+test.use({ deviceScaleFactor: 1, isMobile: false });
+for(const width of [390,430]) test(`durante QR inline y subida desde portada ${width}`,async({page})=>{
+  await page.setViewportSize({width,height:width === 390 ? 844 : 932});
+  await page.route("**/api/**",route=>route.abort());
+  await page.route("**/*.supabase.co/**",route=>route.abort());
+  await page.routeWebSocket(/\/realtime\//,socket=>socket.close());
+  await page.goto(`${url}&contracts=1`);
+  const qr = page.getByRole("region",{name:"Tu ingreso al evento"});
+  await expect(qr.locator("canvas")).toBeVisible();
+  await expect(qr).toContainText("Invitado especial");
+  await expect(qr.locator("li")).toHaveText(["Invitado especial", "Acompañante de prueba uno", "Acompañante de prueba dos"]);
+  await expect(page.getByRole("button",{name:"Mi QR de check-in"})).toHaveCount(0);
+  await expect(page.getByRole("region",{name:"Pase de embarque",exact:true})).toHaveCount(0);
+  const chooser = page.waitForEvent("filechooser");
+  await page.getByTestId("editorial-hero").getByRole("button",{name:"Compartir fotos",exact:true}).click();
+  await chooser;
+  await expect(page.locator('input[type="file"]')).toHaveCount(1);
+  await expect(page.getByRole("region",{name:"Fotos del evento",exact:true})).toHaveCount(1);
+  expect((await qr.boundingBox())!.y).toBeLessThan((await page.locator("#editorial-album").boundingBox())!.y);
+  expect((await page.locator("#editorial-album").boundingBox())!.y).toBeLessThan((await page.getByTestId("editorial-details").boundingBox())!.y);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  fs.mkdirSync("artifacts/editorial-during",{recursive:true});
+  await page.screenshot({path:`artifacts/editorial-during/durante-${width}.png`,fullPage:true});
+  await page.goto(url);
+  await expect(page.getByRole("region",{name:"Tu ingreso al evento"})).toContainText("cuando está disponible");
+  await expect(page.locator("canvas")).toHaveCount(0);
+});
+test("identificación de acompañantes conserva orden y respaldo legacy",()=>{
+  const {invitado}=buildDemoInvitacion({nombreNovios:"Prueba",fechaEvento:"2027-02-20"});
+  expect(nombresAcompanantes({...invitado, invitado_acompanantes:[{nombre:"Acompañante dos",orden:2},{nombre:"Acompañante uno",orden:1}] as typeof invitado.invitado_acompanantes})).toEqual(["Acompañante uno","Acompañante dos"]);
+  expect(nombresAcompanantes({...invitado,nombre_acompanante:"Acompañante legacy"})).toEqual(["Acompañante legacy"]);
+});

@@ -7,15 +7,19 @@ export function EditorialDevelopmentPreview({ phase, boarding, contracts }: { ph
   const config: EditorialPreviewConfig = {
     phase: phase === "durante" || phase === "despues" ? phase : "antes",
     showBoardingPass: boarding !== "0",
-    locationLabel: "Buin",
+    locationLabel: "La Casita de Cuentos · Buin",
     passLocationLabel: "Buin, Chile",
     timeDetail: "Horario de ejemplo",
   };
   const demo = buildDemoInvitacion({ nombreNovios: "Claudia & Gonzalo", fechaEvento: "2027-02-20" });
   demo.evento.direccion_evento_completa = "Camino de ejemplo 123, Buin, Región Metropolitana";
   demo.evento.hora_embarque = "12:00";
-  demo.evento.motivo_viaje = "Hay viajes que cambian la vida. Nos encantaría compartir este contigo.";
+  demo.evento.motivo_viaje = "Los invitamos a celebrar esta nueva aventura con nosotros. Es nuestro viaje más importante: el día que unimos nuestras rutas y nos elegimos para seguir esta vida juntos.";
   demo.invitado.nombre_pasajero = "Invitado especial";
+  if (contracts && config.phase === "durante") demo.invitado.invitado_acompanantes = [
+    { id: "demo-acompanante-1", invitado_id: demo.invitado.id, nombre: "Acompañante de prueba uno", orden: 1 },
+    { id: "demo-acompanante-2", invitado_id: demo.invitado.id, nombre: "Acompañante de prueba dos", orden: 2 },
+  ];
   demo.merged = mergeEventoParaPase(demo.invitado, demo.evento);
   const link = (change: Record<string, string>) => `?${new URLSearchParams({ theme: "editorial-premium", phase: config.phase || "antes", boarding: config.showBoardingPass ? "1" : "0", ...change })}`;
   return <>

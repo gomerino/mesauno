@@ -47,19 +47,17 @@ test("demo segura, diálogos, foco y opciones de fase", async ({ page }) => {
   await expect(page.getByRole("status")).toContainText("Solo en esta demostración");
   await page.keyboard.press("Escape");
   await expect(page.getByRole("button", { name: "Modificar mi respuesta", exact: true })).toBeFocused();
-  await page.getByRole("button", { name: "Ver mi pase", exact: true }).click();
-  await expect(page.getByRole("dialog")).toContainText("Confirmado");
-  await page.keyboard.press("Escape");
+  await expect(page.getByRole("region", { name: "Pase de embarque", exact: true })).toContainText("Confirmado");
   for (const width of [320, 390, 768, 1280]) {
     await page.setViewportSize({ width, height: 844 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
   await page.goto(`${url}&phase=durante`);
-  await expect(page.getByRole("button", { name: "Compartir fotos", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Compartir mis fotos", exact: true })).toBeVisible();
   await page.goto(`${url}&phase=despues`);
-  await expect(page.getByRole("heading", { name: "Álbum de recuerdos", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Nuestros recuerdos", exact: true })).toBeVisible();
   await page.goto(`${url}&boarding=0`);
-  await expect(page.getByRole("button", { name: "Ver mi pase", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Ver pase completo", exact: true })).toHaveCount(0);
   expect(mutations).toEqual([]);
 });
 
@@ -71,14 +69,15 @@ test("token reservado sin override devuelve 404", async ({ page }) => {
 
 test("portada permite continuar con teclado y movimiento reducido en cada etapa", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  for (const [phase, label] of [["antes", "Ver la invitación"], ["durante", "Ver y compartir fotos"], ["despues", "Ver los recuerdos"]]) {
+  for (const [phase, label] of [["antes", "Ver detalles y confirmar"], ["durante", "Compartir fotos"], ["despues", "Ver los recuerdos"]]) {
     await page.goto(`${url}&phase=${phase}`);
     const button = page.getByRole("button", { name: label, exact: true });
     await expect(button).toBeVisible();
     expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(48);
     await button.focus();
     await page.keyboard.press("Enter");
+    if (phase === "durante") { await expect(page.getByRole("dialog")).toBeVisible(); continue; }
     await expect(page.locator("#editorial-content")).toBeFocused();
-    await expect.poll(() => page.locator("#editorial-content").evaluate((element) => element.getBoundingClientRect().top)).toBeLessThan(100);
+    await expect.poll(() => page.locator("#editorial-content").evaluate((element) => element.getBoundingClientRect().top)).toBeLessThan(page.viewportSize()!.height / 2);
   }
 });

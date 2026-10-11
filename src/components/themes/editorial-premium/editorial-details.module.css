@@ -1,0 +1,37 @@
+.details { color: #0d293f; margin: 28px 0; }
+.facts { display: grid; grid-template-columns: 1fr .8fr 1.25fr; align-items: stretch; margin-bottom: 24px; }
+.facts > div { padding: 0 9px; display: flex; align-items: center; flex-direction: column; gap: 8px; text-align: center; font-size: 14px; line-height: 1.4; min-width: 0; overflow-wrap: anywhere; }
+.facts > div + div { border-left: 1px solid #e1dacf; }
+.facts svg { color: #a7804c; width: 30px; height: 30px; flex-shrink: 0; }
+.facts span:not(.srOnly) { color: #626d7a; font-size: 13px; }
+.directions { display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 9px; background: #f0eae2; min-height: 48px; color: #34485b; text-decoration: none; font-size: 15px; }
+.directions svg { color: #a7804c; }
+.pass { margin-top: 28px; border: 1px solid #ded7cd; border-radius: 16px; background: linear-gradient(110deg,#faf7f1,#f3eee5); box-shadow: 0 5px 18px #26394c08; overflow: hidden; }
+.passBody { padding: 20px 18px; }
+.brand { display: flex; align-items: center; gap: 8px; font-size: 10px; letter-spacing: 1.3px; }
+.pass h2 { font: 400 30px/1.2 Baskerville, "Times New Roman", serif; margin: 12px 0 18px; }
+.passFields { display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; }
+.label { display: block; color: #626d7a; text-transform: uppercase; font-size: 10px; letter-spacing: 1px; margin-bottom: 7px; }
+.passengers { font: 20px/1.3 Baskerville, "Times New Roman", serif; }
+.passengers span { display: block; overflow-wrap: anywhere; }
+.confirmed, .state { display: inline-flex; gap: 5px; align-items: center; font-size: 12px; font-weight: 500; padding: 7px 8px; border-radius: 10px; background: #eee9df; }
+.confirmed { color: #217455; background: #edf8f1; border: 1px solid #a3d3bd; }
+.route { display: grid; grid-template-columns: 1fr 1.3fr; margin-top: 18px; font-size: 13px; gap: 14px; line-height: 1.5; }
+.route > div + div { border-left: 1px solid #ded7cd; padding-left: 14px; }
+.route strong, .route span { display: block; overflow-wrap: anywhere; }
+.stub { position: relative; border-top: 1px dashed #cfc5b6; padding: 14px 18px; text-align: center; }
+.stub::before, .stub::after { content: ''; position: absolute; top: -8px; width: 16px; height: 16px; border: 1px solid #ded7cd; border-radius: 50%; background: #faf7f1; }
+.stub::before { left: -9px; } .stub::after { right: -9px; }
+.plane { color: #a7804c; margin: auto; }
+.stub p { font-size: 13px; line-height: 1.5; color: #626d7a; }
+.stub button { min-height: 48px; width: 100%; background: #0d293f; border: 0; border-radius: 10px; color: white; padding: 12px; cursor: pointer; font-size: 14px; }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+@media(min-width:600px) { .facts > div { font-size: 17px; } .facts svg { width: 38px; height: 38px; } .pass { display: grid; grid-template-columns: minmax(0,1fr) 225px; } .passBody { padding: 28px; } .pass h2 { font-size: 38px; } .stub { border-top: 0; border-left: 1px dashed #cfc5b6; display: flex; flex-direction: column; justify-content: center; gap: 12px; } .stub::before { left: -8px; } .stub::after { left: -8px; top: auto; bottom: -9px; } }
+@media(min-width:900px) { .details { width: 760px; margin-left: calc((100% - 760px) / 2); } }
+@media(min-width:600px) and (max-width:899px) { .pass { display: block; } .stub { border-left: 0; border-top: 1px dashed #cfc5b6; } }
+
+.weekday { text-transform: capitalize; }
+.facts .date { color: #0d293f; margin-top: -6px; }
+
+.passengers { font-size: 18px; }
+.pass { display: block; }

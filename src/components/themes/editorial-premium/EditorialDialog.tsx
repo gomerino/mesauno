@@ -15,7 +15,8 @@ export function EditorialDialog({ title, children, onClose, stickyClose = false 
     return () => {
       dialog?.close();
       document.body.style.overflow = overflow;
-      previous?.focus();
+      const trigger = previous?.isConnected ? previous : previous?.id ? document.getElementById(previous.id) : null;
+      trigger?.focus();
     };
   }, []);
   return <dialog ref={ref} className={styles.dialog} aria-labelledby={titleId} onCancel={(event) => { event.preventDefault(); onClose(); }} onClick={(event) => {

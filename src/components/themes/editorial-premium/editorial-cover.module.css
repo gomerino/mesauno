@@ -1,0 +1,44 @@
+.hero { position: relative; isolation: isolate; overflow: hidden; min-height: 365px; background: #0d293f; color: #fff; }
+.photo { position: absolute; z-index: -3; inset: 0 auto 0 0; width: 125%; max-width: none; height: 100%; object-fit: cover; object-position: var(--photo-mobile-position); }
+.shade { position: absolute; inset: 0; z-index: -2; background: linear-gradient(0deg, #081e30c9 0%, #0b263d12 58%, transparent 80%), linear-gradient(90deg, #071e30c7 0%, #0d263d55 40%, transparent 68%); }
+.topline { position: relative; margin: 0; padding: 22px 24px 0; }
+.topline p { margin: 0; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #fff; }
+.flightLine { position: relative; width: 122px; height: 18px; margin-top: 8px; color: #c5a16b; }
+.flightLine::before { content: ''; position: absolute; left: 0; top: 8px; width: 100%; height: 1px; background: currentColor; }
+.flightLine svg { position: absolute; right: -2px; top: -2px; transform: rotate(45deg); }
+.copy { position: relative; padding: 30px 24px 38px; }
+.copy h1 { width: 51%; margin: 0 0 17px; font: 400 clamp(43px, 12vw, 52px)/.98 "Baskerville", "Times New Roman", serif; letter-spacing: -.8px; overflow-wrap: anywhere; }
+.copy h1 > span { display: block; }
+.copy h1 .ampersand { color: #c5a16b; font-size: .66em; font-style: italic; line-height: 1.08; }
+.facts { max-width: 100%; font-size: 10px; line-height: 1.7; text-transform: uppercase; letter-spacing: 1.8px; text-shadow: 0 1px 4px #001323; }
+.facts p { margin: 0; }
+.continue { display: inline-flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 48px; max-width: 100%; margin-top: 14px; padding: 12px 18px; border: 1.5px solid #fff; border-radius: 40px; background: #0c2b43ed; color: #fff; font-size: 13px; font-weight: 500; cursor: pointer; }
+.continue:hover { background: #173e59; }
+.curve { position: absolute; width: 100%; height: 35px; left: 0; bottom: -1px; fill: #faf7f1; }
+.journey { background: #faf7f1; color: #0d293f; padding: 0 24px 22px; text-align: center; }
+.journeyMark { display: flex; align-items: center; justify-content: center; gap: 13px; color: #aa8350; transform: translateY(-9px); }
+.journeyMark span { width: 42px; height: 1px; background: #ddd3c4; }
+.journeyMark svg { transform: rotate(-45deg); }
+.journey .eyebrow { margin: 4px 0 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 2.8px; color: #68717c; }
+.journey h2 { margin: 0; font: 500 23px/1.2 var(--font-invite-serif), Georgia, serif; letter-spacing: -.6px; }
+.rule { width: 26px; height: 1px; background: #aa8350; margin: 18px auto 22px; }
+.journey .message { margin: 0 auto; max-width: 30ch; color: #626d7a; font-size: 15px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (min-width: 600px) {
+  .hero { min-height: 705px; }
+  .photo { object-position: var(--photo-desktop-position); }
+  .topline { padding: 34px 49px 0; }
+  .topline p { font-size: 16px; letter-spacing: 4px; }
+  .flightLine { width: 224px; }
+  .copy { padding: 164px 60px 76px; }
+  .copy h1 { font-size: clamp(66px, 9vw, 88px); margin-bottom: 23px; }
+  .facts { font-size: 17px; letter-spacing: 3px; }
+  .continue { font-size: 18px; min-height: 62px; padding: 15px 30px; min-width: 350px; margin-top: 32px; }
+  .curve { height: 64px; }
+  .journey { padding: 0 64px 30px; }
+  .journeyMark { gap: 20px; }
+  .journeyMark span { width: 88px; }
+  .journey .eyebrow { font-size: 15px; margin: 20px 0 16px; }
+  .journey h2 { font-size: 38px; }
+  .rule { width: 50px; margin: 24px auto 16px; }
+  .journey .message { font-size: 18px; line-height: 1.8; max-width: 48ch; }
+}
