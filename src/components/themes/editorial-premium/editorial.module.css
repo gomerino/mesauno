@@ -44,7 +44,8 @@
 .tile { text-decoration: none; font-family: Arial, sans-serif; display: flex; justify-content: space-between; align-items: center; padding: 17px 0; border: 0; border-bottom: 1px solid #e5dbcd; cursor: pointer; background: transparent; width: 100%; min-height: 44px; color: #25344a; text-align: left; font-size: 17px; }
 .dialog { color: #25344a; background: #fffdf8; border: 0; border-radius: 18px; padding: 23px; max-width: 430px; width: calc(100% - 40px); max-height: 90vh; max-height: 90dvh; overflow: auto; margin: auto; font: 16px/normal system-ui, -apple-system, sans-serif; }
 .dialog::backdrop { background: #102034b8; }
-.dialog h2 { font: normal 30px Georgia, serif; margin: .83em 0; }
+.dialog h2 { font: normal clamp(24px, 7vw, 30px)/1.2 Georgia, serif; margin: .83em 0; }
+.dialog > h2 { margin-right: 56px; }
 .dialog .ticket h2 { font: normal 29px Georgia, serif; margin: 10px 0; }
 .close { float: right; border: 0; background: #f1ebe3; color: #25344a; border-radius: 100%; width: 44px; height: 44px; font-size: 24px; cursor: pointer; }
 .field { display: block; margin: 12px 0; font-size: 16px; }
@@ -73,7 +74,7 @@
 .timelineMoment { position: relative; padding: 0 0 34px 23px; border-left: 1px solid #d8c8ae; min-width: 0; }
 .timelineMoment::before { content: ''; position: absolute; left: -5px; top: 8px; width: 9px; height: 9px; border: 1px solid #9b7b48; border-radius: 50%; background: #fffdf8; }
 .timeline > ol > li:last-child .timelineMoment { border-color: transparent; padding-bottom: 8px; }
-.timelineMoment h3 { font: normal 24px/1.2 Georgia, serif; margin: 0; overflow-wrap: anywhere; }
+.timelineMoment h3 { font: normal clamp(19px, 5.2vw, 24px)/1.25 Georgia, serif; margin: 0; overflow-wrap: normal; word-break: normal; hyphens: none; }
 .timelineMoment p { font-size: 15px; line-height: 1.6; color: #5a626a; margin: 10px 0 0; white-space: pre-line; overflow-wrap: anywhere; }
 .timelineMoment .timelinePlace { font-size: 13px; color: #745a32; }
 .timelineMap { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; color: #745a32; text-decoration: underline; text-underline-offset: 4px; }
@@ -115,3 +116,11 @@
 .checkIn button { min-height: 44px; }
 .checkIn > button { margin-top: 10px; font-size: 14px; }
 .checkIn p { font-size: 13px; line-height: 1.5; }
+
+@media (max-width: 480px) {
+  .dialog { width: calc(100% - 24px); padding: 18px; }
+  .timeline > ol > li { grid-template-columns: 38px minmax(0, 1fr); gap: 10px; }
+  .timeline time { font-size: 13px; }
+  .timelineMoment { padding-left: 13px; padding-bottom: 26px; }
+  .timeline .timelineIntro { margin-bottom: 24px; }
+}

@@ -44,6 +44,6 @@ export function EditorialJourney({ message }: { message: string }) {
     <div className={styles.journeyMark} aria-hidden="true"><span /><Plane size={26} fill="currentColor" strokeWidth={1} /><span /></div>
     <h2 id="editorial-journey-title">Nuestro viaje</h2>
     <div className={styles.rule} aria-hidden="true" />
-    <p className={styles.message}>{message}</p>
+    <p className={styles.message}>{message.split(/(\r?\n[ \t]*\r?\n)/g).map((part, index) => index % 2 ? <span key={index} className={styles.messageGap}>{part}</span> : part)}</p>
   </section>;
 }

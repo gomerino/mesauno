@@ -7,7 +7,7 @@
 .flightLine::before { content: ''; position: absolute; left: 0; top: 8px; width: 100%; height: 1px; background: currentColor; }
 .flightLine svg { position: absolute; right: -2px; top: -2px; transform: rotate(45deg); }
 .copy { position: relative; padding: 30px 24px 38px; }
-.copy h1 { width: 51%; margin: 0 0 17px; font: 400 clamp(43px, 12vw, 52px)/.98 "Baskerville", "Times New Roman", serif; letter-spacing: -.8px; overflow-wrap: anywhere; }
+.copy h1 { width: min-content; max-width: 75%; margin: 0 0 17px; font: 400 clamp(32px, 10.8vw, 52px)/.98 "Baskerville", "Times New Roman", serif; letter-spacing: -.8px; overflow-wrap: normal; word-break: normal; hyphens: none; }
 .copy h1 > span { display: block; }
 .copy h1 .ampersand { color: #c5a16b; font-size: .66em; font-style: italic; line-height: 1.08; }
 .facts { max-width: 100%; font-size: 10px; line-height: 1.7; text-transform: uppercase; letter-spacing: 1.8px; text-shadow: 0 1px 4px #001323; }
@@ -21,7 +21,7 @@
 .journeyMark svg { transform: rotate(-45deg); }
 .journey .eyebrow { margin: 4px 0 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 2.8px; color: #68717c; }
 .journey h2 { margin: 0; font: 500 23px/1.2 var(--font-invite-serif), Georgia, serif; letter-spacing: -.6px; }
-.rule { width: 26px; height: 1px; background: #aa8350; margin: 18px auto 22px; }
+.rule { width: 26px; height: 1px; background: #aa8350; margin: 14px auto 16px; }
 .journey .message { margin: 0 auto; max-width: 30ch; color: #626d7a; font-size: 15px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
 @media (min-width: 600px) {
   .hero { min-height: 705px; }
@@ -30,7 +30,7 @@
   .topline p { font-size: 16px; letter-spacing: 4px; }
   .flightLine { width: 224px; }
   .copy { padding: 164px 60px 76px; }
-  .copy h1 { font-size: clamp(66px, 9vw, 88px); margin-bottom: 23px; }
+  .copy h1 { width: max-content; font-size: clamp(66px, 9vw, 88px); margin-bottom: 23px; }
   .facts { font-size: 17px; letter-spacing: 3px; }
   .continue { font-size: 18px; min-height: 62px; padding: 15px 30px; min-width: 350px; margin-top: 32px; }
   .curve { height: 64px; }
@@ -39,6 +39,8 @@
   .journeyMark span { width: 88px; }
   .journey .eyebrow { font-size: 15px; margin: 20px 0 16px; }
   .journey h2 { font-size: 38px; }
-  .rule { width: 50px; margin: 24px auto 16px; }
+  .rule { width: 50px; margin: 18px auto 12px; }
   .journey .message { font-size: 18px; line-height: 1.8; max-width: 48ch; }
 }
+
+.messageGap { display: block; height: 1.35em; line-height: 0; white-space: pre; }
