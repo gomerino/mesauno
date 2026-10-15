@@ -134,7 +134,77 @@ export function EditorialPremiumTheme({ token, invitado, evento, merged, qrValue
       </>}
       {open === "programa" && <div className={styles.module}>{programaHitos.length ? <InvitacionCronograma presentation="editorial" hitos={programaHitos} fechaEvento={merged.fecha_evento} fotosPorHito={groupedPhotos} /> : <p className={styles.sub}>Ceremonia y celebración. Horarios detallados por confirmar.</p>}</div>}
       {open === "regalos" && <><p className={styles.sub} style={{ whiteSpace: "pre-line" }}>{regalos.texto_regalos || TEXTO_REGALOS_DEFAULT}</p>{giftUrl && <a className={styles.primary} href={giftUrl} target="_blank" rel="noopener noreferrer">Abrir lista de regalos</a>}</>}
-      {open === "musica" && <div className={styles.module}><div className={styles.stack}>{playlists.spotify && <a className={styles.secondary} href={playlists.spotify} target="_blank" rel="noopener noreferrer">Abrir playlist en Spotify</a>}{playlists.appleMusic && <a className={styles.secondary} href={playlists.appleMusic} target="_blank" rel="noopener noreferrer">Abrir playlist en Apple Music</a>}{playlists.other && <a className={styles.secondary} href={playlists.other} target="_blank" rel="noopener noreferrer">Escuchar nuestra música</a>}</div>{musicColabEnabled && !demo && <InvitacionMusicaColaborativa invitationAccessToken={token} eventoId={invitado.evento_id || ""} invitacionConfirmada={estado === "confirmado"} spotifySyncDisponible={musicColabEnabled} surface="light" />}{demo && <p className={styles.sub}>Las propuestas de canciones están disponibles al abrir una invitación real.</p>}</div>}
+      {open === "musica" && (
+  <div className={styles.module}>
+
+    {/* Playlist Spotify */}
+    {playlists.spotify && (() => {
+      const match = playlists.spotify.match(
+        /(?:open\.spotify\.com\/playlist\/|spotify:playlist:)([a-zA-Z0-9]+)/
+      );
+
+      const playlistId = match?.[1];
+
+      return playlistId ? (
+        <div style={{ marginBottom: 24 }}>
+          <iframe
+            title="Nuestra playlist de Spotify"
+            src={`https://open.spotify.com/embed/playlist/${playlistId}`}
+            width="100%"
+            height="352"
+            style={{
+              border: 0,
+              borderRadius: 12,
+              display: "block"
+            }}
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+          />
+
+          <a
+            href={playlists.spotify}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.secondary}
+            style={{ marginTop: 12 }}
+          >
+            Abrir en Spotify
+          </a>
+        </div>
+      ) : null;
+    })()}
+
+    {/* Otros enlaces musicales */}
+    {playlists.other && (
+      <a
+        className={styles.secondary}
+        href={playlists.other}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Escuchar nuestra música
+      </a>
+    )}
+
+    {/* Música colaborativa */}
+    {musicColabEnabled && !demo && (
+      <InvitacionMusicaColaborativa
+        invitationAccessToken={token}
+        eventoId={invitado.evento_id || ""}
+        invitacionConfirmada={estado === "confirmado"}
+        spotifySyncDisponible={musicColabEnabled}
+        surface="light"
+      />
+    )}
+
+    {demo && (
+      <p className={styles.sub}>
+        Las propuestas de canciones están disponibles al abrir una invitación real.
+      </p>
+    )}
+
+  </div>
+)}
       {open === "fotos" && <p className={styles.sub}>Esta es una vista de ejemplo. Abre una invitación real para compartir fotografías.</p>}
       {open !== "rsvp" && open !== "dietas" && open !== "pase" && <div className={styles.stack}><button className={styles.secondary} onClick={close}>Volver a la invitación</button></div>}
     </EditorialDialog>}

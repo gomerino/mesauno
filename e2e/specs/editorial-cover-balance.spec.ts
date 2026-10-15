@@ -25,7 +25,7 @@ for (const width of [320, 360, 375, 390, 430]) test(`equilibrio de portada ${wid
   if (round === 'despues') await message.locator('span').nth(1).evaluate(node => {
     const sheet = Array.from(document.styleSheets).flatMap(sheet => { try { return Array.from(sheet.cssRules); } catch { return []; } });
     const rule = sheet.find(rule => rule.cssText.includes('messageGap')) as CSSStyleRule | undefined;
-    if (rule) node.className = rule.selectorText.slice(1);
+    if (rule) node.setAttribute("class", rule.selectorText.slice(1));
   });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   if (round === 'despues') {

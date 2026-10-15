@@ -110,16 +110,41 @@ export async function musicaEjecutarSyncSpotify(
   const first = uris.slice(0, 100);
   const rest = uris.slice(100);
 
-  const put = await spotifyReplacePlaylistTracks(refreshed.access_token, playlistId, first);
+  const put = await spotifyReplacePlaylistTracks(
+    refreshed.access_token,
+    playlistId,
+    first
+  );
+  
   if (!put.ok) {
-    return { ok: false, message: "Spotify no permitió actualizar la playlist." };
+    console.error("[spotify-sync] Error al actualizar playlist", {
+      status: put.status,
+      spotifyMessage: put.spotifyMessage,
+    });
+  
+    return {
+      ok: false,
+      message:
+        `Spotify rechazó la sincronización (${put.status}): ` +
+        (put.spotifyMessage || "Sin detalle"),
+    };
   }
 
   for (let i = 0; i < rest.length; i += 100) {
     const chunk = rest.slice(i, i + 100);
     const add = await spotifyAddTracksToPlaylist(refreshed.access_token, playlistId, chunk);
     if (!add.ok) {
-      return { ok: false, message: "Spotify no permitió añadir algunas canciones." };
+      console.error("[spotify-sync] Error al agregar canciones", {
+        status: add.status,
+        spotifyMessage: add.spotifyMessage,
+      });
+    
+      return {
+        ok: false,
+        message:
+          `Spotify rechazó añadir canciones (${add.status}): ` +
+          (add.spotifyMessage || "Sin detalle"),
+      };
     }
   }
 
