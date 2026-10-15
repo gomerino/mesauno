@@ -435,8 +435,24 @@ export async function spotifyFetchPlaylistOwner(
     cache: "no-store",
   });
   const bodyText = await res.text();
-  if (!res.ok) {
+  /**if (!res.ok) {
     logSpotifyApiError("api/playlists (GET)", res.status, bodyText);
+    return { ok: false, status: res.status };
+  }*/
+  if (!res.ok) {
+    const spotifyMessage = extractSpotifyWebApiErrorMessage(bodyText);
+  
+    logSpotifyApiError(
+      "api/playlists (GET)",
+      res.status,
+      bodyText
+    );
+  
+    console.error("[spotify] Error al leer playlist", {
+      status: res.status,
+      message: spotifyMessage,
+    });
+  
     return { ok: false, status: res.status };
   }
   let j: { owner?: { id?: string }; collaborative?: boolean };
