@@ -110,6 +110,15 @@ export async function musicaEjecutarSyncSpotify(
   const first = uris.slice(0, 100);
   const rest = uris.slice(100);
 
+  console.log("[spotify-sync] Diagnóstico", {
+    eventoId,
+    playlistId,
+    playlistIdCredenciales: creds.playlist_id,
+    playlistIdEvento: peRow?.spotify_playlist_id,
+    cancionesAprobadas: uris.length,
+    cancionesEnviadas: first.length,
+  });
+
   const put = await spotifyReplacePlaylistTracks(
     refreshed.access_token,
     playlistId,
