@@ -109,6 +109,9 @@ export async function GET(request: Request) {
 
   return NextResponse.json(
     {
+      diagnostico_version: "jurnex-musica-v2",
+      diagnostico_total: items.length,
+      diagnostico_ids: items.map((i) => i.aporte_id),
       items,
       puedeModerar,
       sugerencias_usadas,
