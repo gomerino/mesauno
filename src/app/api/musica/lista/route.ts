@@ -33,6 +33,18 @@ export async function GET(request: Request) {
 
   const db = await createServiceClient();
 
+  const { data: pruebaDirecta, error: errorDirecto } = await db
+  .from("aportes_canciones")
+  .select("id, evento_id, estado, cancion_id")
+  .eq("evento_id", eventoId);
+
+console.log("[DIAGNOSTICO DIRECTO SUPABASE]", {
+  eventoId,
+  error: errorDirecto?.message ?? null,
+  cantidad: pruebaDirecta?.length ?? null,
+  ids: pruebaDirecta?.map((x) => x.id) ?? [],
+});
+
   console.log("[musica-lista] Configuración Supabase", {
     entorno: process.env.VERCEL_ENV ?? "local",
     supabaseHost: new URL(
