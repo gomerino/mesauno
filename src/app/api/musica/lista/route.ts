@@ -32,6 +32,32 @@ export async function GET(request: Request) {
   }
 
   const db = await createServiceClient();
+
+  console.log("[musica-lista] Configuración Supabase", {
+    entorno: process.env.VERCEL_ENV ?? "local",
+    supabaseHost: new URL(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!
+    ).hostname,
+    tieneServiceRole:
+      Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()) &&
+      process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() !== "tu_service_role_key" &&
+      !process.env.SUPABASE_SERVICE_ROLE_KEY?.trim().startsWith("tu_"),
+  });
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+
+console.log("[musica-lista] Entorno producción", {
+  vercelEnv: process.env.VERCEL_ENV ?? "local",
+  supabaseHost: (() => {
+    try {
+      return new URL(supabaseUrl).hostname;
+    } catch {
+      return "URL no válida";
+    }
+  })(),
+  eventoId,
+});
+
   let puedeModerar = false;
   let invitadoIdLista: string | null = null;
   let usuarioIdLista: string | null = null;
