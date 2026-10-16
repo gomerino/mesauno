@@ -227,7 +227,7 @@ export async function spotifyReplacePlaylistTracks(
   trackUris: string[]
 ): Promise<SpotifyAddTracksResult> {
   const id = playlistId.trim();
-  const res = await fetch(`https://api.spotify.com/v1/playlists/${encodeURIComponent(id)}/tracks`, {
+  const res = await fetch(`https://api.spotify.com/v1/playlists/${encodeURIComponent(id)}/items`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${accessToken}`,
