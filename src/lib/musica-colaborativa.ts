@@ -278,6 +278,13 @@ export async function musicaListarAportes(db: SupabaseClient, eventoId: string):
     .select("id, estado, fuente, created_at, invitado_id, cancion_id, votos")
     .eq("evento_id", eventoId);
 
+    console.log("[MUSICA INTERNA] aportes", {
+      eventoId,
+      error: e1?.message ?? null,
+      cantidad: aportes?.length ?? null,
+      ids: aportes?.map((a) => a.id) ?? [],
+    });
+
   if (e1) {
     console.error("[musica] listar aportes", e1.message);
     return { ok: false, items: [], code: "db_aportes" };
@@ -338,6 +345,8 @@ export async function musicaListarAportes(db: SupabaseClient, eventoId: string):
 
   return { ok: true, items: [...aprobadas, ...pendientes, ...rechazadas] };
 }
+
+
 
 export async function musicaMarcarYaVotoEnItems(
   db: SupabaseClient,
