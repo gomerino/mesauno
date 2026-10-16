@@ -275,7 +275,8 @@ export type MusicaListarAportesResult =
 export async function musicaListarAportes(db: SupabaseClient, eventoId: string): Promise<MusicaListarAportesResult> {
   const { data: aportes, error: e1 } = await db
     .from("aportes_canciones")
-    .select("id, estado, fuente, created_at, invitado_id, cancion_id, votos")
+    //.select("id, estado, fuente, created_at, invitado_id, cancion_id, votos")
+    .select("*")
     .eq("evento_id", eventoId);
 
     console.log("[MUSICA INTERNA] aportes", {
