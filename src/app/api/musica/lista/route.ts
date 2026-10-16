@@ -78,6 +78,14 @@ export async function GET(request: Request) {
       { status: 503, headers: SIN_CACHE }
     );
   }
+  console.log("[musica-lista] Diagnóstico", {
+    eventoId,
+    total: listado.items.length,
+    canciones: listado.items.map((item) => ({
+      id: item.aporte_id,
+      estado: item.estado,
+    })),
+  });
 
   let items = listado.items;
   if (!puedeModerar) {
