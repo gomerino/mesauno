@@ -107,6 +107,17 @@ export async function musicaEjecutarSyncSpotify(
   }
 
   const uris = await musicaUrisAprobadasOrdenadas(db, eventoId);
+
+  console.log("[spotify-sync] Diagnóstico", {
+    playlistId,
+    playlistIdCredenciales: creds.playlist_id,
+    playlistIdEvento:
+      (peRow as { spotify_playlist_id?: string | null } | null)
+        ?.spotify_playlist_id,
+    cancionesAprobadas: uris.length,
+    urisEnviadas: uris,
+  });
+  
   const first = uris.slice(0, 100);
   const rest = uris.slice(100);
 
